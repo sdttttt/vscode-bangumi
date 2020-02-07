@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
-
+import axios from "axios";
 // component status
 let flag: boolean = false;
 
@@ -27,7 +27,7 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 function createBangumiView(context: vscode.ExtensionContext) {
-  if (flag) return;
+  if (flag) { return; }
 
   let panel: vscode.WebviewPanel = vscode.window.createWebviewPanel(
     "zhui fan xiao zu jian",
