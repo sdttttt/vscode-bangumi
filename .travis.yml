@@ -1,0 +1,22 @@
+dist: trusty
+
+addons:
+  apt:
+    sources:
+      - google-chrome
+    packages:
+      - google-chrome-stable
+
+language: node_js
+node_js:
+  - "7"
+  - "10"
+  - "12"
+  
+before_install:
+    - "npm config set spin false"
+    - "npm install -g yarn"
+install:
+    - yarn install
+script:
+    - yarn test
