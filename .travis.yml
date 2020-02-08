@@ -1,0 +1,20 @@
+language: node_js
+
+os: 
+- linux
+- osx
+- windows
+
+dist: trusty
+
+node_js:
+  - "8"
+  - "10"
+  - "12"
+
+before_install:
+    - "npm config set spin false"
+    - "npm install -g yarn"
+    - "npm install -g vsce"
+install:
+    - yarn install
