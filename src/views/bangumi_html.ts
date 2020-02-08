@@ -45,39 +45,73 @@ export const makeTdTag: GenerateTag = (text: string) => `
     <td> ${text} </td>
 `;
 
+/**
+ * make table first line
+ * @param bangumi 
+ * @returns string
+ * @author sdttttt
+ */
+const makeFirstTag: GenerateTag = (bangumi: any) => `
+    <tr> ${makeTdTag(makeImageTag(bangumi.cover))}    
+`;
 
 /**
- * Generates html
- * @param data 
- * @returns html 
+ * make table last line
+ * @param bangumi 
+ * @returns string
+ * @author sdttttt
+ */
+const makeLastTag: GenerateTag = (bangumi: any) => `
+    </tr> <tr>  ${makeTdTag(makeImageTag(bangumi.cover))} </tr>
+`; 
+
+/**
+ * make table new line
+ * @param bangumi 
+ * @returns string
+ * @author sdttttt
+ */
+const makeNewLineTag: GenerateTag = (bangumi: any) => `
+    </tr> <tr> ${makeTdTag(makeImageTag(bangumi.cover))}
+`;
+
+/**
+ * make td in table
+ * @param bangumi
+ * @returns string
+ * @author sdttttt
+ */
+const makeReuseTag: GenerateTag = (bangumi: any) => makeTdTag(
+    makeImageTag(bangumi.cover));
+
+/**
+ * Generates Bangumi html
+ * @param data
+ * @returns string
  * @author sdttttt
  */
 export function generateHTML(data: any): string {
 
     const bangumis: Array<any> = data.list;
-    let lineCount: number = 1;
+    let lineCount: number = 0;
     let count: number = bangumis.length >= 30 ? 30 : bangumis.length;
-  
+
     let html: string = "";
     for (let i = 0; i < count; i++) {
       //每行3个，判断是不是换行了
       if (lineCount % 3 == 0) {
         // 是不是第一个
         if (i == 0) {
-          html += "<tr>" + makeTdTag(
-            makeImageTag(bangumis[i].cover));
+          html += makeFirstTag(bangumis[i]);
         } else if (i == count) { /* 是不是最后一个 */
-          html += "</tr> <tr>" + makeTdTag(
-            makeImageTag(bangumis[i].cover)) + "</tr>";
+          html += makeLastTag(bangumis[i]);
         } else {
-          html += "</tr> <tr>" + makeTdTag(
-            makeImageTag(bangumis[i].cover));
+          html += makeNewLineTag(bangumis[i]);
         }
         lineCount = 1;
       } else {
         lineCount += 1;
-        html += makeTdTag(
-          makeImageTag(bangumis[i].cover));
+        html += makeReuseTag(bangumis[i]);
       }
     }
   
