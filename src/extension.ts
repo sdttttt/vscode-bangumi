@@ -6,8 +6,10 @@ import * as BangumiView from "./views/Bangumi";
 // this variate is safe
 export let CONTEXT: vscode.ExtensionContext;
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+
+/**
+ * @author sdttttt 
+ */
 export function activate(context: vscode.ExtensionContext) {
   
   CONTEXT = context;

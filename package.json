@@ -1,5 +1,7 @@
 {
 	"name": "test",
+	"author": "sdttttt",
+	"repository": "https://github.com/sdttttt/vscode-Bangumi",
 	"displayName": "test",
 	"description": "this is your lover",
 	"version": "0.0.1",

@@ -5,6 +5,11 @@ import { getExtensionContext } from "../utils/context";
 // flag => windows whether is open
 let flag: boolean = false;
 
+/**
+ * Creates bangumi view
+ * @param data 
+ * @author sdttttt
+ */
 function createBangumiView(data: any) {
     
     const context: vscode.ExtensionContext = getExtensionContext();
@@ -35,6 +40,10 @@ function createBangumiView(data: any) {
     );
 }
 
+/**
+ * Opens bangumi
+ * @author sdttttt
+ */
 export function openBangumi() {
-    getAllBangumi(createBangumiView);
+  getAllBangumi(createBangumiView);
 }
