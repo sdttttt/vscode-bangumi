@@ -1,0 +1,16 @@
+language: node_js
+
+os: osx
+
+
+dist: trusty
+
+node_js:
+  - "8"
+  - "10"
+  - "12"
+
+install:
+    - yarn install
+test:
+    - yarn test
