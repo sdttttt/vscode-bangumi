@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { getAllBangumi } from "../request/bangumi";
 import { getExtensionContext } from "../utils/context";
+import * as HtmlUtils from '../views/bangumi_html';
 
 // flag => windows whether is open
 let flag: boolean = false;
@@ -11,33 +12,33 @@ let flag: boolean = false;
  * @author sdttttt
  */
 function createBangumiView(data: any) {
-    
-    const context: vscode.ExtensionContext = getExtensionContext();
 
-    if (flag) { return; }
+  const context: vscode.ExtensionContext = getExtensionContext();
 
-    const panel: vscode.WebviewPanel = vscode.window.createWebviewPanel(
-      "zhui fan xiao zu jian",
-      "test",
-      vscode.ViewColumn.Two,
-      {
-        enableScripts: true,
-        retainContextWhenHidden: false,
-        enableFindWidget: true
-      }
-    );
-  
-    flag = true;
+  if (flag) { return; }
 
-    panel.webview.html = JSON.stringify(data);
+  const panel: vscode.WebviewPanel = vscode.window.createWebviewPanel(
+    "zhui fan xiao zu jian",
+    "test",
+    vscode.ViewColumn.Two,
+    {
+      enableScripts: true,
+      retainContextWhenHidden: false,
+      enableFindWidget: true
+    }
+  );
 
-    vscode.window.showInformationMessage(` Oh! a total of ${data.count} !`);
+  flag = true;
 
-    panel.onDidDispose(
-      () => { flag = false; },
-      null,
-      context.subscriptions
-    );
+  panel.webview.html = HtmlUtils.generateHTML(data);
+
+  vscode.window.showInformationMessage(` Oh! a total of ${data.count} !`);
+
+  panel.onDidDispose(
+    () => { flag = false; },
+    null,
+    context.subscriptions
+  );
 }
 
 /**
