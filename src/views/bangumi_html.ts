@@ -1,3 +1,5 @@
+import { Bangumi } from "../request/structure";
+
 const HTML_HEAD = "<html><body>";
 
 const STYLE = `
@@ -31,28 +33,21 @@ const HTML_BODY = `
 
 const HTML_FLOOR = "</table></div></body></html>";
 
-type GenerateTag = (text: string) => string;
-
 /**
- * Links make image tag
- * @param link string
- * @returns string
- * @author sdttttt
+ *  Generate a Bangumi View
+ *
+ * @param bangumi Bangumi
  */
-export const makeImageTag: GenerateTag = (link: string) => `
-    <img src="${link}" alt="抱歉啊" />
-`;
-
-const makeLine: GenerateTag = (bangumi: any) => `
+const makeLine: (b: Bangumi) => string = (bangumi: Bangumi) => `
     <tr>
-      <td class="small">${makeImageTag(bangumi.cover)}</td>
+      <td class="small"><img src="${bangumi.cover}" alt="抱歉啊" /></td>
       <td class="big">
         <div class="infomation">
           <h2>${bangumi.title}</h2>
-          <h3>关注度： ${bangumi.attention}</h3>
-          最后一次更新： ${bangumi.lastupdate_at}
-          <br />
-          地区：${bangumi.area}
+          <h3>关注度： ${bangumi.order}</h3>
+          ${bangumi.badge != "" ? bangumi.badge + "<br />" : "" }
+          ${bangumi.is_finish == 1 ? "以及完结了哦" : "未完结" }<br />
+          集数: ${bangumi.index_show}
           <br />
           <a href="">To Chase Bangumi</a>
         </div>
@@ -66,15 +61,11 @@ const makeLine: GenerateTag = (bangumi: any) => `
  * @returns string
  * @author sdttttt
  */
-export function generateHTML(data: any): string {
-
-  const bangumis: Array<any> = data.list;
-  let lineCount: number = 0;
-  let count: number = bangumis.length >= 30 ? 30 : bangumis.length;
+export function generateHTML(bangumis: Array<Bangumi>): string {
 
   let html: string = "";
-  for (let i = 0; i < count; i++) {
-    html += makeLine(bangumis[i]);
+  for (let bangumi of bangumis ) {
+    html += makeLine(bangumi);
   }
 
   return HTML_HEAD + STYLE + HTML_BODY + html + HTML_FLOOR;

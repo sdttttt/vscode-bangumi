@@ -3,6 +3,7 @@ import { getAllBangumi } from "../request/bangumi";
 import { getExtensionContext } from "../utils/context";
 import * as HtmlUtils from '../views/bangumi_html';
 import { BangumiUrl } from "../utils/constant";
+import { BangumisResponse } from "../request/structure";
 
 // flag => windows whether is open
 let flag: boolean = false;
@@ -12,10 +13,10 @@ const bangumiUrl: BangumiUrl = new BangumiUrl();
 
 /**
  * Creates bangumi view
- * @param data 
+ * @param bangumis
  * @author sdttttt
  */
-function createBangumiView(data: any) {
+function createBangumiView(bangumis: BangumisResponse) {
 
   const context: vscode.ExtensionContext = getExtensionContext();
 
@@ -34,9 +35,9 @@ function createBangumiView(data: any) {
 
   flag = true;
 
-  panel.webview.html = HtmlUtils.generateHTML(data);
+  panel.webview.html = HtmlUtils.generateHTML(bangumis.data.list);
 
-  vscode.window.showInformationMessage(` Oh! a total of ${data.count} !`);
+  vscode.window.showInformationMessage(` Oh! a total of ${bangumis.data.list.length} !`);
 
   panel.onDidDispose(
     () => { flag = false; },

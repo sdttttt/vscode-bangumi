@@ -8,10 +8,10 @@ export let CONTEXT: vscode.ExtensionContext;
 
 
 /**
- * @author sdttttt 
+ * @author sdttttt
  */
 export function activate(context: vscode.ExtensionContext) {
-  
+
   CONTEXT = context;
 
   // The command has been defined in the package.json file

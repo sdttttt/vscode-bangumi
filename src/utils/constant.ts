@@ -1,16 +1,17 @@
 
-// bilibili API => show all Bangumi
+// bilibili API => Base Url of show all Bangumi
  const BANGUMI_SHOW = "https://api.bilibili.com/pgc/season/index/result?";
 
 /**
  * Bangumi url
- * use Build mode
- * 
+ * Use Build mode
+ *
  * TODO: NOT TEST
- * 
+ *
  * @author sdttttt
  */
 export class BangumiUrl {
+
     constructor() {
 
         this._finalUrl = BANGUMI_SHOW;
@@ -26,12 +27,12 @@ export class BangumiUrl {
         this._order = "3";
         this._sort = "0";
         this._st = "1";
-        this._page = "0";
+        this._page = "1";
         this._seasonType = "1";
         this._pagesize = "20";
         this._type = "1";
     }
-    
+
     private _finalUrl: string;
 
     private _seasonVersion: string;
@@ -54,7 +55,7 @@ export class BangumiUrl {
         this._seasonVersion = value;
         return this;
     }
-    
+
     setArea(value: string): this {
         this._area = value;
         return this;
@@ -132,8 +133,17 @@ export class BangumiUrl {
         return this.add(key, value).and();
     }
 
+    /**
+     * Build finalUrl of BangumiUrl
+     *
+     * @returns {this}
+     * @memberof BangumiUrl
+     * @author sdttttt
+     */
     build(): this {
-         
+
+        this._finalUrl = BANGUMI_SHOW;
+
         return this
         .next("season_version", this._seasonVersion)
         .next("area", this._area)
@@ -149,9 +159,16 @@ export class BangumiUrl {
         .next("page", this._page)
         .next("season_type", this._seasonType)
         .next("pagesize", this._pagesize)
-        .next("type", this._type);
+        .add("type", this._type);
     }
 
+    /**
+     * Get finalUrl on Builded
+     *
+     * @readonly
+     * @type {string}
+     * @memberof BangumiUrl
+     */
     get finalUrl(): string {
         return this._finalUrl;
     }

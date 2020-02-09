@@ -10,14 +10,12 @@ import { BangumiUrl } from "../../utils/constant";
  * TODO: Test
  */
 suite("Test API", () => {
-
     test("bilibili Bangumi API", () => {
         const callback: (data: any) => void = (data: any) => {
             console.log(data);
         };
 
         const url = new BangumiUrl();
-        getAllBangumi(url, callback);    
+        getAllBangumi(url, callback);
     });
-    
 });
