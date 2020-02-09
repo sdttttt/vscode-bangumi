@@ -2,9 +2,13 @@ import * as vscode from "vscode";
 import { getAllBangumi } from "../request/bangumi";
 import { getExtensionContext } from "../utils/context";
 import * as HtmlUtils from '../views/bangumi_html';
+import { BangumiUrl } from "../utils/constant";
 
 // flag => windows whether is open
 let flag: boolean = false;
+
+// Bangumi Url Object => build Bangumi Url
+const bangumiUrl: BangumiUrl = new BangumiUrl();
 
 /**
  * Creates bangumi view
@@ -18,8 +22,8 @@ function createBangumiView(data: any) {
   if (flag) { return; }
 
   const panel: vscode.WebviewPanel = vscode.window.createWebviewPanel(
-    "zhui fan xiao zu jian",
-    "test",
+    "Hello",
+    "Bangumis",
     vscode.ViewColumn.Two,
     {
       enableScripts: true,
@@ -42,9 +46,9 @@ function createBangumiView(data: any) {
 }
 
 /**
- * Opens bangumi
+ * Opens bangumi View
  * @author sdttttt
  */
 export function openBangumi() {
-  getAllBangumi(createBangumiView);
+  getAllBangumi(bangumiUrl, createBangumiView);
 }

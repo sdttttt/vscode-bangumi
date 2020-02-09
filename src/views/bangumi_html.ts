@@ -9,9 +9,17 @@ const STYLE = `
         width: 100%;
         height: 100%;
     }
-    td {
+    .small {
         height: 200px;
         width: 150px;
+    }
+    .big {
+        height: 200px;
+        width: 400px;
+    }
+    .infomation {
+        width: 100%;
+        height: 100%;
     }
 </style>
 `;
@@ -35,54 +43,22 @@ export const makeImageTag: GenerateTag = (link: string) => `
     <img src="${link}" alt="抱歉啊" />
 `;
 
-/**
- * Texts make td tag
- * @param text
- * @returns string
- * @author sdttttt 
- */
-export const makeTdTag: GenerateTag = (text: string) => `
-    <td> ${text} </td>
+const makeLine: GenerateTag = (bangumi: any) => `
+    <tr>
+      <td class="small">${makeImageTag(bangumi.cover)}</td>
+      <td class="big">
+        <div class="infomation">
+          <h2>${bangumi.title}</h2>
+          <h3>关注度： ${bangumi.attention}</h3>
+          最后一次更新： ${bangumi.lastupdate_at}
+          <br />
+          地区：${bangumi.area}
+          <br />
+          <a href="">To Chase Bangumi</a>
+        </div>
+      </td>
+    </tr>
 `;
-
-/**
- * make table first line
- * @param bangumi 
- * @returns string
- * @author sdttttt
- */
-const makeFirstTag: GenerateTag = (bangumi: any) => `
-    <tr> ${makeTdTag(makeImageTag(bangumi.cover))}    
-`;
-
-/**
- * make table last line
- * @param bangumi 
- * @returns string
- * @author sdttttt
- */
-const makeLastTag: GenerateTag = (bangumi: any) => `
-    </tr> <tr>  ${makeTdTag(makeImageTag(bangumi.cover))} </tr>
-`; 
-
-/**
- * make table new line
- * @param bangumi 
- * @returns string
- * @author sdttttt
- */
-const makeNewLineTag: GenerateTag = (bangumi: any) => `
-    </tr> <tr> ${makeTdTag(makeImageTag(bangumi.cover))}
-`;
-
-/**
- * make td in table
- * @param bangumi
- * @returns string
- * @author sdttttt
- */
-const makeReuseTag: GenerateTag = (bangumi: any) => makeTdTag(
-    makeImageTag(bangumi.cover));
 
 /**
  * Generates Bangumi html
@@ -92,28 +68,14 @@ const makeReuseTag: GenerateTag = (bangumi: any) => makeTdTag(
  */
 export function generateHTML(data: any): string {
 
-    const bangumis: Array<any> = data.list;
-    let lineCount: number = 0;
-    let count: number = bangumis.length >= 30 ? 30 : bangumis.length;
+  const bangumis: Array<any> = data.list;
+  let lineCount: number = 0;
+  let count: number = bangumis.length >= 30 ? 30 : bangumis.length;
 
-    let html: string = "";
-    for (let i = 0; i < count; i++) {
-      //每行3个，判断是不是换行了
-      if (lineCount % 3 == 0) {
-        // 是不是第一个
-        if (i == 0) {
-          html += makeFirstTag(bangumis[i]);
-        } else if (i == count) { /* 是不是最后一个 */
-          html += makeLastTag(bangumis[i]);
-        } else {
-          html += makeNewLineTag(bangumis[i]);
-        }
-        lineCount = 1;
-      } else {
-        lineCount += 1;
-        html += makeReuseTag(bangumis[i]);
-      }
-    }
-  
-    return HTML_HEAD + STYLE + HTML_BODY + html + HTML_FLOOR;
+  let html: string = "";
+  for (let i = 0; i < count; i++) {
+    html += makeLine(bangumis[i]);
   }
+
+  return HTML_HEAD + STYLE + HTML_BODY + html + HTML_FLOOR;
+}
