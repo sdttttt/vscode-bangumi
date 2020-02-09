@@ -6,13 +6,13 @@ import { BangumisResponse } from "./structure";
 
 /**
  * HTTP Request Gets all bangumi
+ *
  * @param callback
  * @author sdttttt
  */
 export function getAllBangumi(burl: BangumiUrl, callback: (data: BangumisResponse) => void) {
 
     const url: string = burl.build().finalUrl;
-    vscode.window.showInformationMessage("opening Bangumi ...");
 
     Axios.get(url)
     .then( (res: AxiosResponse ) => {

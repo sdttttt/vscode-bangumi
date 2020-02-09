@@ -9,5 +9,4 @@ const config: AxiosRequestConfig = {
 
 const instance: AxiosInstance = Axios.create(config);
 
-
 export default instance;

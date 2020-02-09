@@ -18,7 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
   let disposable = vscode.commands.registerCommand(
-    "extension.helloWorld",
+    "extension.openBangumi",
     () => { BangumiView.openBangumi(); }
   );
 

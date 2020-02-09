@@ -13,14 +13,13 @@ const bangumiUrl: BangumiUrl = new BangumiUrl();
 
 /**
  * Creates bangumi view
+ *
  * @param bangumis
  * @author sdttttt
  */
 function createBangumiView(bangumis: BangumisResponse) {
 
   const context: vscode.ExtensionContext = getExtensionContext();
-
-  if (flag) { return; }
 
   const panel: vscode.WebviewPanel = vscode.window.createWebviewPanel(
     "Hello",
@@ -37,8 +36,6 @@ function createBangumiView(bangumis: BangumisResponse) {
 
   panel.webview.html = HtmlUtils.generateHTML(bangumis.data.list);
 
-  vscode.window.showInformationMessage(` Oh! a total of ${bangumis.data.list.length} !`);
-
   panel.onDidDispose(
     () => { flag = false; },
     null,
@@ -48,8 +45,14 @@ function createBangumiView(bangumis: BangumisResponse) {
 
 /**
  * Opens bangumi View
+ *
  * @author sdttttt
  */
 export function openBangumi() {
+  if (flag) {
+    vscode.window.showWarningMessage("Bangumis has been opened!");
+    return;
+  }
+  vscode.window.showInformationMessage("opening Bangumi ...");
   getAllBangumi(bangumiUrl, createBangumiView);
 }

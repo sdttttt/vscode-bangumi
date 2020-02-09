@@ -6,8 +6,6 @@
  * Bangumi url
  * Use Build mode
  *
- * TODO: NOT TEST
- *
  * @author sdttttt
  */
 export class BangumiUrl {
