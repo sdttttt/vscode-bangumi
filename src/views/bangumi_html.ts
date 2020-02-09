@@ -13,19 +13,21 @@ const STYLE = `
 }
 
 .cover {
-  width:400px;
-height:200px;
-margin:10px;
-display:flex;
+  width:420px;
+  height:250px;
+  margin:10px;
+  display:flex;
 }
 
 .big {
-  height: 200px;
-  width: 150px;
+  margin-top: 15px;
+  height: 220px;
+  width: 200px;
   z-index: 2;
 }
 
 img {
+  border-radius: 10px;
   width: 100%;
   height: 100%;
 }
@@ -39,6 +41,20 @@ img {
   z-index: 1;
   text-align: center;
 }
+
+a {color: #FFF;TEXT-DECORATION: none}
+a:active {background: #888}
+.btn{
+    height: 22px;
+    line-height: 19px;
+    padding: 0 11px;
+    background: #FFBBFF;
+    border: 1px #E5E7EA solid;
+    border-radius: 3px;
+    display: inline-block;
+    font-size: 14px;
+    outline: none;
+ }
 
 </style>
 `;
@@ -59,13 +75,17 @@ const makeLine: (b: Bangumi) => string = (bangumi: Bangumi) => `
   <div class="cover" >
     <div class="big"><img src="${bangumi.cover}" alt="抱歉啊" /></div>
     <div class="info">
-      <h3>${bangumi.title}</h3>
+
+      ${ bangumi.title.length > 17 ?
+  "<h4>" + bangumi.title + "</h4>" :
+  "<h3>" + bangumi.title + "</h3>"}
+
       <h4>关注度： ${bangumi.order}</h4>
-      ${bangumi.badge != "" ? bangumi.badge + "<br />" : ""}
-      ${bangumi.is_finish == 1 ? "以及完结了哦" : "未完结"}<br />
-      集数: ${bangumi.index_show}
-      <br />
-      <a href="">To Chase Bangumi</a>
+      ${bangumi.badge != "" ? "<h5>" + bangumi.badge + "</h5>" : "<h5>❤白嫖</h5>"}
+      <span>${bangumi.is_finish == 1 ? "已完结 😎" : "未完结 😕"}</span><br /><br />
+      状态: <span>${bangumi.index_show}</span>
+      <br /><br />
+      <a class="btn" href="${bangumi.link}">To Chase Bangumi</a>
     </div>
   </div>
 
