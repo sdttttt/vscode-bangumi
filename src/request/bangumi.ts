@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import Axios from "./instance";
 import { AxiosResponse } from "axios";
-import { BANGUMI_SHOW } from "./constant";
+import { BANGUMI_SHOW } from "../utils/constant";
 
 
 /**
