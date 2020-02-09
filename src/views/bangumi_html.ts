@@ -1,85 +1,109 @@
+import { Bangumi } from "../request/structure";
+
 const HTML_HEAD = "<html><body>";
 
 const STYLE = `
 <style type="text/css">
-    table {
-        width: 500px;
-    }
-    img {
-        width: 100%;
-        height: 100%;
-    }
-    td {
-        height: 200px;
-        width: 150px;
-    }
+.container {
+  display: flex;
+  margin:20px;
+  width:80%;
+  height:80% ;
+  flex-wrap: wrap;
+}
+
+.cover {
+  width:420px;
+  height:250px;
+  margin:10px;
+  display:flex;
+}
+
+.big {
+  margin-top: 15px;
+  height: 220px;
+  width: 200px;
+  z-index: 2;
+}
+
+img {
+  border-radius: 10px;
+  width: 100%;
+  height: 100%;
+}
+
+.info {
+  width: 450px;
+  background-image: linear-gradient(to right, #555555,  rgba(0,0,0,0));
+  color: #FFF;
+  border-radius: 30px;
+  margin-left: -30px;
+  z-index: 1;
+  text-align: center;
+}
+
+a {color: #FFF;TEXT-DECORATION: none}
+a:active {background: #888}
+.btn{
+    height: 22px;
+    line-height: 19px;
+    padding: 0 11px;
+    background: #FFBBFF;
+    border: 1px #E5E7EA solid;
+    border-radius: 3px;
+    display: inline-block;
+    font-size: 14px;
+    outline: none;
+ }
+
 </style>
 `;
 
 const HTML_BODY = `
-<div style="container">
-        <table border="0">
+<div class="container">
 `;
 
-const HTML_FLOOR = "</table></div></body></html>";
-
-type GenerateTag = (text: string) => string;
+const HTML_FLOOR = "</div></body></html>";
 
 /**
- * Links make image tag
- * @param link string
+ *  Generate a Bangumi View
+ *
+ * @param bangumi Bangumi
+ * @author sdttttt
+ */
+const makeLine: (b: Bangumi) => string = (bangumi: Bangumi) => `
+  <div class="cover" >
+    <div class="big"><img src="${bangumi.cover}" alt="抱歉啊" /></div>
+    <div class="info">
+
+      ${ bangumi.title.length > 17 ?
+  "<h4>" + bangumi.title + "</h4>" :
+  "<h3>" + bangumi.title + "</h3>"}
+
+      <h4>关注度： ${bangumi.order}</h4>
+      ${bangumi.badge != "" ? "<h5>" + bangumi.badge + "</h5>" : "<h5>❤白嫖</h5>"}
+      <span>${bangumi.is_finish == 1 ? "已完结 😎" : "未完结 😕"}</span><br /><br />
+      状态: <span>${bangumi.index_show}</span>
+      <br /><br />
+      <a class="btn" href="${bangumi.link}">To Chase Bangumi</a>
+    </div>
+  </div>
+
+    `;
+
+/**
+ * Generates Bangumi html
+ *
+ * @param bangumis Array<Bangumi>
  * @returns string
  * @author sdttttt
  */
-export const makeImageTag: GenerateTag = (link: string) => `
-    <img src="${link}" alt="抱歉啊" />
-`;
+export function generateHTML(bangumis: Array<Bangumi>): string {
 
-/**
- * Texts make td tag
- * @param text
- * @returns string
- * @author sdttttt 
- */
-export const makeTdTag: GenerateTag = (text: string) => `
-    <td> ${text} </td>
-`;
-
-
-/**
- * Generates html
- * @param data 
- * @returns html 
- * @author sdttttt
- */
-export function generateHTML(data: any): string {
-
-    const bangumis: Array<any> = data.list;
-    let lineCount: number = 1;
-    let count: number = bangumis.length >= 30 ? 30 : bangumis.length;
-  
-    let html: string = "";
-    for (let i = 0; i < count; i++) {
-      //每行3个，判断是不是换行了
-      if (lineCount % 3 == 0) {
-        // 是不是第一个
-        if (i == 0) {
-          html += "<tr>" + makeTdTag(
-            makeImageTag(bangumis[i].cover));
-        } else if (i == count) { /* 是不是最后一个 */
-          html += "</tr> <tr>" + makeTdTag(
-            makeImageTag(bangumis[i].cover)) + "</tr>";
-        } else {
-          html += "</tr> <tr>" + makeTdTag(
-            makeImageTag(bangumis[i].cover));
-        }
-        lineCount = 1;
-      } else {
-        lineCount += 1;
-        html += makeTdTag(
-          makeImageTag(bangumis[i].cover));
-      }
-    }
-  
-    return HTML_HEAD + STYLE + HTML_BODY + html + HTML_FLOOR;
+  let html: string = "";
+  for (let bangumi of bangumis) {
+    html += makeLine(bangumi);
   }
+
+  return HTML_HEAD + STYLE + HTML_BODY + html + HTML_FLOOR;
+}

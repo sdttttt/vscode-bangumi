@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { CONTEXT } from "../extension"; 
+import { CONTEXT } from "../extension";
 
 const Context: vscode.ExtensionContext = CONTEXT;
 

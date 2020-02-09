@@ -1,9 +1,9 @@
 {
-	"name": "test",
+	"name": "bangumiopen",
 	"author": "sdttttt",
 	"repository": "https://github.com/sdttttt/vscode-Bangumi",
-	"displayName": "test",
-	"description": "this is your lover",
+	"displayName": "Bangumi Open",
+	"description": "The favorite of otakuo friends.",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.41.0"
@@ -12,14 +12,24 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld"
+		"onCommand:extension.openBangumi",
+		"onCommand:extension.nextPage",
+		"onCommand:extension.backPage"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.helloWorld",
-				"title": "Hello World"
+				"command": "extension.openBangumi",
+				"title": "Open Bangumi"
+			},
+			{
+				"command": "extension.nextPage",
+				"title": "Next Page"
+			},
+			{
+				"command": "extension.backPage",
+				"title": "Back Page"
 			}
 		]
 	},

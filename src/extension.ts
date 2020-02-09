@@ -8,21 +8,31 @@ export let CONTEXT: vscode.ExtensionContext;
 
 
 /**
- * @author sdttttt 
+ * @author sdttttt
  */
 export function activate(context: vscode.ExtensionContext) {
-  
+
   CONTEXT = context;
 
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
-  let disposable = vscode.commands.registerCommand(
-    "extension.helloWorld",
+  const openBangumi = vscode.commands.registerCommand(
+    "extension.openBangumi",
     () => { BangumiView.openBangumi(); }
   );
 
-  context.subscriptions.push(disposable);
+  const nextPage = vscode.commands.registerCommand(
+    "extension.nextPage",
+    () => { BangumiView.nextPage(); }
+  );
+
+  const backPage = vscode.commands.registerCommand(
+    "extension.backPage",
+    () => { BangumiView.backPage(); }
+  );
+
+  context.subscriptions.push(openBangumi, nextPage, backPage);
 }
 
 

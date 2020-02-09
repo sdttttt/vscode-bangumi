@@ -1,18 +1,21 @@
 import * as vscode from "vscode";
 import Axios from "./instance";
 import { AxiosResponse } from "axios";
-import { BANGUMI_SHOW } from "../utils/constant";
-
+import { BangumiUrl } from '../utils/constant';
+import { BangumisResponse } from "./structure";
 
 /**
  * HTTP Request Gets all bangumi
- * @param callback 
+ *
+ * @param callback
  * @author sdttttt
  */
-export function getAllBangumi( callback: (data: any,) => void) {
-    vscode.window.showInformationMessage("opening Bangumi ...");
-    Axios.get(BANGUMI_SHOW)
+export function getAllBangumi(burl: BangumiUrl, callback: (data: BangumisResponse) => void) {
+
+    const url: string = burl.build().finalUrl;
+
+    Axios.get(url)
     .then( (res: AxiosResponse ) => {
-        callback(res.data);
+        callback(<BangumisResponse>(res.data));
     });
 }
