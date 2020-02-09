@@ -5,11 +5,55 @@ import * as HtmlUtils from '../views/bangumi_html';
 import { BangumiUrl } from "../utils/constant";
 import { BangumisResponse } from "../request/structure";
 
-// flag => windows whether is open
-let flag: boolean = false;
-
 // Bangumi Url Object => build Bangumi Url
 const bangumiUrl: BangumiUrl = new BangumiUrl();
+
+// Bangumi WebviewPanel
+let panelView: vscode.WebviewPanel | undefined = undefined;
+
+// column To show In
+const columnToshowIn: vscode.ViewColumn | undefined = vscode.window.activeTextEditor ?
+  vscode.window.activeTextEditor.viewColumn :
+  undefined;
+
+/**
+ *  show View
+ *  need Callback function
+ *
+ * @param {(pv: vscode.WebviewPanel) => void} callback
+ */
+function initWebViewPanel(callback: (pv: vscode.WebviewPanel) => void) {
+
+  if (panelView) {
+    panelView.reveal(columnToshowIn);
+    callback(panelView);
+  } else {
+    panelView = vscode.window.createWebviewPanel(
+      "Hello",
+      "Bangumis",
+      vscode.ViewColumn.Two,
+      {
+        enableScripts: true,
+        retainContextWhenHidden: false,
+        enableFindWidget: true
+      }
+  );
+
+  callback(panelView);
+    // Close Event
+    panelView.onDidDispose(
+      () => {
+        vscode.window.showInformationMessage("Shit");
+        panelView = undefined;
+      },
+      null,
+      getExtensionContext().subscriptions
+    );
+  }
+
+}
+
+let pageNumber: number = 1;
 
 /**
  * Creates bangumi view
@@ -18,29 +62,19 @@ const bangumiUrl: BangumiUrl = new BangumiUrl();
  * @author sdttttt
  */
 function createBangumiView(bangumis: BangumisResponse) {
-
-  const context: vscode.ExtensionContext = getExtensionContext();
-
-  const panel: vscode.WebviewPanel = vscode.window.createWebviewPanel(
-    "Hello",
-    "Bangumis",
-    vscode.ViewColumn.Two,
-    {
-      enableScripts: true,
-      retainContextWhenHidden: false,
-      enableFindWidget: true
+  initWebViewPanel(
+    (pv: vscode.WebviewPanel) => {
+      pv.webview.html = HtmlUtils.generateHTML(bangumis.data.list);
     }
   );
+}
 
-  flag = true;
-
-  panel.webview.html = HtmlUtils.generateHTML(bangumis.data.list);
-
-  panel.onDidDispose(
-    () => { flag = false; },
-    null,
-    context.subscriptions
-  );
+/**
+ * show number of Page
+ * @author sdttttt
+ */
+function showPageNumber() {
+  vscode.window.showInformationMessage(`现在是第${pageNumber}页哦~`);
 }
 
 /**
@@ -49,10 +83,37 @@ function createBangumiView(bangumis: BangumisResponse) {
  * @author sdttttt
  */
 export function openBangumi() {
-  if (flag) {
-    vscode.window.showWarningMessage("Bangumis has been opened!");
-    return;
+  getAllBangumi(
+    bangumiUrl.setPage(pageNumber)
+    , createBangumiView);
+}
+
+/**
+ * Next Page
+ *
+ * @export
+ * @author sdttttt
+ */
+export function nextPage() {
+  pageNumber++;
+  showPageNumber();
+  openBangumi();
+}
+ 
+/**
+ *  back Page
+ *
+ * @export
+ * @author sdttttt
+ */
+export function backPage() {
+  if (pageNumber > 1) {
+    pageNumber--;
+    showPageNumber();
+    openBangumi();
+  } else {
+    pageNumber = 1;
+    vscode.window.showInformationMessage("😰真的一滴都没有了!");
+    openBangumi();
   }
-  vscode.window.showInformationMessage("opening Bangumi ...");
-  getAllBangumi(bangumiUrl, createBangumiView);
 }

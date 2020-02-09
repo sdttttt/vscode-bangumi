@@ -25,7 +25,7 @@ export class BangumiUrl {
         this._order = "3";
         this._sort = "0";
         this._st = "1";
-        this._page = "1";
+        this._page = 1;
         this._seasonType = "1";
         this._pagesize = "20";
         this._type = "1";
@@ -44,7 +44,7 @@ export class BangumiUrl {
     private _order: string;
     private _st: string;
     private _sort: string;
-    private _page: string;
+    private _page: number;
     private _seasonType: string;
     private _pagesize: string;
     private _type: string;
@@ -84,7 +84,7 @@ export class BangumiUrl {
         return this;
     }
 
-    setPage(value: string): this {
+    setPage(value: number): this {
         this._page = value;
         return this;
     }
@@ -154,7 +154,7 @@ export class BangumiUrl {
         .next("order", this._order)
         .next("st", this._st)
         .next("sort", this._sort)
-        .next("page", this._page)
+        .next("page", this._page.toString())
         .next("season_type", this._seasonType)
         .next("pagesize", this._pagesize)
         .add("type", this._type);

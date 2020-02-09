@@ -12,7 +12,9 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.openBangumi"
+		"onCommand:extension.openBangumi",
+		"onCommand:extension.nextPage",
+		"onCommand:extension.backPage"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -20,6 +22,14 @@
 			{
 				"command": "extension.openBangumi",
 				"title": "Open Bangumi"
+			},
+			{
+				"command": "extension.nextPage",
+				"title": "Next Page"
+			},
+			{
+				"command": "extension.backPage",
+				"title": "Back Page"
 			}
 		]
 	},
