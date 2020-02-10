@@ -68,7 +68,7 @@ const HTML_FLOOR = "</div></body></html>";
 /**
  *  Generate a Bangumi View
  *
- * @param bangumi Bangumi
+ * @param {Bangumi} bangumi
  * @author sdttttt
  */
 const makeLine: (b: Bangumi) => string = (bangumi: Bangumi) => `
@@ -94,7 +94,7 @@ const makeLine: (b: Bangumi) => string = (bangumi: Bangumi) => `
 /**
  * Generates Bangumi html
  *
- * @param bangumis Array<Bangumi>
+ * @param {Array<Bangumi>} bangumis
  * @returns string
  * @author sdttttt
  */
