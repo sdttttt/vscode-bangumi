@@ -44,7 +44,6 @@ function initWebViewPanel(callback: (pv: vscode.WebviewPanel) => void) {
     // Close Event
     panelView.onDidDispose(
       () => {
-        vscode.window.showInformationMessage("Shit");
         panelView = undefined;
       },
       null,

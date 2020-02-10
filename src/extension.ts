@@ -25,27 +25,32 @@ export function activate(context: vscode.ExtensionContext) {
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
-  const initializerEvent = vscode.commands.registerCommand(
-    "extension.initializer",
-    () => { initializer(context); }
-  );
 
   const openBangumi = vscode.commands.registerCommand(
     "extension.openBangumi",
-    () => { BangumiView.openBangumi(); }
+    () => {
+      initializer(context);
+      BangumiView.openBangumi();
+    }
   );
 
   const nextPage = vscode.commands.registerCommand(
     "extension.nextPage",
-    () => { BangumiView.nextPage(); }
+    () => {
+      initializer(context);
+      BangumiView.nextPage();
+    }
   );
 
   const backPage = vscode.commands.registerCommand(
     "extension.backPage",
-    () => { BangumiView.backPage(); }
+    () => {
+      initializer(context);
+      BangumiView.backPage();
+    }
   );
 
-  context.subscriptions.push(initializerEvent, openBangumi, nextPage, backPage);
+  context.subscriptions.push(openBangumi, nextPage, backPage);
 }
 
 /**
