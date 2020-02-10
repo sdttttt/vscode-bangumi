@@ -1,9 +1,11 @@
 import * as vscode from "vscode";
 import { getAllBangumi } from "../request/bangumi";
-import { getExtensionContext } from "../utils/context";
 import * as HtmlUtils from '../views/bangumi_html';
-import { BangumiUrl } from "../utils/constant";
+import { BangumiUrl } from "../utils/bangumi_url";
 import { BangumisResponse } from "../request/structure";
+import { globalVar } from '../utils/constant';
+
+export let context: vscode.ExtensionContext | undefined = undefined;
 
 // Bangumi Url Object => build Bangumi Url
 const bangumiUrl: BangumiUrl = new BangumiUrl();
@@ -12,7 +14,7 @@ const bangumiUrl: BangumiUrl = new BangumiUrl();
 let panelView: vscode.WebviewPanel | undefined = undefined;
 
 // column To show In
-const columnToshowIn: vscode.ViewColumn | undefined = vscode.window.activeTextEditor ?
+const columnToShowIn: vscode.ViewColumn | undefined = vscode.window.activeTextEditor ?
   vscode.window.activeTextEditor.viewColumn :
   undefined;
 
@@ -25,7 +27,7 @@ const columnToshowIn: vscode.ViewColumn | undefined = vscode.window.activeTextEd
 function initWebViewPanel(callback: (pv: vscode.WebviewPanel) => void) {
 
   if (panelView) {
-    panelView.reveal(columnToshowIn);
+    panelView.reveal(columnToShowIn);
     callback(panelView);
   } else {
     panelView = vscode.window.createWebviewPanel(
@@ -33,7 +35,6 @@ function initWebViewPanel(callback: (pv: vscode.WebviewPanel) => void) {
       "Bangumis",
       vscode.ViewColumn.Two,
       {
-        enableScripts: true,
         retainContextWhenHidden: false,
         enableFindWidget: true
       }
@@ -47,10 +48,9 @@ function initWebViewPanel(callback: (pv: vscode.WebviewPanel) => void) {
         panelView = undefined;
       },
       null,
-      getExtensionContext().subscriptions
+      globalVar().context.subscriptions
     );
   }
-
 }
 
 let pageNumber: number = 1;
@@ -99,7 +99,7 @@ export function nextPage() {
   showPageNumber();
   openBangumi();
 }
- 
+
 /**
  *  back Page
  *

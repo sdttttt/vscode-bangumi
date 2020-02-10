@@ -3,6 +3,7 @@
  *
  * @export
  * @interface BangumisResponse
+ * @author sdttttt
  */
 export interface BangumisResponse {
     // 0 is Success
@@ -16,6 +17,7 @@ export interface BangumisResponse {
  *
  * @export
  * @interface BangumisData
+ * @author sdttttt
  */
 interface BangumisData {
 
@@ -29,6 +31,7 @@ interface BangumisData {
  *
  * @export
  * @interface Bangumis
+ * @author sdttttt
  */
 export interface Bangumi {
     // Bangumis of Bilibili, need Play permission
