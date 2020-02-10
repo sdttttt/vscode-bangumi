@@ -5,7 +5,7 @@ import { getAllBangumi } from "../../request/bangumi";
 import { BangumiUrl } from "../../utils/bangumi_url";
 import { BangumisResponse, Bangumi } from '../../request/structure';
 
-type BangumiCall = (res: BangumisResponse) => void
+type BangumiCall = (res: BangumisResponse) => void;
 
 /**
  * There's something wrong with the environment.
@@ -34,7 +34,7 @@ suite("TEST API", () => {
 
                 expect(bangumis).to.be.exist;
 
-                expect(bangumis.length).to.not.equal(0)
+                expect(bangumis.length).to.not.equal(0);
                 expect(bangumis.length).to.be.above(1);
 
                 expect(bangumi).to.be.exist;
