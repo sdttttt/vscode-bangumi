@@ -1,10 +1,12 @@
 {
 	"name": "bangumiopen",
-	"author": "sdttttt",
+	"publisher": "SDTTTTT",
+	"author": "SDTTTTT",
 	"repository": "https://github.com/sdttttt/vscode-Bangumi",
 	"displayName": "Bangumi Open",
 	"description": "The favorite of otakuo friends.",
 	"version": "1.0.1",
+	"icon": "Icon.png",
 	"engines": {
 		"vscode": "^1.41.0"
 	},
