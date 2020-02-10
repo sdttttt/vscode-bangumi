@@ -10,6 +10,6 @@ node_js:
   - "12"
 
 install:
-    - npm install
+    - yarn install
 test:
-    - npm test
+    - yarn test
