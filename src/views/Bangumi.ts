@@ -4,6 +4,7 @@ import * as HtmlUtils from '../views/bangumi_html';
 import { BangumiUrl } from "../utils/bangumi_url";
 import { BangumisResponse } from "../request/structure";
 import { globalVar } from '../constant';
+import { createWebviewPanel } from "../utils/view";
 
 export let context: vscode.ExtensionContext | undefined = undefined;
 
@@ -19,36 +20,22 @@ const columnToShowIn: vscode.ViewColumn | undefined = vscode.window.activeTextEd
   undefined;
 
 /**
- *  show View
+ *  Show WebViewPanel
  *  need Callback function
  *
  * @param {(pv: vscode.WebviewPanel) => void} callback
  */
-function initWebViewPanel(callback: (pv: vscode.WebviewPanel) => void) {
+function callWebViewPanel(callback: (pv: vscode.WebviewPanel) => void) {
 
   if (panelView) {
     panelView.reveal(columnToShowIn);
     callback(panelView);
   } else {
-    panelView = vscode.window.createWebviewPanel(
-      "Hello",
-      "Bangumis",
-      vscode.ViewColumn.Two,
-      {
-        retainContextWhenHidden: false,
-        enableFindWidget: true
-      }
-  );
+    panelView = createWebviewPanel("html", "Bangumis", () => {
+      panelView = undefined;
+    });
 
-  callback(panelView);
-    // Close Event
-    panelView.onDidDispose(
-      () => {
-        panelView = undefined;
-      },
-      null,
-      globalVar().context.subscriptions
-    );
+    callback(panelView);
   }
 }
 
@@ -61,7 +48,7 @@ let pageNumber: number = 1;
  * @author sdttttt
  */
 function createBangumiView(bangumis: BangumisResponse) {
-  initWebViewPanel(
+  callWebViewPanel(
     (pv: vscode.WebviewPanel) => {
       pv.webview.html = HtmlUtils.generateHTML(bangumis.data.list);
     }

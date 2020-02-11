@@ -4,6 +4,8 @@ import * as vscode from "vscode";
 import * as BangumiView from "./views/Bangumi";
 import { newGlobal } from "./constant";
 
+let isInit: boolean = false;
+
 /**
  * init work
  *
@@ -11,7 +13,11 @@ import { newGlobal } from "./constant";
  * @author sdttttt
  */
 function initializer(context: vscode.ExtensionContext) {
+  if (isInit) {
+    return;
+  }
   newGlobal(context);
+  isInit = !isInit;
 }
 
 /**
