@@ -58,13 +58,6 @@
 		]
 	},
 	"scripts": {
-<<<<<<< HEAD
-		"vscode:prepublish": "webpack --mode production",
-		"compile": "webpack --mode none",
-		"watch": "webpack --mode none --watch",
-		"pretest": "yarn run compile",
-		"test": "node ./out/test/runTest.js" 
-=======
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
 		"pretest": "yarn run compile",
@@ -72,7 +65,6 @@
 		"vscode:prepublish": "webpack --mode production",
   		"webpack:compile": "webpack --mode none",
   		"webpack:watch": "webpack --mode none --watch"
->>>>>>> CICD
 	},
 
 	"devDependencies": {
