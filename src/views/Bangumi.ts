@@ -3,7 +3,7 @@ import { getAllBangumi } from "../request/bangumi";
 import * as HtmlUtils from '../views/bangumi_html';
 import { BangumiUrl } from "../utils/bangumi_url";
 import { BangumisResponse } from "../request/structure";
-import { globalVar } from '../utils/constant';
+import { globalVar } from '../constant';
 
 export let context: vscode.ExtensionContext | undefined = undefined;
 

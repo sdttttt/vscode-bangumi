@@ -7,6 +7,7 @@
 
 "use strict";
 
+const webpack = require("webpack");
 const path = require("path");
 
 /**@type {import('webpack').Configuration}*/
@@ -29,6 +30,9 @@ const config = {
     // 支持读取TypeScript和JavaScript文件, 📖 -> https://github.com/TypeStrong/ts-loader
     extensions: [".ts", ".js"]
   },
+  plugins: [
+    new webpack.ProgressPlugin()
+  ],
   module: {
     rules: [
       {

@@ -15,7 +15,15 @@ export function getAllBangumi(burl: BangumiUrl, callback: (data: BangumisRespons
     const url: string = burl.build().finalUrl;
 
     Axios.get(url)
-    .then( (res: AxiosResponse ) => {
-        callback(<BangumisResponse>(res.data));
+        .then((res: AxiosResponse) => {
+            const bangumisResponse = <BangumisResponse>(res.data);
+            if (bangumisResponse.code !== 0) {
+                vscode.window.showInformationMessage(`
+                    Oops! B站可能炸了! 或许是API地址更改了./(ㄒoㄒ)/~~
+                    https://github.com/sdttttt/vscode-bangumi/issues
+                `);
+                return;
+            }
+            callback(bangumisResponse);
     });
 }
