@@ -1,4 +1,4 @@
-import { openBangumi, nextPage, backPage } from '../../views/Bangumi';
+import { openBangumi, nextPage, backPage } from '../../views/bangumi';
 suite("VIEW TEST", () => {
     test("OPEN BANGUMI TEST",function() {
         openBangumi();

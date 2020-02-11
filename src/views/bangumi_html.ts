@@ -7,7 +7,7 @@ const STYLE = `
 .container {
   display: flex;
   margin:20px;
-  width:80%;
+  width:100%;
   height:80% ;
   flex-wrap: wrap;
 }
@@ -81,8 +81,8 @@ const makeLine: (b: Bangumi) => string = (bangumi: Bangumi) => `
   "<h3>" + bangumi.title + "</h3>"}
 
       <h4>关注度： ${bangumi.order}</h4>
-      ${bangumi.badge != "" ? "<h5>" + bangumi.badge + "</h5>" : "<h5>❤白嫖</h5>"}
-      <span>${bangumi.is_finish == 1 ? "已完结 😎" : "未完结 😕"}</span><br /><br />
+      ${bangumi.badge !== "" ? "<h5>" + bangumi.badge + "</h5>" : "<h5>❤白嫖</h5>"}
+      <span>${bangumi.is_finish === 1 ? "已完结 😎" : "未完结 😕"}</span><br /><br />
       状态: <span>${bangumi.index_show}</span>
       <br /><br />
       <a class="btn" href="${bangumi.link}">To Chase Bangumi</a>
