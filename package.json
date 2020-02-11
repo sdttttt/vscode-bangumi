@@ -13,6 +13,11 @@
 	"categories": [
 		"Other"
 	],
+	"keywords": [
+		"bilibili",
+		"bangumi",
+		"anime"
+	],
 	"activationEvents": [
 		"onCommand:extension.openBangumi",
 		"onCommand:extension.nextPage",
@@ -37,6 +42,18 @@
 			{
 				"command": "extension.jumpPage",
 				"title": "Bangumi Open: Jump to number of Page"
+			}
+		],
+		"keybindings": [
+			{
+				"command": "extension.nextPage",
+				"key": "ctrl+p",
+				"mac": "cmd+p"
+			},
+			{
+				"command": "extension.backPage",
+				"key": "ctrl+o",
+				"mac": "cmd+o"
 			}
 		]
 	},

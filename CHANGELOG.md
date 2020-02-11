@@ -12,4 +12,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - 重构部分代码, 优化性能
 
 ### Add
+
 - 增加页面跳转功能
+- 增加下一页和上一页的快捷键

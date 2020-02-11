@@ -7,8 +7,6 @@ import { globalVar } from '../constant';
 import { createWebviewPanel } from "../utils/view";
 import { toNumber } from '../utils/type';
 
-export let context: vscode.ExtensionContext | undefined = undefined;
-
 // Bangumi Url Object => build Bangumi Url
 const bangumiUrl: BangumiUrl = new BangumiUrl();
 

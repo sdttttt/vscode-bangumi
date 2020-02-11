@@ -17,6 +17,9 @@
 
 `Next Page` 和 `Back Page` 提供翻页功能.
 
+`Next Page` 可用 `Ctrl+p` 代替
+
+`Back Page` 可用 `Ctrl+o` 代替
 
 ## Future
 
