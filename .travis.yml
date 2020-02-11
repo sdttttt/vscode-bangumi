@@ -15,6 +15,8 @@ install:
       export DISPLAY=':99.0'
       /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
     fi
+    npm install -g vsce
+
 script:
   - |
     echo ">>> Compile vscode-test"
@@ -24,6 +26,17 @@ script:
     echo ">>> Run sample integration test"
     yarn && yarn compile && yarn test
     npm run webpack:compile
-    npm run webpack:vscode:prepublish
+    npm run vscode:prepublish
+    vsce package
 
 cache: yarn
+
+deploy:
+  provider: releases
+  api_key:
+    secure: el3iwt9sLCSWCCEVP3QPhK+6KH6YSzsV+IoFxj6eRRtzFzgNwWsxesZ/4Z1Uqps11nKoWSxEh4ee2qG/row//2JgOUTbbHuIo7iBDOJPl7UtG1L9Ugxp0MfI26vscxDywcFP2XmWV/yxiOXUXsJLF9NnPdJ0qMwyiBwtGrnOZdYPd5H1Bj3QbiTfHhiht1lDJaq4sbs2nXiJTWDWmOeKgBcTF9FmcFz2a2Ecend6r3PH8Y6gEHWxQz8GlnCjokbyGUht8QsJm8j+o1ZAEYK1njUIcG4gzDgYf/tcoiYjvn//LsW6RE2rLCslrFy5B0G3RzvQQDqf+dwOGZdNHzIInC6OuAIH0w5D5oUZIrUVq1AFMg7JmWAfXPoeeXPQ6bi4KsJ4ZroETMOpI4B356SSssUkSeqbNDjSvHzI5wpb3IuG4/aAvdF6Dg5yxqXqsQ8dm80vFrzfAXBDyQXM3M5wt1tQGhyzOXKvi5nM+HEj5Zq/CHt3VjhTfjsFQI99I6dZP2WfWJd1Dbl71roCZN77LnTmmrm6tAnxrSOh0i0LYJ6p38w1+Txfz1xnKoHopp0SpjPDA94S38AATBksF8QefZxJ4eKeQlpVBBVeRnUEdE4vjIp88FJPnBiTiDWOnXeaG5xqdeLBGUO+6rXQ5ZLwuac60smIZf0wTAqbOoKniqY=
+  file: 'bangumiopen-1.0.1.vsix'
+  skip_cleanup: true
+  on:
+    tags: true
+    repo: sdttttt/vscode-bangumi
