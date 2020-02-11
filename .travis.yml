@@ -23,7 +23,5 @@ script:
     cd sample
     echo ">>> Run sample integration test"
     yarn && yarn compile && yarn test
-    npm run webpack:compile
-    npm run webpack:vscode:prepublish
 
 cache: yarn
