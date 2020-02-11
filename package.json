@@ -16,7 +16,8 @@
 	"activationEvents": [
 		"onCommand:extension.openBangumi",
 		"onCommand:extension.nextPage",
-		"onCommand:extension.backPage"
+		"onCommand:extension.backPage",
+		"onCommand:extension.jumpPage"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
@@ -27,11 +28,15 @@
 			},
 			{
 				"command": "extension.nextPage",
-				"title": "Next Page"
+				"title": "Bangumi Open: Next Page"
 			},
 			{
 				"command": "extension.backPage",
-				"title": "Back Page"
+				"title": "Bangumi Open: Back Page"
+			},
+			{
+				"command": "extension.jumpPage",
+				"title": "Bangumi Open: Jump to number of Page"
 			}
 		]
 	},

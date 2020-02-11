@@ -19,11 +19,22 @@ export function getAllBangumi(burl: BangumiUrl, callback: (data: BangumisRespons
             const bangumisResponse = <BangumisResponse>(res.data);
             if (bangumisResponse.code !== 0) {
                 vscode.window.showInformationMessage(`
-                    Oops! B站可能炸了! 或许是API地址更改了./(ㄒoㄒ)/~~
+                    Oops! B站可能炸了! 或许是API地址更改了./(ㄒoㄒ)/~~d
                     https://github.com/sdttttt/vscode-bangumi/issues
                 `);
                 return;
             }
+
+            if (JSON.stringify(bangumisResponse.data) === "{}") {
+                vscode.window.showInformationMessage(`
+                  获取数据为空🤔
+                `);
+                return;
+            }
+
             callback(bangumisResponse);
-    });
+        }).catch((reason: any) => {
+            vscode.window.showWarningMessage("输入数字大概在100左右就到头了.");
+            console.log(reason);
+        });
 }

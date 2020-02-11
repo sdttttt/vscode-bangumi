@@ -1,5 +1,11 @@
 import * as vscode from "vscode";
 
+/**
+ *  Define the Global variable that need to be used.
+ *
+ * @class Global
+ * @author sdttttt
+ */
 class Global {
 
     constructor(context: vscode.ExtensionContext) {
@@ -13,6 +19,7 @@ class Global {
     }
 }
 
+// Single Instance
 let global: Global;
 
 export function newGlobal(context: vscode.ExtensionContext) {
