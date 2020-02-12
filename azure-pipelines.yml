@@ -31,6 +31,11 @@ steps:
     condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
   - bash: |
+      npm install -g vsce
+    displayName: Install VSCE
+    condition: suceeded()
+
+  - bash: |
       echo ">>> Compile vscode-test"
       yarn && yarn compile
       echo ">>> Compiled vscode-test"
