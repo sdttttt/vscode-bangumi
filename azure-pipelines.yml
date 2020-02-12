@@ -16,12 +16,6 @@ strategy:
       imageName: "macos-10.13"
     windows:
       imageName: "vs2017-win2016"
-    node_8_x:
-      node_version: 8.x
-    node_10_x:
-      node_version: 10.x
-    node_12_x:
-      node_version: 12.x
 
 pool:
   vmImage: $(imageName)
@@ -29,7 +23,7 @@ pool:
 steps:
   - task: NodeTool@0
     inputs:
-      versionSpec: $(node_version)
+      versionSpec: '8.x'
     displayName: "Install Node.js"
 
   - bash: |
