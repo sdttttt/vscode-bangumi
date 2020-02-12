@@ -33,7 +33,7 @@ steps:
   - bash: |
       npm install -g vsce
     displayName: Install VSCE
-    condition: suceeded()
+    condition: succeeded()
 
   - bash: |
       echo ">>> Compile vscode-test"
