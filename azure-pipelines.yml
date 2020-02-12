@@ -5,31 +5,23 @@
 
 trigger:
   - master
-  - SDTTTTT
-  - CICD
 
 strategy:
   matrix:
     linux:
-      imageName: "ubuntu-18.04"
+      imageName: "ubuntu-16.04"
     mac:
-      imageName: "macos-10.14"
+      imageName: "macos-10.13"
     windows:
       imageName: "vs2017-win2016"
-    node_8_x:
-      node_version: 8.x
-    node_9_x:
-      node_version: 9.x
 
 pool:
   vmImage: $(imageName)
 
-
-
 steps:
   - task: NodeTool@0
     inputs:
-      versionSpec: $(node_version)
+      versionSpec: "8.x"
     displayName: "Install Node.js"
 
   - bash: |
@@ -39,16 +31,12 @@ steps:
     condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
   - bash: |
-      npm install -g vsce
       echo ">>> Compile vscode-test"
       yarn && yarn compile
       echo ">>> Compiled vscode-test"
       cd sample
       echo ">>> Run sample integration test"
       yarn && yarn compile && yarn test
-      npm run webpack:compile
-      npm run vscode:prepublish
-      vsce package
     displayName: Run Tests
     env:
       DISPLAY: ":99.0"
