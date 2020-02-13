@@ -1,11 +1,9 @@
 import { expect } from 'chai';
-import * as vscode from "vscode";
-import * as assert from "assert";
 import { getAllBangumi } from "../../request/bangumi";
-import { BangumiUrl } from "../../utils/bangumi_url";
-import { BangumisResponse, Bangumi } from '../../request/structure';
+import { BangumiUrl } from "../../request/bangumi_url";
+import { BangumisResponse, Bangumi, BangumisData } from '../../request/structure';
 
-type BangumiCall = (res: BangumisResponse) => void;
+type BangumiCall = (res: BangumisData) => void;
 
 /**
  * There's something wrong with the environment.
@@ -16,10 +14,7 @@ type BangumiCall = (res: BangumisResponse) => void;
 suite("TEST API", () => {
 
     test("BILIBILI BANGUMI API TEST", function (done) {
-        const callback: BangumiCall  = (res: BangumisResponse) => {
-            const code: number = res.code;
-            const data = res.data;
-
+        const callback: BangumiCall  = (data: BangumisData) => {
             const hasNext: number = data.has_next;
             const bangumis: Array<Bangumi> = data.list;
 
@@ -27,16 +22,17 @@ suite("TEST API", () => {
 
             // request Successful
             try {
-                expect(code).to.equal(0);
 
                 // exists Next Page
                 expect(hasNext).to.equal(1);
 
+                // tslint:disable-next-line: no-unused-expression
                 expect(bangumis).to.be.exist;
 
                 expect(bangumis.length).to.not.equal(0);
                 expect(bangumis.length).to.be.above(1);
 
+                // tslint:disable-next-line: no-unused-expression
                 expect(bangumi).to.be.exist;
 
                 done();

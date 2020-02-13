@@ -24,10 +24,11 @@ export function createWebviewPanel(viewType: string, title: string, listener: ()
         }
     );
 
+    const context: vscode.ExtensionContext = globalVar().context;
     panel.onDidDispose(
         listener,
         null,
-        globalVar().context.subscriptions
+        context.subscriptions
       );
 
     return panel;

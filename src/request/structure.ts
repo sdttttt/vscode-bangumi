@@ -19,7 +19,7 @@ export interface BangumisResponse {
  * @interface BangumisData
  * @author sdttttt
  */
-interface BangumisData {
+export interface BangumisData {
 
     has_next: number;
 
@@ -48,4 +48,54 @@ export interface Bangumi {
     order: string;
     // Bangumi name
     title: string;
+}
+
+
+//=========================================== Week Bangumi ========================================
+
+/**
+ *  Week Bangumi Response
+ *
+ * @export
+ * @interface WeekBangumiResponse
+ * @author sdttttt
+ */
+export interface WeekBangumiResponse {
+    code: number;
+    message: string;
+    result: Array<WeekBangumiData>;
+}
+
+/**
+ * Week Bangumi Data
+ *
+ * @export
+ * @interface WeekBangumiData
+ * @author sdttttt
+ */
+export interface WeekBangumiData {
+    date: string;
+    date_ts: number;
+    day_of_week: number;
+    is_today: number;
+    seasons: Array<WBangumi>;
+}
+
+/**
+ * Bangumi of Week
+ *
+ * @export
+ * @interface WBangumi
+ * @author sdttttt
+ */
+export interface WBangumi {
+    cover: string;
+    favorites: number;
+    is_published: number;
+    pub_index: string;
+    pub_time: string;
+    pub_ts: string;
+    square_cover: string;
+    title: string;
+    url: string;
 }

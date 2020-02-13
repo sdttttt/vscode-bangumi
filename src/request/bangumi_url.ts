@@ -1,6 +1,8 @@
 
+export const BANGUMI_WEEK = "https://bangumi.bilibili.com/web_api/timeline_global";
+
 // bilibili API => Base Url of show all Bangumi
- const BANGUMI_SHOW = "https://api.bilibili.com/pgc/season/index/result?";
+const BANGUMI_SHOW = "https://api.bilibili.com/pgc/season/index/result?";
 
 /**
  * Bangumi url

@@ -22,3 +22,12 @@ export function toNumber(text: string | undefined): number {
 
     return 0;
 }
+
+
+export function isEmptyArray(array: Array<any>): boolean {
+    return array.length === 0;
+}
+
+export function isEmptyObject(obj: any): boolean {
+    return JSON.stringify(obj) === "{}";
+}

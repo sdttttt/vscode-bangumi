@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 
 /**
- *  Define the Global variable that need to be used.
+ *  Define the need Init Global variable.
  *
  * @class Global
  * @author sdttttt
