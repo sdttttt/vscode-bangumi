@@ -1,3 +1,12 @@
+
+# VUE 结合 WebView of Vscode  Failed
+
+这两个模块想要灵活的结合。
+以为我的能力，难以实现。
+耦合性太强，不便与后期的迭代。
+
+> **此分支放弃，有想法可以联系📫**
+
 # Bangumi Open
 [![Build Status](https://travis-ci.com/sdttttt/vscode-bangumi.svg?branch=master)](https://travis-ci.com/sdttttt/vscode-bangumi)
 [![CodeFactor](https://www.codefactor.io/repository/github/sdttttt/vscode-bangumi/badge/master)](https://www.codefactor.io/repository/github/sdttttt/vscode-bangumi/overview/master)
