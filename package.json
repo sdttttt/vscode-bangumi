@@ -22,7 +22,8 @@
 		"onCommand:extension.openBangumi",
 		"onCommand:extension.nextPage",
 		"onCommand:extension.backPage",
-		"onCommand:extension.jumpPage"
+		"onCommand:extension.jumpPage",
+		"onCommand:extension.weekBangumi"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
@@ -42,6 +43,10 @@
 			{
 				"command": "extension.jumpPage",
 				"title": "Bangumi Open: Jump to number of Page"
+			},
+			{
+				"command": "extension.weekBangumi",
+				"title": "Bangumi Open: Week Bangumi"
 			}
 		],
 		"keybindings": [

@@ -2,8 +2,7 @@ import * as vscode from "vscode";
 import { getAllBangumi } from "../request/bangumi";
 import * as HtmlUtils from './bangumi_html';
 import { BangumiUrl } from "../request/bangumi_url";
-import { BangumisResponse, Bangumi, BangumisData } from '../request/structure';
-import { globalVar } from '../constant';
+import { Bangumi, BangumisData } from '../request/structure';
 import { createWebviewPanel } from "../utils/view";
 import { toNumber } from '../utils/type';
 

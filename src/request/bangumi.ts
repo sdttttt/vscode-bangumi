@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import Axios from "./instance";
 import { AxiosResponse } from "axios";
 import { BangumiUrl, BANGUMI_WEEK } from './bangumi_url';
-import { BangumisResponse, WeekBangumiData, WeekBangumiResponse, BangumisData } from './structure';
+import { BangumisResponse, WeekBangumiData, WeekBangumiResponse, BangumisData, isSuccess } from './structure';
 import { isEmptyArray, isEmptyObject } from '../utils/type';
 
 /**
@@ -18,13 +18,7 @@ export function getAllBangumi(burl: BangumiUrl, callback: (data: BangumisData) =
     Axios.get(url)
         .then((res: AxiosResponse<BangumisResponse>) => {
             const bangumisResponse = res.data;
-            if (bangumisResponse.code !== 0) {
-                vscode.window.showInformationMessage(`
-                    Oops! B站可能炸了! 或许是API地址更改了./(ㄒoㄒ)/~~d
-                    https://github.com/sdttttt/vscode-bangumi/issues
-                `);
-                return;
-            }
+            isSuccess(bangumisResponse);
 
             if (isEmptyObject(bangumisResponse.data) || isEmptyArray(bangumisResponse.data.list)) {
                 vscode.window.showInformationMessage(`
@@ -40,20 +34,16 @@ export function getAllBangumi(burl: BangumiUrl, callback: (data: BangumisData) =
         });
 }
 
-
+/**
+ * Gets week bangumi
+ * @param {(data: Array<WeekBangumiData>) => void} callback 
+ */
 export function getWeekBangumi(callback: (data: Array<WeekBangumiData>) => void) {
 
     Axios.get(BANGUMI_WEEK)
         .then((res: AxiosResponse<WeekBangumiResponse>) => {
             const weekBangumiResponse = res.data;
-            if (weekBangumiResponse.code === 0) {
-                vscode.window.showInformationMessage(`
-                    Oops! B站可能炸了! 或许是API地址更改了./(ㄒoㄒ)/~~d
-                    https://github.com/sdttttt/vscode-bangumi/issues
-                `);
-                return;
-            }
-
+            isSuccess(weekBangumiResponse);
             if (isEmptyArray(weekBangumiResponse.result)) {
                 vscode.window.showInformationMessage(`
                   获取数据为空🤔

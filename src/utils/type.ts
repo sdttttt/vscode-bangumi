@@ -4,7 +4,7 @@
  * @export
  * @param {(string | undefined)} text
  * @returns {number}
- *
+ * 
  * @author sdttttt
  */
 export function toNumber(text: string | undefined): number {
@@ -23,11 +23,26 @@ export function toNumber(text: string | undefined): number {
     return 0;
 }
 
-
+/**
+ * Determines whether empty array is
+ * 
+ * @param {Array<any>} array 
+ * @returns true if empty array
+ * 
+ * @author sdttttt
+ */
 export function isEmptyArray(array: Array<any>): boolean {
     return array.length === 0;
 }
 
+/**
+ * Determines whether empty object is
+ * 
+ * @param {any} obj 
+ * @returns true if empty object
+ * 
+ * @author sdttttt 
+ */
 export function isEmptyObject(obj: any): boolean {
     return JSON.stringify(obj) === "{}";
 }

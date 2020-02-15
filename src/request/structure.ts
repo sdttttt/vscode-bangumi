@@ -1,3 +1,40 @@
+import * as vscode from 'vscode';
+
+/**
+ * Determines whether success is
+ * 
+ * @param {BiliResponse} res 
+ * @returns true if success 
+ * @author sdttttt
+ */
+export function isSuccess(res: BiliResponse): boolean {
+
+    if (res.code === 0 && res.message === "success") {
+        return true;
+    }
+
+    vscode.window.showInformationMessage(`
+        Oops! B站可能炸了! 或许是API地址更改了./(ㄒoㄒ)/~~d
+        https://github.com/sdttttt/vscode-bangumi/issues
+    `);
+
+    return false;
+}
+
+/**
+ * Bili response
+ * 
+ * @interface BiliResponse
+ * @author sdttttt
+ */
+export interface BiliResponse {
+    // 0 is Success
+    code: number;
+
+    // success
+    message: string;
+}
+
 /**
  * Structure of Bangumi Response
  *
@@ -5,9 +42,7 @@
  * @interface BangumisResponse
  * @author sdttttt
  */
-export interface BangumisResponse {
-    // 0 is Success
-    code: number;
+export interface BangumisResponse extends BiliResponse {
 
     data: BangumisData;
 }
@@ -60,9 +95,7 @@ export interface Bangumi {
  * @interface WeekBangumiResponse
  * @author sdttttt
  */
-export interface WeekBangumiResponse {
-    code: number;
-    message: string;
+export interface WeekBangumiResponse extends BiliResponse {
     result: Array<WeekBangumiData>;
 }
 
