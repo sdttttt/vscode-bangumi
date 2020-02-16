@@ -24,7 +24,7 @@ function callWebViewPanel(callback: (pv: vscode.WebviewPanel) => void) {
       panelView.reveal(columnToShowIn);
       callback(panelView);
     } else {
-      panelView = createWebviewPanel("html", "Bangumis", () => {
+      panelView = createWebviewPanel("html", "Week Bangumis", () => {
         panelView = undefined;
       });
   
