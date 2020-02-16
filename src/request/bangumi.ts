@@ -40,7 +40,7 @@ export function getAllBangumi(burl: BangumiUrl, callback: (data: BangumisData) =
  */
 export function getWeekBangumi(callback: (data: Array<WeekBangumiData>) => void) {
 
-    Axios.get(BANGUMI_WEEK)
+Axios.get(BANGUMI_WEEK)
         .then((res: AxiosResponse<WeekBangumiResponse>) => {
             const weekBangumiResponse = res.data;
             isSuccess(weekBangumiResponse);

@@ -30,9 +30,8 @@
                 "--extensionDevelopmentPath=${workspaceFolder}"
             ],
             "outFiles": [
-                "${workspaceFolder}/out/**/*.js"
-            ],
-            "preLaunchTask": "npm: watch"
+                "${workspaceFolder}/dist/**/*.js"
+            ]
         }
     ]
 }
