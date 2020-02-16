@@ -5,7 +5,7 @@
 	"repository": "https://github.com/sdttttt/vscode-Bangumi",
 	"displayName": "Bangumi Open",
 	"description": "The favorite of otakuo friends.",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"icon": "Icon.png",
 	"engines": {
 		"vscode": "^1.41.0"
