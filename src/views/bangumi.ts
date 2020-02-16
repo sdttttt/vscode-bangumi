@@ -1,9 +1,8 @@
 import * as vscode from "vscode";
 import { getAllBangumi } from "../request/bangumi";
 import * as HtmlUtils from './bangumi_html';
-import { BangumiUrl } from "../utils/bangumi_url";
-import { BangumisResponse, Bangumi } from '../request/structure';
-import { globalVar } from '../constant';
+import { BangumiUrl } from "../request/bangumi_url";
+import { Bangumi, BangumisData } from '../request/structure';
 import { createWebviewPanel } from "../utils/view";
 import { toNumber } from '../utils/type';
 
@@ -46,16 +45,9 @@ let pageNumber: number = 1;
  * @param bangumis
  * @author sdttttt
  */
-function createBangumiView(bangumiRes: BangumisResponse) {
+function createBangumiView(bangumiRes: BangumisData) {
 
-  const bangumis: Array<Bangumi> = bangumiRes.data.list;
-
-  if (bangumis.length === 0) {
-    vscode.window.showInformationMessage(`
-        💀没有数据可以渲染
-    `);
-    return;
-  }
+  const bangumis: Array<Bangumi> = bangumiRes.list;
 
   callWebViewPanel(
     (pv: vscode.WebviewPanel) => {

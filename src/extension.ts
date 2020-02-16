@@ -2,7 +2,8 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import * as BangumiView from "./views/bangumi";
-import { newGlobal } from "./constant";
+import * as WeekBangumiView from "./views/bangumi_week";
+import { newGlobal } from "./constants";
 
 let isInit: boolean = false;
 
@@ -64,11 +65,20 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  const weekBangumi = vscode.commands.registerCommand(
+    "extension.weekBangumi",
+    () => {
+      initializer(context);
+      WeekBangumiView.openWeekBangumi();
+    }
+  );
+
   context.subscriptions.push(
     openBangumi,
     nextPage,
     backPage,
     jumpPage,
+    weekBangumi,
   );
 }
 

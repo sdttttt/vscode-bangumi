@@ -15,3 +15,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - 增加页面跳转功能
 - 增加下一页和上一页的快捷键
+
+## [1.0.2] - 2020-2.13
+
+### Add
+
+- 增加了周推的获取接口
+- 完成了周推的页面

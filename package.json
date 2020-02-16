@@ -5,7 +5,7 @@
 	"repository": "https://github.com/sdttttt/vscode-Bangumi",
 	"displayName": "Bangumi Open",
 	"description": "The favorite of otakuo friends.",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"icon": "Icon.png",
 	"engines": {
 		"vscode": "^1.41.0"
@@ -22,7 +22,8 @@
 		"onCommand:extension.openBangumi",
 		"onCommand:extension.nextPage",
 		"onCommand:extension.backPage",
-		"onCommand:extension.jumpPage"
+		"onCommand:extension.jumpPage",
+		"onCommand:extension.weekBangumi"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
@@ -42,6 +43,10 @@
 			{
 				"command": "extension.jumpPage",
 				"title": "Bangumi Open: Jump to number of Page"
+			},
+			{
+				"command": "extension.weekBangumi",
+				"title": "Bangumi Open: Week Bangumi"
 			}
 		],
 		"keybindings": [
@@ -63,10 +68,10 @@
 		"pretest": "yarn run compile",
 		"test": "node ./out/test/runTest.js",
 		"vscode:prepublish": "webpack --mode production",
-  		"webpack:compile": "webpack --mode none",
-  		"webpack:watch": "webpack --mode none --watch"
+		"webpack:compile": "webpack --mode none",
+		"webpack:watch": "webpack --mode none --watch",
+		"lint": "tslint ./src/**/*.ts -t verbose"
 	},
-
 	"devDependencies": {
 		"@types/chai": "^4.2.8",
 		"@types/glob": "^7.1.1",

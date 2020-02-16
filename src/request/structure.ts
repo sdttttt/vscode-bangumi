@@ -1,3 +1,40 @@
+import * as vscode from 'vscode';
+
+/**
+ * Determines whether success is
+ * 
+ * @param {BiliResponse} res 
+ * @returns true if success 
+ * @author sdttttt
+ */
+export function isSuccess(res: BiliResponse): boolean {
+
+    if (res.code === 0 && res.message === "success") {
+        return true;
+    }
+
+    vscode.window.showInformationMessage(`
+        Oops! B站可能炸了! 或许是API地址更改了./(ㄒoㄒ)/~~d
+        https://github.com/sdttttt/vscode-bangumi/issues
+    `);
+
+    return false;
+}
+
+/**
+ * Bili response
+ * 
+ * @interface BiliResponse
+ * @author sdttttt
+ */
+export interface BiliResponse {
+    // 0 is Success
+    code: number;
+
+    // success
+    message: string;
+}
+
 /**
  * Structure of Bangumi Response
  *
@@ -5,9 +42,7 @@
  * @interface BangumisResponse
  * @author sdttttt
  */
-export interface BangumisResponse {
-    // 0 is Success
-    code: number;
+export interface BangumisResponse extends BiliResponse {
 
     data: BangumisData;
 }
@@ -19,7 +54,7 @@ export interface BangumisResponse {
  * @interface BangumisData
  * @author sdttttt
  */
-interface BangumisData {
+export interface BangumisData {
 
     has_next: number;
 
@@ -48,4 +83,52 @@ export interface Bangumi {
     order: string;
     // Bangumi name
     title: string;
+}
+
+
+//=========================================== Week Bangumi ========================================
+
+/**
+ *  Week Bangumi Response
+ *
+ * @export
+ * @interface WeekBangumiResponse
+ * @author sdttttt
+ */
+export interface WeekBangumiResponse extends BiliResponse {
+    result: Array<WeekBangumiData>;
+}
+
+/**
+ * Week Bangumi Data
+ *
+ * @export
+ * @interface WeekBangumiData
+ * @author sdttttt
+ */
+export interface WeekBangumiData {
+    date: string;
+    date_ts: number;
+    day_of_week: number;
+    is_today: number;
+    seasons: Array<WBangumi>;
+}
+
+/**
+ * Bangumi of Week
+ *
+ * @export
+ * @interface WBangumi
+ * @author sdttttt
+ */
+export interface WBangumi {
+    cover: string;
+    favorites: number;
+    is_published: number;
+    pub_index: string;
+    pub_time: string;
+    pub_ts: string;
+    square_cover: string;
+    title: string;
+    url: string;
 }

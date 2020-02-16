@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import { globalVar } from '../constant';
+import { globalVar } from '../constants';
+import * as path from 'path';
 
 
 /**
@@ -13,22 +14,25 @@ import { globalVar } from '../constant';
  *
  * @author sdttttt
  */
-export function createWebviewPanel(viewType: string, title: string, listener: () => any ): vscode.WebviewPanel {
-    const panel = vscode.window.createWebviewPanel(
-        "Hello",
-        "Bangumis",
-        vscode.ViewColumn.Two,
-        {
-          retainContextWhenHidden: false,
-          enableFindWidget: true
-        }
-    );
+export function createWebviewPanel(viewType: string, title: string, closeListener: () => any): vscode.WebviewPanel {
+  const panel = vscode.window.createWebviewPanel(
+    viewType,
+    title,
+    vscode.ViewColumn.Two,
+    {
+      retainContextWhenHidden: false,
+      enableFindWidget: true,
+      localResourceRoots: [vscode.Uri.file(
+        path.join(globalVar().context.extensionPath, 'public'))]
+    }
+  );
 
-    panel.onDidDispose(
-        listener,
-        null,
-        globalVar().context.subscriptions
-      );
+  const context: vscode.ExtensionContext = globalVar().context;
+  panel.onDidDispose(
+    closeListener,
+    null,
+    context.subscriptions
+  );
 
-    return panel;
+  return panel;
 }
