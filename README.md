@@ -17,7 +17,7 @@
 
 ## Usage
 
-`Ctrl+Shift+P` 调出控制栏后,输入`Bangumi Open` 即可打开视图.
+`Ctrl+Shift+P` 调出控制栏后,输入`Bangumi Open`或 `Bangumi Open: Week Bangumi` 即可打开视图.
 
 `Next Page` 和 `Back Page` 提供翻页功能.
 
