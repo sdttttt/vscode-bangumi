@@ -6,10 +6,13 @@
 
 ![b1](./resources/b1.png)
 
+![b2](./resources/b2.png)
+
 ## Description
 
 使用 BILIBLI 的API.
 目前只能提供简单的番剧查看.
+还有每周更新番剧也能看哦!
 
 ## Usage
 
@@ -25,8 +28,8 @@
 
 可能会在将来提供的功能:
 
+- 提醒番剧更新
 - 番剧索引
-- 每周番剧推送
 - <大嘘>在Vscode上看番???
 
 **Enjoy!**

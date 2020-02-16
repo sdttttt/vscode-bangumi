@@ -21,3 +21,4 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Add
 
 - 增加了周推的获取接口
+- 完成了周推的页面

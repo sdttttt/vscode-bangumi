@@ -28,7 +28,7 @@ const STYLE = `
     }
 
     .container {
-        width: 3000px;
+        width: 3500px;
         height: 2000px;
         display: flex;
     }
@@ -81,7 +81,9 @@ const STYLE = `
         width: 70px;
         height: 20px;
         color: #999;
-        margin-left: -22px;
+        margin-left: -8px;
+        font-weight: 700;
+        font-size: 14px;
     }
 </style>
 `;
