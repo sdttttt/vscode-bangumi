@@ -1,6 +1,7 @@
 # Bangumi Open
 
 [![Build Status](https://travis-ci.com/sdttttt/vscode-bangumi.svg?branch=master)](https://travis-ci.com/sdttttt/vscode-bangumi)
+[![Build Status](https://dev.azure.com/shiinazch/Vscode%20Bangumi/_apis/build/status/sdttttt.vscode-bangumi?branchName=master)](https://dev.azure.com/shiinazch/Vscode%20Bangumi/_build/latest?definitionId=4&branchName=master)
 [![CodeFactor](https://www.codefactor.io/repository/github/sdttttt/vscode-bangumi/badge/master)](https://www.codefactor.io/repository/github/sdttttt/vscode-bangumi/overview/master)
 
 一款基于 **Vscode** 的番剧插件.
@@ -17,7 +18,7 @@
 
 ## Usage
 
-`Ctrl+Shift+P` 调出控制栏后,输入`Bangumi Open` 即可打开视图.
+`Ctrl+Shift+P` 调出控制栏后,输入`Open Bangumi`或 `Bangumi Open: Week Bangumi` 即可打开视图.
 
 `Next Page` 和 `Back Page` 提供翻页功能.
 
