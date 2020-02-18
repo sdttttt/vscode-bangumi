@@ -1,10 +1,10 @@
 import { WeekBangumiData, WBangumi } from '../request/structure';
 import { toWeekDay } from '../utils/strings';
-import HTMLGenerator from './generator';
+import AbstractHTMLGenerator from './generator';
 import { STYLE } from './week_bangumi_style';
 const HTML_HEAD = "<html>";
 
-export default new class WeekBangumisHTMLGenerator extends HTMLGenerator<Array<WeekBangumiData>> {
+export default new class WeekBangumisHTMLGenerator extends AbstractHTMLGenerator<Array<WeekBangumiData>> {
 
     protected readonly style: string = STYLE;
 

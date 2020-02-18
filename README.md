@@ -1,4 +1,5 @@
 # Bangumi Open
+
 [![Build Status](https://travis-ci.com/sdttttt/vscode-bangumi.svg?branch=master)](https://travis-ci.com/sdttttt/vscode-bangumi)
 [![CodeFactor](https://www.codefactor.io/repository/github/sdttttt/vscode-bangumi/badge/master)](https://www.codefactor.io/repository/github/sdttttt/vscode-bangumi/overview/master)
 
@@ -10,7 +11,7 @@
 
 ## Description
 
-使用 BILIBLI 的API.
+使用 BILIBLI 的 API.
 目前只能提供简单的番剧查看.
 还有每周更新番剧也能看哦!
 
@@ -20,9 +21,9 @@
 
 `Next Page` 和 `Back Page` 提供翻页功能.
 
-`Next Page` 可用 `Ctrl+p` 代替
+`Next Page` 可用 `Ctrl+alt+l` 代替
 
-`Back Page` 可用 `Ctrl+o` 代替
+`Back Page` 可用 `Ctrl+alt+k` 代替
 
 ## Future
 
@@ -30,6 +31,6 @@
 
 - 提醒番剧更新
 - 番剧索引
-- <大嘘>在Vscode上看番???
+- <大嘘>在 Vscode 上看番???
 
 **Enjoy!**
