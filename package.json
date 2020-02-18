@@ -63,12 +63,14 @@
     ]
   },
   "scripts": {
-    "compile": "webpack --mode none",
-    "watch": "webpack --mode none --watch",
-    "pretest": "yarn run compile",
-    "test": "node ./out/test/runTest.js",
-    "vscode:prepublish": "webpack --mode production",
-    "lint": "tslint ./src/**/*.ts -t verbose"
+    "compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"pretest": "yarn run compile",
+		"test": "node ./out/test/runTest.js",
+		"vscode:prepublish": "webpack --mode production",
+		"webpack:compile": "webpack --mode none",
+		"webpack:watch": "webpack --mode none --watch",
+		"lint": "tslint ./src/**/*.ts -t verbose"
   },
   "devDependencies": {
     "@types/chai": "^4.2.8",
