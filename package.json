@@ -63,11 +63,13 @@
     ]
   },
   "scripts": {
-    "compile": "webpack --mode none",
-    "watch": "webpack --mode none --watch",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile",
     "test": "node ./out/test/runTest.js",
     "vscode:prepublish": "webpack --mode production",
+    "webpack:compile": "webpack --mode none",
+    "webpack:watch": "webpack --mode none --watch",
     "lint": "tslint ./src/**/*.ts -t verbose"
   },
   "devDependencies": {
