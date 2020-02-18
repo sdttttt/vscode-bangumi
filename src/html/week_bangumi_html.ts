@@ -70,4 +70,4 @@ export default new class WeekBangumisHTMLGenerator extends HTMLGenerator<Array<W
 
         return this.htmlHead + this.style + this.htmlBody + html + this.htmlFloor;
     }
-}
+};
