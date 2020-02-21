@@ -86,7 +86,7 @@ export interface Bangumi {
 }
 
 
-//=========================================== Week Bangumi ========================================
+//=============================== Week Bangumi =============================
 
 /**
  *  Week Bangumi Response
@@ -127,7 +127,7 @@ export interface WBangumi {
     is_published: number;
     pub_index: string;
     pub_time: string;
-    pub_ts: string;
+    pub_ts: number;
     square_cover: string;
     title: string;
     url: string;

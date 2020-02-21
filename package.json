@@ -19,44 +19,40 @@
     "anime"
   ],
   "activationEvents": [
-    "onCommand:extension.openBangumi",
-    "onCommand:extension.nextPage",
-    "onCommand:extension.backPage",
-    "onCommand:extension.jumpPage",
-    "onCommand:extension.weekBangumi"
+    "*"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "extension.openBangumi",
+        "command": "openBangumi",
         "title": "Open Bangumi"
       },
       {
-        "command": "extension.nextPage",
+        "command": "nextPage",
         "title": "Bangumi Open: Next Page"
       },
       {
-        "command": "extension.backPage",
+        "command": "backPage",
         "title": "Bangumi Open: Back Page"
       },
       {
-        "command": "extension.jumpPage",
+        "command": "jumpPage",
         "title": "Bangumi Open: Jump to number of Page"
       },
       {
-        "command": "extension.weekBangumi",
+        "command": "weekBangumi",
         "title": "Bangumi Open: Week Bangumi"
       }
     ],
     "keybindings": [
       {
-        "command": "extension.nextPage",
+        "command": "nextPage",
         "key": "ctrl+alt+l",
         "mac": "cmd+alt+l"
       },
       {
-        "command": "extension.backPage",
+        "command": "backPage",
         "key": "ctrl+alt+k",
         "mac": "cmd+alt+k"
       }

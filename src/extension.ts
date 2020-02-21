@@ -9,7 +9,7 @@ let isInit: boolean = false;
 
 /**
  * init work
- *
+ * 
  * @param {vscode.ExtensionContext} context
  * @author sdttttt
  */
@@ -29,64 +29,44 @@ function initializer(context: vscode.ExtensionContext) {
  */
 export function activate(context: vscode.ExtensionContext) {
 
+  initializer(context);
+
+  WeekBangumiView.startBangumiUpdateReminder();
+
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
 
-  const openBangumi = vscode.commands.registerCommand(
-    "extension.openBangumi",
-    () => {
-      initializer(context);
-      BangumiView.openBangumi();
-    }
-  );
-
-  const nextPage = vscode.commands.registerCommand(
-    "extension.nextPage",
-    () => {
-      initializer(context);
-      BangumiView.nextPage();
-    }
-  );
-
-  const backPage = vscode.commands.registerCommand(
-    "extension.backPage",
-    () => {
-      initializer(context);
-      BangumiView.backPage();
-    }
-  );
-
-  const jumpPage = vscode.commands.registerCommand(
-    "extension.jumpPage",
-    () => {
-      initializer(context);
-      BangumiView.jumpPage();
-    }
-  );
-
-  const weekBangumi = vscode.commands.registerCommand(
-    "extension.weekBangumi",
-    () => {
-      initializer(context);
-      WeekBangumiView.openWeekBangumi();
-    }
-  );
-
   context.subscriptions.push(
-    openBangumi,
-    nextPage,
-    backPage,
-    jumpPage,
-    weekBangumi,
+    vscode.commands.registerCommand(
+      "openBangumi",
+      () => BangumiView.openBangumi()
+    ),
+    vscode.commands.registerCommand(
+      "nextPage",
+      () => BangumiView.nextPage()
+    ),
+    vscode.commands.registerCommand(
+      "backPage",
+      () => BangumiView.backPage()
+    ),
+    vscode.commands.registerCommand(
+      "jumpPage",
+      () => BangumiView.jumpPage()
+    ),
+    vscode.commands.registerCommand(
+      "weekBangumi",
+      () => WeekBangumiView.openWeekBangumi()
+    ),
   );
 }
 
 /**
  * this method is called when your extension is deactivated
+ *
  * @export
  * @author sdttttt
  */
 export function deactivate() {
-  vscode.window.showInformationMessage("you has stop [Bangumi Open] extensions.");
+  WeekBangumiView.destroyReminder();
 }

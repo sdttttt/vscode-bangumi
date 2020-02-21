@@ -6,6 +6,12 @@ import { Bangumi, BangumisData } from '../request/structure';
 import { toNumber } from '../utils/type';
 import AbstractView from './view';
 
+/**
+ * Bangumi View.
+ * 
+ * @class BangumisView
+ * @author sdttttt
+ */
 export default new class BangumisView extends AbstractView {
 
   protected readonly viewType: string = "html";
@@ -17,7 +23,7 @@ export default new class BangumisView extends AbstractView {
 
   constructor() {
     super();
-    this.bangumiUrl = new BangumiUrl();
+    this.bangumiUrl = new BangumiUrl;
     this.pageNumber = 1;
   }
 
@@ -42,7 +48,7 @@ export default new class BangumisView extends AbstractView {
   * @author sdttttt
   */
   private showPageNumber() {
-    vscode.window.showInformationMessage(`✔ 第${this.pageNumber}页`);
+    vscode.window.showInformationMessage(`🐶 第${this.pageNumber}页`);
   }
 
   /**
