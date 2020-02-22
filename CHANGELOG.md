@@ -28,4 +28,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Fix
 
 - 这次的几乎重构了超过 **85%** 的代码. 对大量逻辑进行了抽象拆分. 对性能上的影响未知.
-- 修改 KeyBind,解决快捷键冲突问题
+- 修改 KeyBind,解决快捷键冲突问题.
+
+# [1.2.0] - 2020-2.22
+
+### Add
+
+- 增加了番剧更新提醒.
+- 增加 加载页面.
+- 使用选项配置是否开启番剧提醒
