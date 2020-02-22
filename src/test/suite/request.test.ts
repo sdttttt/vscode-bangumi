@@ -9,7 +9,9 @@ import { Bangumi, BangumisData, WeekBangumiData, WBangumi } from '../../request/
  *
  * @author sdttttt
  */
-suite("TEST API", () => {
+suite("TEST API", function () {
+
+    this.timeout(5000);
 
     test("BILIBILI BANGUMI API TEST", function (done) {
         const callback: (res: BangumisData | undefined) => void =

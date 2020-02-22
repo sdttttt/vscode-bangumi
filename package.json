@@ -5,7 +5,7 @@
   "repository": "https://github.com/sdttttt/vscode-Bangumi",
   "displayName": "Bangumi Open",
   "description": "The favorite of otakuo friends.",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "icon": "Icon.png",
   "engines": {
     "vscode": "^1.41.0"
@@ -19,57 +19,68 @@
     "anime"
   ],
   "activationEvents": [
-    "onCommand:extension.openBangumi",
-    "onCommand:extension.nextPage",
-    "onCommand:extension.backPage",
-    "onCommand:extension.jumpPage",
-    "onCommand:extension.weekBangumi"
+    "*"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "extension.openBangumi",
+        "command": "openBangumi",
         "title": "Open Bangumi"
       },
       {
-        "command": "extension.nextPage",
+        "command": "nextPage",
         "title": "Bangumi Open: Next Page"
       },
       {
-        "command": "extension.backPage",
+        "command": "backPage",
         "title": "Bangumi Open: Back Page"
       },
       {
-        "command": "extension.jumpPage",
+        "command": "jumpPage",
         "title": "Bangumi Open: Jump to number of Page"
       },
       {
-        "command": "extension.weekBangumi",
+        "command": "weekBangumi",
         "title": "Bangumi Open: Week Bangumi"
       }
     ],
     "keybindings": [
       {
-        "command": "extension.nextPage",
+        "command": "nextPage",
         "key": "ctrl+alt+l",
         "mac": "cmd+alt+l"
       },
       {
-        "command": "extension.backPage",
+        "command": "backPage",
         "key": "ctrl+alt+k",
         "mac": "cmd+alt+k"
       }
-    ]
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Bangumi Open",
+      "properties": {
+        "BangumiOpen.DisplayHistory": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to show the Bangumi of the past 6 days?"
+        },
+        "BangumiOpen.EnableReminder": {
+          "type": "boolean",
+          "default": true,
+          "description": "When enabled, BangumiOpen will remind you when the Bangumi is updated."
+        }
+      }
+    }
   },
   "scripts": {
     "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "watch": "webpack --mode none --watch",
     "pretest": "yarn run compile",
     "test": "node ./out/test/runTest.js",
     "vscode:prepublish": "webpack --mode production",
     "webpack:compile": "webpack --mode none",
-    "webpack:watch": "webpack --mode none --watch",
     "lint": "tslint ./src/**/*.ts -t verbose"
   },
   "devDependencies": {

@@ -10,11 +10,33 @@
 
 ![b2](./resources/b2.png)
 
+
+
+
 ## Description
 
 使用 BILIBLI 的 API.
-目前只能提供简单的番剧查看.
-还有每周更新番剧也能看哦!
+提供的番剧浏览.
+
+每周新番也可以.
+
+## Functions in testing
+
+**插件有自带提醒的功能.在番剧更新时会提醒你.**
+
+该功能可以在配置文件中关闭.
+
+## Configuration
+
+```json
+    //default Config
+
+    // 是否显示前六天的番剧更新
+    "BangumiOpen.DisplayHistory": false,
+    // 是否开启番更新剧提醒
+    "BangumiOpen.EnableReminder": true
+
+```
 
 ## Usage
 
@@ -30,7 +52,6 @@
 
 可能会在将来提供的功能:
 
-- 提醒番剧更新
 - 番剧索引
 - <大嘘>在 Vscode 上看番???
 

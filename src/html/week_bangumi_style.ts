@@ -1,6 +1,6 @@
 /**
  * Week Bangumi css style
- * 
+ *
  * @export
  * @author sdttttt
  */
@@ -36,7 +36,7 @@ export const STYLE: string = `
     }
 
     .container .item {
-        width: 15%;
+        width: 222px;
         height: 750px;
         margin-left: 68px;
     }

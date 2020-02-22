@@ -1,9 +1,19 @@
+import * as vscode from "vscode";
 import { WeekBangumiData, WBangumi } from '../request/structure';
 import { toWeekDay } from '../utils/strings';
 import AbstractHTMLGenerator from './generator';
 import { STYLE } from './week_bangumi_style';
+import { toNumber } from '../utils/type';
+import { getConfig } from "../configuration";
+
 const HTML_HEAD = "<html>";
 
+/**
+ * Week Bangumis HTML Generator
+ *
+ * @class WeekBangumisHTMLGenerator
+ * @author sdttttt
+ */
 export default new class WeekBangumisHTMLGenerator extends AbstractHTMLGenerator<Array<WeekBangumiData>> {
 
     protected readonly style: string = STYLE;
@@ -64,8 +74,18 @@ export default new class WeekBangumisHTMLGenerator extends AbstractHTMLGenerator
 
         let html: string = "";
 
-        for (let day of data) {
-            html += this.makeOneDay(day);
+        const isDisplayHistory: any = getConfig("BangumiOpen.DisplayHistory");
+
+        if (<boolean>isDisplayHistory) {
+            for (let day of data) {
+                html += this.makeOneDay(day);
+            }
+        } else {
+            for (let index in data) {
+                if (toNumber(index) >= 5) {
+                    html += this.makeOneDay(data[index]);
+                }
+            }
         }
 
         return this.htmlHead + this.style + this.htmlBody + html + this.htmlFloor;

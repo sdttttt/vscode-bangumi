@@ -1,11 +1,11 @@
 /**
  * Html Generator
- * 
+ *
  * @template T input Data
  * @abstract AbstractHTMLGenerator
  * @author sdttttt
  */
-export default abstract class AbstractHTMLGenerator<T> {
+export default abstract class AbstractHTMLGenerator<T = any | undefined> {
 
     protected abstract readonly htmlHead: string;
     protected abstract readonly style: string;

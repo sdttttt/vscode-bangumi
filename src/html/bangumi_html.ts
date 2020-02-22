@@ -2,6 +2,12 @@ import { Bangumi } from "../request/structure";
 import { STYLE } from "./bangumi_style";
 import AbstractHTMLGenerator from './generator';
 
+/**
+ * Bangumis HTML Generator
+ *
+ * @class BangumisHTMLGenerator
+ * @author sdttttt
+ */
 export default new class BangumisHTMLGenerator extends AbstractHTMLGenerator<Array<Bangumi>> {
 
   protected readonly style: string = STYLE;
