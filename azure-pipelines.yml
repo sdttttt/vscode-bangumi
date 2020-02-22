@@ -36,6 +36,8 @@ steps:
       yarn compile
       yarn test
     displayName: Run Tests
+    env:
+      DISPLAY: ":99.0"
 
   - bash: |
       npm run webpack:compile
@@ -43,5 +45,4 @@ steps:
       vsce package
     displayName: Packing
 
-    env:
-      DISPLAY: ":99.0"
+    
