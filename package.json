@@ -5,7 +5,7 @@
   "repository": "https://github.com/sdttttt/vscode-Bangumi",
   "displayName": "Bangumi Open",
   "description": "The favorite of otakuo friends.",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "icon": "Icon.png",
   "engines": {
     "vscode": "^1.41.0"
@@ -60,12 +60,11 @@
   },
   "scripts": {
     "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "watch": "webpack --mode none --watch",
     "pretest": "yarn run compile",
     "test": "node ./out/test/runTest.js",
     "vscode:prepublish": "webpack --mode production",
     "webpack:compile": "webpack --mode none",
-    "webpack:watch": "webpack --mode none --watch",
     "lint": "tslint ./src/**/*.ts -t verbose"
   },
   "devDependencies": {

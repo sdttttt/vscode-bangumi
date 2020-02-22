@@ -8,7 +8,7 @@ import { isEmptyArray } from '../utils/type';
 
 /**
  * Week Bangumi View
- * 
+ *
  * @class
  * @author sdttttt
  */
@@ -38,7 +38,7 @@ export default new class WeekBangumisView extends AbstractView {
 
   /**
    * Opens week bangumi
-   * 
+   *
    * @author sdttttt
    */
   openWeekBangumi() {
@@ -53,11 +53,11 @@ export default new class WeekBangumisView extends AbstractView {
 
   /**
    * Reminders bangumi update
-   * 
+   *
    * TODO: NOT TEST
-   * 
+   *
    * @returns
-   * @author sdttttt  
+   * @author sdttttt
    */
   async startBangumiUpdateReminder() {
     let bangumisData: Array<WeekBangumiData> | undefined =
@@ -86,8 +86,8 @@ export default new class WeekBangumisView extends AbstractView {
     /**
      * 首先这里只遍历2次
      * 分别是今天和明天.
-     * 应该不会有 **整整把vscode开了三天的人吧** 💠 
-     * 
+     * 应该不会有 **整整把vscode开了三天的人吧** 💠
+     *
      * 然后便利这这两天所有的番剧
      * 超过当前时间戳的,也就是未来
      * 会开启一个定时器，时间到了就提醒开发者🦐
@@ -108,11 +108,14 @@ export default new class WeekBangumisView extends AbstractView {
         }
       }
     }
+
+    this.remindTimers.push(setTimeout(() => { vscode.window.showInformationMessage("测试触发了"); }, 10000));
+
   }
 
   /**
-   * Destorys reminder
-   * 
+   * Destroy reminder
+   *
    * @author sdttttt
    */
   destroyReminder() {

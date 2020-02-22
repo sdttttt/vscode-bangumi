@@ -1,5 +1,3 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import BangumiView from "./views/bangumi";
 import WeekBangumiView from "./views/week_bangumi";
@@ -9,7 +7,7 @@ let isInit: boolean = false;
 
 /**
  * init work
- * 
+ *
  * @param {vscode.ExtensionContext} context
  * @author sdttttt
  */
