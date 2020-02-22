@@ -59,7 +59,7 @@
     ],
     "configuration": {
       "type": "object",
-      "title": "TypeScript configuration",
+      "title": "Bangumi Open",
       "properties": {
         "BangumiOpen.DisplayHistory": {
           "type": "boolean",

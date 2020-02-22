@@ -1,7 +1,8 @@
 import * as vscode from "vscode";
 import BangumiView from "./views/bangumi";
 import WeekBangumiView from "./views/week_bangumi";
-import { newGlobal } from "./constants";
+import { setContext } from "./constants";
+import { getConfig } from "./configuration";
 
 let isInit: boolean = false;
 
@@ -12,10 +13,8 @@ let isInit: boolean = false;
  * @author sdttttt
  */
 function initializer(context: vscode.ExtensionContext) {
-  if (isInit) {
-    return;
-  }
-  newGlobal(context);
+  if (isInit) { return; }
+  setContext(context);
   isInit = !isInit;
 }
 
@@ -29,7 +28,11 @@ export function activate(context: vscode.ExtensionContext) {
 
   initializer(context);
 
-  WeekBangumiView.startBangumiUpdateReminder();
+  const useReminder: any = getConfig("BangumiOpen.EnableReminder");
+
+  if (<boolean>useReminder) {
+    WeekBangumiView.enableBangumiUpdateReminder();
+  }
 
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand

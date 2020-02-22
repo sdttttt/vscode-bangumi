@@ -5,6 +5,7 @@ import { WeekBangumiData } from '../request/structure';
 import AbstractView from './view';
 import { isToday, currentTimestamp } from '../utils/strings';
 import { isEmptyArray } from '../utils/type';
+import { getConfig } from '../configuration';
 
 /**
  * Week Bangumi View
@@ -61,15 +62,13 @@ export default new class WeekBangumisView extends AbstractView {
    * @async
    * @author sdttttt
    */
-  async startBangumiUpdateReminder() {
+  async enableBangumiUpdateReminder() {
     let bangumisData: Array<WeekBangumiData> | undefined =
       await getWeekBangumi();
 
     if (!bangumisData) {
       vscode.window.showWarningMessage("有这种事？每周番剧获取失败！🅰");
       return;
-    } else {
-      vscode.window.showWarningMessage("正在载入...");
     }
 
     let todayIndex: number = 0;
@@ -85,15 +84,6 @@ export default new class WeekBangumisView extends AbstractView {
 
     const currentTime: number = currentTimestamp();
 
-    /**
-     * 首先这里只遍历2次
-     * 分别是今天和明天.
-     * 应该不会有 **整整把vscode开了三天的人吧** 💠
-     *
-     * 然后便利这这两天所有的番剧
-     * 超过当前时间戳的,也就是未来
-     * 会开启一个定时器，时间到了就提醒开发者🦐
-     */
     for (let i = todayIndex; i <= todayIndex + 1; i++) {
       for (const bangumi of bangumisData[i].seasons) {
         const bangumiTime: number = bangumi.pub_ts * 1000;
@@ -101,6 +91,10 @@ export default new class WeekBangumisView extends AbstractView {
           const timeDifference: number = bangumiTime - currentTime;
 
           const timer: NodeJS.Timeout = setTimeout((bangumiName: string) => {
+            const useReminder: any = getConfig("BangumiOpen.EnableReminder");
+            if(!<boolean>useReminder) {
+              return;
+            }
             vscode.window.showInformationMessage(`
               SDTTTTT: 《${bangumiName}》 更新🌶！
             `);

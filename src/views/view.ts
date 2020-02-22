@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { globalVar } from '../constants';
+import { getContext } from '../constants';
 import LoadingHTMLGenerator from "../html/loading_html";
 
 /**
@@ -40,6 +40,9 @@ export default abstract class AbstractView {
      * @author sdttttt
      */
     createWebviewPanel(closeListener: () => any): vscode.WebviewPanel {
+
+        const context: vscode.ExtensionContext = getContext();
+
         const panel = vscode.window.createWebviewPanel(
             this.viewType,
             this.title,
@@ -48,11 +51,10 @@ export default abstract class AbstractView {
                 retainContextWhenHidden: false,
                 enableFindWidget: true,
                 localResourceRoots: [vscode.Uri.file(
-                    path.join(globalVar().context.extensionPath, 'resources'))]
+                    path.join(context.extensionPath, 'resources'))]
             }
         );
 
-        const context: vscode.ExtensionContext = globalVar().context;
         panel.onDidDispose(
             closeListener,
             null,

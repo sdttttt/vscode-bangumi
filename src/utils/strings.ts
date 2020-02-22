@@ -1,8 +1,8 @@
 
 /**
  * To week day
- * 
- * @param {number} day 
+ *
+ * @param {number} day
  * @returns week day
  * @author sdttttt
  */
@@ -30,7 +30,7 @@ export function toWeekDay(day: number): string {
 
 /**
  * To judge whether it is today or not.
- * 
+ *
  * @return {string}
  * @export
  * @author sdttttt
@@ -43,10 +43,10 @@ export function isToday(day: string): boolean {
 
 /**
  * Currents timestamp
- * 
+ *
  * @returns timestamp
  * @export
- * @author sdttttt 
+ * @author sdttttt
  */
 export function currentTimestamp(): number {
     return Number(new Date());
