@@ -57,6 +57,7 @@ export default new class WeekBangumisView extends AbstractView {
    * TODO: NOT TEST
    *
    * @returns
+   * @async
    * @author sdttttt
    */
   async startBangumiUpdateReminder() {

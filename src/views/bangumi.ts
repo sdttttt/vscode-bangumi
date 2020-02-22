@@ -8,7 +8,7 @@ import AbstractView from './view';
 
 /**
  * Bangumi View.
- * 
+ *
  * @class BangumisView
  * @author sdttttt
  */
