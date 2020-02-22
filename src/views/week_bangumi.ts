@@ -42,6 +42,7 @@ export default new class WeekBangumisView extends AbstractView {
    * @author sdttttt
    */
   openWeekBangumi() {
+    this.showLoadingView();
     const that = this;
 
     getWeekBangumi().then((result: Array<WeekBangumiData> | undefined) => {
@@ -109,8 +110,6 @@ export default new class WeekBangumisView extends AbstractView {
         }
       }
     }
-
-    this.remindTimers.push(setTimeout(() => { vscode.window.showInformationMessage("测试触发了"); }, 10000));
 
   }
 

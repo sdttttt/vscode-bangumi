@@ -56,7 +56,23 @@
         "key": "ctrl+alt+k",
         "mac": "cmd+alt+k"
       }
-    ]
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "TypeScript configuration",
+      "properties": {
+        "BangumiOpen.DisplayHistory": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to show the Bangumi of the past 6 days?"
+        },
+        "BangumiOpen.EnableReminder": {
+          "type": "boolean",
+          "default": true,
+          "description": "When enabled, BangumiOpen will remind you when the Bangumi is updated."
+        }
+      }
+    }
   },
   "scripts": {
     "compile": "tsc -p ./",

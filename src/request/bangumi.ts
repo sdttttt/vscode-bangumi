@@ -40,7 +40,7 @@ export async function getAllBangumi(burl: BangumiUrl): Promise<BangumisData | un
 
 /**
  * Gets week bangumi
- * 
+ *
  * @param {(data: Array<WeekBangumiData>) => void} callback
  * @async
  * @author sdttttt

@@ -1,9 +1,11 @@
 import * as vscode from 'vscode';
-import { createWebviewPanel } from '../utils/view';
+import * as path from 'path';
+import { globalVar } from '../constants';
+import LoadingHTMLGenerator from "../html/loading_html";
 
 /**
  * Abstract view.
- * 
+ *
  * @abstract
  * @class AbstractView
  * @author sdttttt
@@ -27,22 +29,66 @@ export default abstract class AbstractView {
     }
 
     /**
+     *  Quick Create a WebviewPanel
+     *
+     * @export
+     * @param {string} viewType
+     * @param {string} title
+     * @param {() => any} listener
+     * @returns {vscode.WebviewPanel}
+     *
+     * @author sdttttt
+     */
+    createWebviewPanel(closeListener: () => any): vscode.WebviewPanel {
+        const panel = vscode.window.createWebviewPanel(
+            this.viewType,
+            this.title,
+            vscode.ViewColumn.Two,
+            {
+                retainContextWhenHidden: false,
+                enableFindWidget: true,
+                localResourceRoots: [vscode.Uri.file(
+                    path.join(globalVar().context.extensionPath, 'resources'))]
+            }
+        );
+
+        const context: vscode.ExtensionContext = globalVar().context;
+        panel.onDidDispose(
+            closeListener,
+            null,
+            context.subscriptions
+        );
+        return panel;
+    }
+
+    /**
      *  Show WebViewPanel
      *  need Callback function
      *
      * @param {(pv: vscode.WebviewPanel) => void} callback
      */
-    openWebViewPanel(callback: (pv: vscode.WebviewPanel) => void) {
+    protected openWebViewPanel(callback: (pv: vscode.WebviewPanel) => void) {
         if (this.panelView) {
             this.panelView.reveal(this.columToShowIn);
             callback(this.panelView);
         } else {
-            const that = this;
-            this.panelView = createWebviewPanel("html", "Week Bangumis", () => {
+            const that: this = this;
+            this.panelView = this.createWebviewPanel(() => {
                 that.panelView = undefined;
             });
 
             callback(this.panelView);
         }
+    }
+
+    /**
+     * Shows loading view
+     *
+     * @author sdttttt
+     */
+    protected showLoadingView() {
+        this.openWebViewPanel((pv: vscode.WebviewPanel) => {
+            pv.webview.html = LoadingHTMLGenerator.generateHTML();
+        });
     }
 }

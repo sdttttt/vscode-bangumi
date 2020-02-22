@@ -57,6 +57,7 @@ export default new class BangumisView extends AbstractView {
   * @author sdttttt
   */
   openBangumi() {
+    this.showLoadingView();
     const that = this;
 
     getAllBangumi(this.bangumiUrl.setPage(this.pageNumber))

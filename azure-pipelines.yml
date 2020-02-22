@@ -44,5 +44,3 @@ steps:
       npm run vscode:prepublish
       vsce package
     displayName: Packing
-
-    
