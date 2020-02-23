@@ -29,15 +29,21 @@ steps:
 
   - bash: |
       npm install -g vsce
-    displayName: Install VSCE
+      npm install -g nyc
+    displayName: Install Tools
 
   - bash: |
       yarn
       yarn compile
-      yarn test
+      nyc --reporter=html --reporter=text yarn test
     displayName: Run Tests
     env:
       DISPLAY: ":99.0"
+
+  - bash: |
+      - nyc report --reporter=text-lcov > coverage.lcov
+      - bash <(curl -s https://codecov.io/bash)
+    displayName: Upload Coverage
 
   - bash: |
       npm run webpack:compile
