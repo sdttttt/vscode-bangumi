@@ -81,7 +81,8 @@
     "test": "node ./out/test/runTest.js",
     "vscode:prepublish": "webpack --mode production",
     "webpack:compile": "webpack --mode none",
-    "lint": "tslint ./src/**/*.ts -t verbose"
+    "lint": "tslint ./src/**/*.ts -t verbose",
+    "package": "vsce package"
   },
   "devDependencies": {
     "@types/chai": "^4.2.8",
