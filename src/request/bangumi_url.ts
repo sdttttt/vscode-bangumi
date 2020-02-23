@@ -1,6 +1,8 @@
 
+export const BANGUMI_WEEK = "https://bangumi.bilibili.com/web_api/timeline_global";
+
 // bilibili API => Base Url of show all Bangumi
- const BANGUMI_SHOW = "https://api.bilibili.com/pgc/season/index/result?";
+const BANGUMI_SHOW = "https://api.bilibili.com/pgc/season/index/result?";
 
 /**
  * Bangumi url
@@ -143,21 +145,21 @@ export class BangumiUrl {
         this._finalUrl = BANGUMI_SHOW;
 
         return this
-        .next("season_version", this._seasonVersion)
-        .next("area", this._area)
-        .next("is_finish", this._isFinish)
-        .next("copyright", this._copyright)
-        .next("season_status", this._seasonStatus)
-        .next("season_month", this._seasonMonth)
-        .next("year", this._year)
-        .next("style_id", this._styleId)
-        .next("order", this._order)
-        .next("st", this._st)
-        .next("sort", this._sort)
-        .next("page", this._page.toString())
-        .next("season_type", this._seasonType)
-        .next("pagesize", this._pagesize)
-        .add("type", this._type);
+            .next("season_version", this._seasonVersion)
+            .next("area", this._area)
+            .next("is_finish", this._isFinish)
+            .next("copyright", this._copyright)
+            .next("season_status", this._seasonStatus)
+            .next("season_month", this._seasonMonth)
+            .next("year", this._year)
+            .next("style_id", this._styleId)
+            .next("order", this._order)
+            .next("st", this._st)
+            .next("sort", this._sort)
+            .next("page", this._page.toString())
+            .next("season_type", this._seasonType)
+            .next("pagesize", this._pagesize)
+            .add("type", this._type);
     }
 
     /**

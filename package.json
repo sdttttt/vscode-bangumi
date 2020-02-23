@@ -1,90 +1,106 @@
 {
-	"name": "bangumiopen",
-	"publisher": "SDTTTTT",
-	"author": "SDTTTTT",
-	"repository": "https://github.com/sdttttt/vscode-Bangumi",
-	"displayName": "Bangumi Open",
-	"description": "The favorite of otakuo friends.",
-	"version": "1.0.1",
-	"icon": "Icon.png",
-	"engines": {
-		"vscode": "^1.41.0"
-	},
-	"categories": [
-		"Other"
-	],
-	"keywords": [
-		"bilibili",
-		"bangumi",
-		"anime"
-	],
-	"activationEvents": [
-		"onCommand:extension.openBangumi",
-		"onCommand:extension.nextPage",
-		"onCommand:extension.backPage",
-		"onCommand:extension.jumpPage"
-	],
-	"main": "./dist/extension.js",
-	"contributes": {
-		"commands": [
-			{
-				"command": "extension.openBangumi",
-				"title": "Open Bangumi"
-			},
-			{
-				"command": "extension.nextPage",
-				"title": "Bangumi Open: Next Page"
-			},
-			{
-				"command": "extension.backPage",
-				"title": "Bangumi Open: Back Page"
-			},
-			{
-				"command": "extension.jumpPage",
-				"title": "Bangumi Open: Jump to number of Page"
-			}
-		],
-		"keybindings": [
-			{
-				"command": "extension.nextPage",
-				"key": "ctrl+p",
-				"mac": "cmd+p"
-			},
-			{
-				"command": "extension.backPage",
-				"key": "ctrl+o",
-				"mac": "cmd+o"
-			}
-		]
-	},
-	"scripts": {
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"pretest": "yarn run compile",
-		"test": "node ./out/test/runTest.js",
-		"vscode:prepublish": "webpack --mode production",
-  		"webpack:compile": "webpack --mode none",
-  		"webpack:watch": "webpack --mode none --watch"
-	},
-
-	"devDependencies": {
-		"@types/chai": "^4.2.8",
-		"@types/glob": "^7.1.1",
-		"@types/mocha": "^5.2.7",
-		"@types/node": "^12.11.7",
-		"@types/vscode": "^1.41.0",
-		"chai": "^4.2.0",
-		"glob": "^7.1.5",
-		"mocha": "^6.2.2",
-		"ts-loader": "^6.2.1",
-		"tslint": "^5.20.0",
-		"typescript": "^3.6.4",
-		"vscode-test": "^1.2.2",
-		"webpack": "^4.41.5",
-		"webpack-cli": "^3.3.10"
-	},
-	"dependencies": {
-		"@types/axios": "^0.14.0",
-		"axios": "^0.19.2"
-	}
+  "name": "bangumiopen",
+  "publisher": "SDTTTTT",
+  "author": "SDTTTTT",
+  "repository": "https://github.com/sdttttt/vscode-Bangumi",
+  "displayName": "Bangumi Open",
+  "description": "The favorite of otakuo friends.",
+  "version": "1.2.0",
+  "icon": "Icon.png",
+  "engines": {
+    "vscode": "^1.41.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "bilibili",
+    "bangumi",
+    "anime"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "openBangumi",
+        "title": "Open Bangumi"
+      },
+      {
+        "command": "nextPage",
+        "title": "Bangumi Open: Next Page"
+      },
+      {
+        "command": "backPage",
+        "title": "Bangumi Open: Back Page"
+      },
+      {
+        "command": "jumpPage",
+        "title": "Bangumi Open: Jump to number of Page"
+      },
+      {
+        "command": "weekBangumi",
+        "title": "Bangumi Open: Week Bangumi"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "nextPage",
+        "key": "ctrl+alt+l",
+        "mac": "cmd+alt+l"
+      },
+      {
+        "command": "backPage",
+        "key": "ctrl+alt+k",
+        "mac": "cmd+alt+k"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Bangumi Open",
+      "properties": {
+        "BangumiOpen.DisplayHistory": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to show the Bangumi of the past 6 days?"
+        },
+        "BangumiOpen.EnableReminder": {
+          "type": "boolean",
+          "default": true,
+          "description": "When enabled, BangumiOpen will remind you when the Bangumi is updated."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "webpack --mode none --watch",
+    "pretest": "yarn run compile",
+    "test": "node ./out/test/runTest.js",
+    "vscode:prepublish": "webpack --mode production",
+    "webpack:compile": "webpack --mode none",
+    "lint": "tslint ./src/**/*.ts -t verbose"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.8",
+    "@types/glob": "^7.1.1",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.11.7",
+    "@types/vscode": "^1.41.0",
+    "chai": "^4.2.0",
+    "glob": "^7.1.5",
+    "mocha": "^6.2.2",
+    "ts-loader": "^6.2.1",
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.4",
+    "vscode-test": "^1.2.2",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
+  },
+  "dependencies": {
+    "@types/axios": "^0.14.0",
+    "axios": "^0.19.2"
+  }
 }

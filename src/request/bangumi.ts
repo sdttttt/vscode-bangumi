@@ -1,40 +1,64 @@
 import * as vscode from "vscode";
 import Axios from "./instance";
 import { AxiosResponse } from "axios";
-import { BangumiUrl } from '../utils/bangumi_url';
-import { BangumisResponse } from "./structure";
+import { BangumiUrl, BANGUMI_WEEK } from './bangumi_url';
+import { isEmptyArray, isEmptyObject } from '../utils/type';
+import {
+    BangumisResponse,
+    WeekBangumiData,
+    WeekBangumiResponse,
+    BangumisData,
+    isSuccess
+} from './structure';
 
 /**
  * HTTP Request Gets all bangumi
  *
  * @param callback
+ * @async
  * @author sdttttt
  */
-export function getAllBangumi(burl: BangumiUrl, callback: (data: BangumisResponse) => void) {
+export async function getAllBangumi(burl: BangumiUrl): Promise<BangumisData | undefined> {
 
     const url: string = burl.build().finalUrl;
 
-    Axios.get(url)
-        .then((res: AxiosResponse) => {
-            const bangumisResponse = <BangumisResponse>(res.data);
-            if (bangumisResponse.code !== 0) {
-                vscode.window.showInformationMessage(`
-                    Oops! B站可能炸了! 或许是API地址更改了./(ㄒoㄒ)/~~d
-                    https://github.com/sdttttt/vscode-bangumi/issues
-                `);
-                return;
-            }
+    const res: AxiosResponse<BangumisResponse> =
+        await Axios.get<any, AxiosResponse<BangumisResponse>>(url);
 
-            if (JSON.stringify(bangumisResponse.data) === "{}") {
-                vscode.window.showInformationMessage(`
-                  获取数据为空🤔
-                `);
-                return;
-            }
+    const bangumisResponse: BangumisResponse = res.data;
+    isSuccess(bangumisResponse);
 
-            callback(bangumisResponse);
-        }).catch((reason: any) => {
-            vscode.window.showWarningMessage("输入数字大概在100左右就到头了.");
-            console.log(reason);
-        });
+    if (isEmptyObject(bangumisResponse.data) || isEmptyArray(bangumisResponse.data.list)) {
+        vscode.window.showInformationMessage(`
+            获取数据为空🤔
+        `);
+        return;
+    }
+
+    return bangumisResponse.data;
+}
+
+/**
+ * Gets week bangumi
+ *
+ * @param {(data: Array<WeekBangumiData>) => void} callback
+ * @async
+ * @author sdttttt
+ */
+export async function getWeekBangumi(): Promise<Array<WeekBangumiData> | undefined> {
+
+    const res: AxiosResponse<WeekBangumiResponse> =
+        await Axios.get<any, AxiosResponse<WeekBangumiResponse>>(BANGUMI_WEEK);
+
+    const weekBangumiResponse = res.data;
+    isSuccess(weekBangumiResponse);
+
+    if (isEmptyArray(weekBangumiResponse.result)) {
+        vscode.window.showInformationMessage(`
+            获取数据为空🤔
+        `);
+        return;
+    }
+
+    return weekBangumiResponse.result;
 }

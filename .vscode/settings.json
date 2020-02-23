@@ -10,9 +10,13 @@
     "typescript.tsc.autoDetect": "off",
     "cSpell.words": [
         "Bangumi",
+        "Bili",
+        "Xvfb",
         "bangumiopen",
         "bangumis",
         "bilibili",
-        "sdttttt"
+        "sdttttt",
+        "vsce",
+        "vsix"
     ]
 }
