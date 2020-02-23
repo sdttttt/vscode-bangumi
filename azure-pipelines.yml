@@ -40,7 +40,5 @@ steps:
       DISPLAY: ":99.0"
 
   - bash: |
-      npm run webpack:compile
-      npm run vscode:prepublish
       vsce package
     displayName: Packing

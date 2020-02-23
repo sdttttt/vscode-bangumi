@@ -22,9 +22,7 @@ script:
   - yarn
   - yarn compile
   - yarn test
-  - npm run webpack:compile
-  - npm run vscode:prepublish
-  - vsce package
+  - yarn run package
 
 cache: yarn
 

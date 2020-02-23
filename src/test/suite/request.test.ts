@@ -11,8 +11,6 @@ import { Bangumi, BangumisData, WeekBangumiData, WBangumi } from '../../request/
  */
 suite("TEST API", function () {
 
-    this.timeout(5000);
-
     test("BILIBILI BANGUMI API TEST", function (done) {
         const callback: (res: BangumisData | undefined) => void =
             (data: BangumisData | undefined) => {
@@ -24,7 +22,6 @@ suite("TEST API", function () {
 
                     // request Successful
                     try {
-
                         // exists Next Page
                         expect(hasNext).to.equal(1);
 
