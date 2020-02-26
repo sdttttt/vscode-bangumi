@@ -10,9 +10,6 @@
 
 ![b2](./resources/b2.png)
 
-
-
-
 ## Description
 
 使用 BILIBLI 的 API.
@@ -55,4 +52,12 @@
 - 番剧索引
 - <大嘘>在 Vscode 上看番???
 
-**Enjoy!**
+## Contribution
+
+|  contributer   | cover  |
+|  ----  | ----  |
+| sdttttt  | ![sdttttt](https://avatars1.githubusercontent.com/u/42728902?s=96&v=4) |
+
+> 咸鱼开发者, 目前想给这个项目加一个测试覆盖率统计.遇到了困难, 有想法的欢迎联系我のemail.(๑•̀ㅂ•́)و✧
+
+# Enjoy!
