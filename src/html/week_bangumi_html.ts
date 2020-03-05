@@ -1,10 +1,12 @@
 import * as vscode from "vscode";
 import { WeekBangumiData, WBangumi } from '../request/structure';
-import { toWeekDay } from '../utils/strings';
+import { toWeekDay, isToday } from '../utils/strings';
 import AbstractHTMLGenerator from './generator';
 import { STYLE } from './week_bangumi_style';
 import { toNumber } from '../utils/type';
 import { getConfig } from "../configuration";
+import { getResourceFile } from '../utils/file';
+import { yinglili } from '../constants';
 
 const HTML_HEAD = "<html>";
 
@@ -25,10 +27,18 @@ export default new class WeekBangumisHTMLGenerator extends AbstractHTMLGenerator
     protected readonly htmlFloor: string = "</div></body></html>";
 
     private makeOneDay(day: WeekBangumiData): string {
+
+        let toDayBadge: vscode.Uri | undefined = undefined;
+        if (isToday(day.date)){
+            toDayBadge = getResourceFile(yinglili);
+        }
+
         let daysHtml: string = `
-    <div class="item">
+    <div class="item ${ isToday(day.date) ? "today" : "" }">
             <div class="day">
-                <h2>${toWeekDay(day.day_of_week)}</h2>
+                <h2>${toWeekDay(day.day_of_week)} ${toDayBadge ? 
+                    '<div class="today-badge" ><img src="' + toDayBadge + '"></div>' : "" }
+                </h2>
                 ${day.date}
             </div>
     `;

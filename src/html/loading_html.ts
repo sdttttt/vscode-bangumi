@@ -1,5 +1,8 @@
 import { STYLE } from './bangumi_style';
 import AbstractHTMLGenerator from './generator';
+import { Uri } from 'vscode';
+import { getResourceFile } from '../utils/file';
+import { huihui } from '../constants';
 
 /**
  * Loading Html Generator.
@@ -16,7 +19,7 @@ export default new class LoadingHTMLGenerator extends AbstractHTMLGenerator<unde
 
     protected readonly htmlFloor: string = "</div></body></html>";
 
-    protected readonly html: string;
+    protected html?: string;
 
     /**
      * HTML initializer for Improve performance.
@@ -24,11 +27,14 @@ export default new class LoadingHTMLGenerator extends AbstractHTMLGenerator<unde
      */
     constructor() {
         super();
-        this.html = '<div class="load">Loading...</div>';
-        this.html = this.htmlHead + this.style + this.htmlBody + this.html + this.htmlFloor;
     }
 
     generateHTML(): string {
+        if (!this.html) {
+            const loadimg: Uri = getResourceFile(huihui);
+            this.html = `<div class="load"><img style="width:120px;height:130px;" src="${loadimg}">Loading...</div>`;
+            this.html = this.htmlHead + this.style + this.htmlBody + this.html + this.htmlFloor;
+        }
         return this.html;
     }
 };

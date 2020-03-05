@@ -2,8 +2,6 @@
 
 All notable changes to the **Bangumi Open** extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
 ## [1.0.1] - 2020-2-10
 
 ### Fix
@@ -13,27 +11,34 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### Add
 
-- 增加页面跳转功能
-- 增加下一页和上一页的快捷键
+- 增加`页面跳转`功能
+- 增加`下一页`和`上一页`的快捷键
 
-## [1.1.0] - 2020-2.13
+## [1.1.0] - 2020-2-13
 
 ### Add
 
-- 增加了周推的获取接口
-- 完成了周推的页面
+- 增加了`周推`的获取接口
+- 完成了`周推`的页面
 
-## [1.1.1] - 2020-2.18
+## [1.1.1] - 2020-2-18
 
 ### Fix
 
 - 这次的几乎重构了超过 **85%** 的代码. 对大量逻辑进行了抽象拆分. 对性能上的影响未知.
-- 修改 KeyBind,解决快捷键冲突问题.
+- 修改`KeyBind`,解决`快捷键`冲突问题.
 
-# [1.2.0] - 2020-2.22
+# [1.2.0] - 2020-2-22
 
 ### Add
 
-- 增加了番剧更新提醒.
-- 增加 加载页面.
-- 使用选项配置是否开启番剧提醒
+- 增加了`番剧更新提醒`.
+- 增加加载页面.
+- 使用选项配置是否开启番剧提醒.
+
+# [1.2.1] - 2020-3-5
+
+### Fix
+
+- 在每周新番中会,如果是`今天`会标注一个败犬的badge.
+- 追番提醒中多一个打开`WeekBangumi`的选项.
