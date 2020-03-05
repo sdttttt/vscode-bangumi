@@ -1,5 +1,3 @@
-
-
 suite("VIEW TEST", () => {
 
 });

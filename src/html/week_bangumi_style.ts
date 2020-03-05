@@ -29,10 +29,20 @@ export const STYLE: string = `
         border-radius: 7px;
     }
 
+    .today-badge {
+        width: 25px;
+        height: 25px;
+        display:inline-block;
+    }
+
     .container {
         width: 3500px;
         height: 2000px;
         display: flex;
+    }
+
+    .container .today {
+        margin-top: -5px;
     }
 
     .container .item {

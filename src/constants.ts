@@ -1,5 +1,9 @@
 import * as vscode from "vscode";
 
+export const yinglili: string = "heiheihei.gif";
+
+export const huihui: string = "loading.gif";
+
 let _context: vscode.ExtensionContext;
 
 /**

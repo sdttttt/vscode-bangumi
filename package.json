@@ -5,7 +5,9 @@
   "repository": "https://github.com/sdttttt/vscode-Bangumi",
   "displayName": "Bangumi Open",
   "description": "The favorite of otakuo friends.",
-  "version": "1.2.0",
+  "preview":true,
+  "version": "1.2.1",
+  "license": "SEE LICENSE IN LICENSE",
   "icon": "Icon.png",
   "engines": {
     "vscode": "^1.41.0"
@@ -98,9 +100,7 @@
     "typescript": "^3.6.4",
     "vscode-test": "^1.2.2",
     "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10"
-  },
-  "dependencies": {
+    "webpack-cli": "^3.3.10",
     "@types/axios": "^0.14.0",
     "axios": "^0.19.2"
   }

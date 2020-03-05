@@ -96,15 +96,18 @@ export default new class WeekBangumisView extends AbstractView {
               return;
             }
             vscode.window.showInformationMessage(`
-              SDTTTTT: 《${bangumiName}》 更新🌶！
-            `);
+              《${bangumiName}》 更新啦！🎉
+              `, "Open WeekBangumi").then((result: string | undefined) => {
+                if (result) {
+                  vscode.commands.executeCommand("weekBangumi");
+                }
+              });
           }, timeDifference, bangumi.title);
 
           this.remindTimers.push(timer);
         }
       }
     }
-
   }
 
   /**
