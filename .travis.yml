@@ -29,7 +29,7 @@ cache: yarn
 deploy:
   provider: releases
   api_key: ${GITHUB_TOKEN}
-  file: *.vsix
+  file: "bangumiopen-1.2.1.vsix"
   skip_cleanup: true
   on:
     tags: true
