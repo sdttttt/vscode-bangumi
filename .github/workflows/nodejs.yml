@@ -28,8 +28,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Install
-      run: yarn && npm install -g vsce
+    - name: Install VSCE
+      run: npm install -g vsce
+    - name: Install Depend
+      run: yarn
     - name: Compile
       run: yarn compile
     - name: Run Test
