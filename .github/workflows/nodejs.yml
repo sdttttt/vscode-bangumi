@@ -19,24 +19,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Config xvfb
-      if: runner.os  == 'Linux'
-      run: |
-        /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        echo ">>> Started xvfb"
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Install VSCE
-      run: npm install -g vsce
-    - name: Install Depend
-      run: yarn
-    - name: Compile
-      run: yarn compile
-    - name: Run Test
-      run: yarn test
-    - name: Packing
-      run: vsce package
+    - name: Config xvfb
+      if: runner.os  == 'Linux'
+      run: |
+        /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        echo ">>> Started xvfb":  
+    - run: npm install -g vsce
+    - run: yarn
+    - run: yarn compile
+    - run: yarn test
+    - run: vsce package
       env:
         CI: true
