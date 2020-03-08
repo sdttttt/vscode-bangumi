@@ -26,13 +26,16 @@
 ## Configuration
 
 ```json
-    //default Config
+    //Default Config
 
     // 是否显示前六天的番剧更新
-    "BangumiOpen.DisplayHistory": false,
-    // 是否开启番更新剧提醒
-    "BangumiOpen.EnableReminder": true
+    "bangumiOpen.DisplayHistory": false,
 
+    // 是否开启番更新剧提醒
+    "bangumiOpen.EnableReminder": true,
+    
+    // 更新提醒时间提前 (单位：秒)
+    "bangumiOpen.ReminderAheadTime": 0
 ```
 
 ## Usage

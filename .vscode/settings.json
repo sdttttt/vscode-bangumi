@@ -18,5 +18,6 @@
         "sdttttt",
         "vsce",
         "vsix"
-    ]
+    ],
+    "commentTranslate.targetLanguage": "zh-CN"
 }

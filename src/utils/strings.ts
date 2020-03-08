@@ -1,3 +1,5 @@
+import { WeekBangumiData, BangumisData } from '../request/structure';
+
 /**
  * To week day
  *
@@ -49,4 +51,31 @@ export function isToday(day: string): boolean {
  */
 export function currentTimestamp(): number {
     return Number(new Date());
+}
+
+/**
+ * Gets today index in week bangumi
+ *
+ * @param bangumis 
+ * @returns today index in week bangumi
+ * @export
+ * @author sdttttt
+ */
+export function getTodayIndexInWeekBangumi(bangumis: Array<WeekBangumiData>): number | undefined {
+    for (let i = 0; i < bangumis.length; i++) {
+        if (isToday(bangumis[i].date)) {
+          return i;
+        }
+    }
+}
+
+/**
+ * To minute from secode
+ *
+ * @param {number} time 
+ * @returns {number} minute from secode
+ * @author sdttttt 
+ */
+export function toMinuteFromSecode(time: number): number{
+   return Math.ceil(time / 60);
 }

@@ -15,7 +15,6 @@ export function isSuccess(res: BiliResponse): boolean {
 
     vscode.window.showInformationMessage(`
         Oops! B站可能炸了! 或许是API地址更改了./(ㄒoㄒ)/~~d
-        https://github.com/sdttttt/vscode-bangumi/issues
     `);
 
     return false;
@@ -131,4 +130,8 @@ export interface WBangumi {
     square_cover: string;
     title: string;
     url: string;
+
+    delay: number;
+    delay_index: string;
+    delay_reason: string;
 }

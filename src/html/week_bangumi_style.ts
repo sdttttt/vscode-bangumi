@@ -57,6 +57,10 @@ export const STYLE: string = `
         margin-bottom: 10px;
     }
 
+    .delay {
+        opacity: 0.5;
+    }
+
     .container .item .bangumi {
         padding-top: 15px;
         padding-left: 20px;
