@@ -1,5 +1,8 @@
 import { toNumber, isEmptyArray, isEmptyObject } from '../../utils/type';
-import { isToday, currentTimestamp, toWeekDay } from '../../utils/strings';
+import { isToday, 
+    currentTimestamp, 
+    toWeekDay, 
+    toMinuteFromSecode } from '../../utils/strings';
 import { expect } from 'chai';
 
 /**
@@ -63,4 +66,16 @@ suite("Utils TEST", () => {
         expect(toWeekDay(8)).to.be.equal("");
     });
 
+    test("To Minute From Secode TEST", () => {
+        expect(toMinuteFromSecode(60)).to.be.equal(1);
+        expect(toMinuteFromSecode(30)).to.be.equal(1);
+        expect(toMinuteFromSecode(5)).to.be.equal(1);
+
+        expect(toMinuteFromSecode(120)).to.be.equal(2);
+        expect(toMinuteFromSecode(119)).to.be.equal(2);
+
+        expect(toMinuteFromSecode(121)).to.be.equal(3);
+    });
+
+    
 });
