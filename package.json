@@ -6,7 +6,7 @@
   "displayName": "Bangumi Open",
   "description": "The favorite of otakuo friends.",
   "preview":true,
-  "version": "1.2.1",
+  "version": "1.3.0",
   "license": "SEE LICENSE IN LICENSE",
   "icon": "Icon.png",
   "engines": {
@@ -72,6 +72,11 @@
           "type": "boolean",
           "default": true,
           "description": "When enabled, BangumiOpen will remind you when the Bangumi is updated."
+        },
+        "BangumiOpen.ReminderAheadTime": {
+          "type": "integer",
+          "default": 0,
+          "description": "**Unit: seconds** Sometimes, you may need Reminder to remind you in advance."
         }
       }
     }

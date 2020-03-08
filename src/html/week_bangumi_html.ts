@@ -60,24 +60,48 @@ export default new class WeekBangumisHTMLGenerator extends AbstractHTMLGenerator
     }
 
     private makeOneBangumi(bangumi: WBangumi): string {
+
+        if (bangumi.delay === 1) { // 拖更了！
+            return `
+            <div class="bangumi delay">
+                <div class="cover">
+                    <a href="${bangumi.url}">
+                        <img alt="加载不出来鸭!"
+                            src="${bangumi.square_cover}">
+                    </a>
+                </div>
+                <div class="info">
+                    <a href="${bangumi.url}">
+                        <div class="title">${bangumi.title}</div>
+                    </a>
+                    <a href="${bangumi.url}">
+                        <div class="part-number">${bangumi.delay_index}   
+                        w(ﾟДﾟ)w ${bangumi.delay_reason}</div>
+                    </a>
+                </div>
+            </div>
+            `;
+        }
+         
         return `
-    <div class="bangumi">
-        <div class="cover">
-            <a href="${bangumi.url}">
-                <img alt="加载不出来鸭!"
-                    src="${bangumi.square_cover}">
-            </a>
-        </div>
-        <div class="info">
-            <a href="${bangumi.url}">
-                <div class="title">${bangumi.title}</div>
-            </a>
-            <a href="${bangumi.url}">
-                <div class="part-number">${bangumi.pub_index}</div>
-            </a>
-        </div>
-    </div>
-    `;
+            <div class="bangumi">
+                <div class="cover">
+                    <a href="${bangumi.url}">
+                        <img alt="加载不出来鸭!"
+                            src="${bangumi.square_cover}">
+                    </a>
+                </div>
+                <div class="info">
+                    <a href="${bangumi.url}">
+                        <div class="title">${bangumi.title}</div>
+                    </a>
+                    <a href="${bangumi.url}">
+                        <div class="part-number">${bangumi.pub_index}</div>
+                    </a>
+                </div>
+            </div>
+            `;
+        
     }
 
     generateHTML(data: Array<WeekBangumiData>): string {
