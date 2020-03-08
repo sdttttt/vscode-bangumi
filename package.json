@@ -63,20 +63,20 @@
       "type": "object",
       "title": "Bangumi Open",
       "properties": {
-        "BangumiOpen.DisplayHistory": {
+        "bangumiOpen.DisplayHistory": {
           "type": "boolean",
           "default": false,
           "description": "Whether to show the Bangumi of the past 6 days?"
         },
-        "BangumiOpen.EnableReminder": {
+        "bangumiOpen.EnableReminder": {
           "type": "boolean",
           "default": true,
           "description": "When enabled, BangumiOpen will remind you when the Bangumi is updated."
         },
-        "BangumiOpen.ReminderAheadTime": {
+        "bangumiOpen.ReminderAheadTime": {
           "type": "integer",
           "default": 0,
-          "description": "**Unit: seconds** Sometimes, you may need Reminder to remind you in advance."
+          "description": "[Unit: seconds] Sometimes, you may need Reminder to remind you in advance."
         }
       }
     }

@@ -28,7 +28,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   initializer(context);
 
-  const useReminder: any = getConfig("BangumiOpen.EnableReminder");
+  const useReminder: any = getConfig("bangumiOpen.EnableReminder");
 
   if (<boolean>useReminder) {
     WeekBangumiView.enableBangumiUpdateReminder();

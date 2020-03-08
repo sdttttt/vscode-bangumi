@@ -20,7 +20,7 @@ export function getConfig(key: string): any {
  * @author sdttttt
  */
 export function getReminderAheadTime(): number {
-    let aheadTime: any = getConfig("BangumiOpen.ReminderAheadTime");
+    let aheadTime: any = getConfig("bangumiOpen.ReminderAheadTime");
     aheadTime = <number>aheadTime;
     if (isNaN(aheadTime) || aheadTime < 0) {
         return 0;

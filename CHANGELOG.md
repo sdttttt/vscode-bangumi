@@ -42,3 +42,13 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 
 - 在每周新番中会,如果是`今天`会标注一个败犬的badge.
 - 追番提醒中多一个打开`WeekBangumi`的选项.
+
+# [1.3.0] - 2020-3-8
+
+### Add
+
+- 在提醒功能中, 可以自定义提醒的提前时间.
+
+### Fix
+
+- 优化了周番界面的显示.

@@ -108,7 +108,7 @@ export default new class WeekBangumisHTMLGenerator extends AbstractHTMLGenerator
 
         let html: string = "";
 
-        const isDisplayHistory: any = getConfig("BangumiOpen.DisplayHistory");
+        const isDisplayHistory: any = getConfig("bangumiOpen.DisplayHistory");
 
         if (<boolean>isDisplayHistory) {
             for (let day of data) {
