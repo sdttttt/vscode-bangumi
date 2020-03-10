@@ -2,11 +2,10 @@ import * as vscode from "vscode";
 import { WeekBangumiData, WBangumi } from '../request/structure';
 import { toWeekDay, isToday } from '../utils/strings';
 import AbstractHTMLGenerator from './generator';
-import { STYLE } from './week_bangumi_style';
 import { toNumber } from '../utils/type';
 import { getConfig } from "../configuration";
 import { getResourceFile } from '../utils/file';
-import { yinglili } from '../constants';
+import { yinglili, WeekBangumiCSS } from '../constants';
 
 const HTML_HEAD = "<html>";
 
@@ -18,26 +17,26 @@ const HTML_HEAD = "<html>";
  */
 export default new class WeekBangumisHTMLGenerator extends AbstractHTMLGenerator<Array<WeekBangumiData>> {
 
-    protected readonly style: string = STYLE;
+    protected style: string = "";
 
-    protected readonly htmlBody: string = '<body><div class="container">';
+    protected html?: string;
 
-    protected readonly htmlHead: string = "<html>";
-
-    protected readonly htmlFloor: string = "</div></body></html>";
+    constructor() {
+        super();
+    }
 
     private makeOneDay(day: WeekBangumiData): string {
 
         let toDayBadge: vscode.Uri | undefined = undefined;
-        if (isToday(day.date)){
+        if (isToday(day.date)) {
             toDayBadge = getResourceFile(yinglili);
         }
 
         let daysHtml: string = `
-    <div class="item ${ isToday(day.date) ? "today" : "" }">
+    <div class="item ${ isToday(day.date) ? "today" : ""}">
             <div class="day">
-                <h2>${toWeekDay(day.day_of_week)} ${toDayBadge ? 
-                    '<div class="today-badge" ><img src="' + toDayBadge + '"></div>' : "" }
+                <h2>${toWeekDay(day.day_of_week)} ${toDayBadge ?
+                '<div class="today-badge" ><img src="' + toDayBadge + '"></div>' : ""}
                 </h2>
                 ${day.date}
             </div>
@@ -82,7 +81,7 @@ export default new class WeekBangumisHTMLGenerator extends AbstractHTMLGenerator
             </div>
             `;
         }
-         
+
         return `
             <div class="bangumi">
                 <div class="cover">
@@ -101,27 +100,27 @@ export default new class WeekBangumisHTMLGenerator extends AbstractHTMLGenerator
                 </div>
             </div>
             `;
-        
+
     }
 
     generateHTML(data: Array<WeekBangumiData>): string {
 
-        let html: string = "";
-
+        this.html = "";
+        this.makeCssUri(WeekBangumiCSS);
         const isDisplayHistory: any = getConfig("bangumiOpen.DisplayHistory");
 
         if (<boolean>isDisplayHistory) {
             for (let day of data) {
-                html += this.makeOneDay(day);
+                this.html += this.makeOneDay(day);
             }
         } else {
             for (let index in data) {
                 if (toNumber(index) >= 5) {
-                    html += this.makeOneDay(data[index]);
+                    this.html += this.makeOneDay(data[index]);
                 }
             }
         }
 
-        return this.htmlHead + this.style + this.htmlBody + html + this.htmlFloor;
+        return this.htmlHead + this.style + this.htmlBody + this.html + this.htmlFloor;
     }
 };

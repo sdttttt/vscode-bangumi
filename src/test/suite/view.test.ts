@@ -1,3 +1,0 @@
-suite("VIEW TEST", () => {
-
-});
