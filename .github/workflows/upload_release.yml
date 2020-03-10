@@ -29,16 +29,9 @@ jobs:
       env:
         CI: true
 
-    - name: Upload files to a GitHub release
-      uses: svenstaro/upload-release-action@1.0.1
+    - name: Upload to release
+      uses: JasonEtco/upload-to-release@master
       with:
-        # GitHub token
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        # Local file to upload
-        file: bangumiopen-*
-        # Tag to use as a release
-        asset_name: bangumiopen-${{ github.ref }}.vsix
-        tag: ${{ github.ref }}
-        # Overwrite the release in case it already exists
-        overwrite: true
-        # optional
+        args: bangumiopen-1.3.1.vsix
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
