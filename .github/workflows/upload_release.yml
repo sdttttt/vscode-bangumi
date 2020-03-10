@@ -37,6 +37,7 @@ jobs:
         # Local file to upload
         file: bangumiopen-*
         # Tag to use as a release
+        asset_name: bangumiopen-${{ github.ref }}.vsix
         tag: ${{ github.ref }}
         # Overwrite the release in case it already exists
         overwrite: true
