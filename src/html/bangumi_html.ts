@@ -1,6 +1,6 @@
 import { Bangumi } from "../request/structure";
-import { STYLE } from "./bangumi_style";
 import AbstractHTMLGenerator from './generator';
+import { BangumiCSS } from '../constants';
 
 /**
  * Bangumis HTML Generator
@@ -10,13 +10,9 @@ import AbstractHTMLGenerator from './generator';
  */
 export default new class BangumisHTMLGenerator extends AbstractHTMLGenerator<Array<Bangumi>> {
 
-  protected readonly style: string = STYLE;
+  protected style?: string;
 
-  protected readonly htmlBody: string = '<div class="container">';
-
-  protected readonly htmlHead: string = "<html><body>";
-
-  protected readonly htmlFloor: string = "</div></body></html>";
+  protected html?: string;
 
   /**
    *  Generate a Bangumi View
@@ -55,11 +51,13 @@ export default new class BangumisHTMLGenerator extends AbstractHTMLGenerator<Arr
    */
   generateHTML(bangumis: Array<Bangumi>): string {
 
-    let html: string = "";
+    this.makeCssUri(BangumiCSS);
+
+    this.html = "";
     for (let bangumi of bangumis) {
-      html += this.makeLine(bangumi);
+      this.html += this.makeLine(bangumi);
     }
 
-    return this.htmlHead + this.style + this.htmlBody + html + this.htmlFloor;
+    return this.htmlHead + this.style + this.htmlBody + this.html + this.htmlFloor;
   }
 };

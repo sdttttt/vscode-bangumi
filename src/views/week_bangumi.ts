@@ -52,46 +52,46 @@ export default new class WeekBangumisView extends AbstractView {
         that.createWeekBangumiView(result);
       }
     });
+}
+
+/**
+ * Reminders bangumi update
+ *
+ * @returns
+ * @async
+ * @author sdttttt
+ */
+async enableBangumiUpdateReminder() {
+  let bangumisData: Array<WeekBangumiData> | undefined =
+    await getWeekBangumi();
+
+  if (!bangumisData) {
+    vscode.window.showWarningMessage("有这种事？每周番剧获取失败！🅰");
+    return;
   }
 
-  /**
-   * Reminders bangumi update
-   *
-   * @returns
-   * @async
-   * @author sdttttt
-   */
-  async enableBangumiUpdateReminder() {
-    let bangumisData: Array<WeekBangumiData> | undefined =
-      await getWeekBangumi();
+  let todayIndex: number | undefined = getTodayIndexInWeekBangumi(bangumisData);
+  if (!todayIndex) {
+    vscode.window.showInformationMessage("没有找到今日的索引 ??");
+    return;
+  }
 
-    if (!bangumisData) {
-      vscode.window.showWarningMessage("有这种事？每周番剧获取失败！🅰");
-      return;
-    }
+  const currentTime: number = currentTimestamp();
+  let aheadTime: number = getReminderAheadTime();
 
-    let todayIndex: number | undefined = getTodayIndexInWeekBangumi(bangumisData);
-    if (!todayIndex) {  
-      vscode.window.showInformationMessage("没有找到今日的索引 ??");  
-      return;
-    }
+  for (let i = todayIndex; i <= todayIndex + 1; i++) {
+    for (const bangumi of bangumisData[i].seasons) {
+      const bangumiTime: number = bangumi.pub_ts * 1000;
+      if (currentTime < bangumiTime && bangumi.delay !== 1) {
+        const timeDifference: number = bangumiTime - currentTime;
+        const timer: NodeJS.Timeout = this.makeRemind(
+          bangumi.title, timeDifference, aheadTime);
 
-    const currentTime: number = currentTimestamp();
-    let aheadTime: number = getReminderAheadTime();
-
-    for (let i = todayIndex; i <= todayIndex + 1; i++) {
-      for (const bangumi of bangumisData[i].seasons) {
-        const bangumiTime: number = bangumi.pub_ts * 1000;
-        if (currentTime < bangumiTime && bangumi.delay !== 1) {
-          const timeDifference: number = bangumiTime - currentTime;
-          const timer: NodeJS.Timeout = this.makeRemind(
-            bangumi.title, timeDifference, aheadTime);
-
-          this.remindTimers.push(timer);
-        }
+        this.remindTimers.push(timer);
       }
     }
   }
+}
 
   /**
    * Makes remind
@@ -101,43 +101,43 @@ export default new class WeekBangumisView extends AbstractView {
    * @returns remind 
    * @author sdttttt
    */
-  private makeRemind(bangumiName: string, timeDifference: number,aheadTime: number): NodeJS.Timeout {
-    
-    let aheadTimeM: number = aheadTime * 1000;
+  private makeRemind(bangumiName: string, timeDifference: number, aheadTime: number): NodeJS.Timeout {
 
-    return setTimeout(async () => {
-      if (aheadTime === 0) {
-        vscode.window.showInformationMessage(`
+  let aheadTimeM: number = aheadTime * 1000;
+
+  return setTimeout(async () => {
+    if (aheadTime === 0) {
+      vscode.window.showInformationMessage(`
         《${bangumiName}》 更新啦！🎉
         `, "Open WeekBangumi").then((result: string | undefined) => {
-          if (result) {
-            vscode.commands.executeCommand("weekBangumi");
-          }
-        });
-      } else {
-        let minute = toMinuteFromSecode(aheadTime);
-        vscode.window.showInformationMessage(`
+        if (result) {
+          vscode.commands.executeCommand("weekBangumi");
+        }
+      });
+    } else {
+      let minute = toMinuteFromSecode(aheadTime);
+      vscode.window.showInformationMessage(`
         《${bangumiName}》 还有${minute}分钟就更新啦！ 🎉
         `, "Open WeekBangumi").then((result: string | undefined) => {
-          if (result) {
-            vscode.commands.executeCommand("weekBangumi");
-          }
-        });
-      }
-    }, timeDifference - aheadTimeM);
-  }
-
-  /**
-   * Destroy reminder
-   *
-   * @author sdttttt
-   */
-  destroyReminder() {
-    if (!isEmptyArray(this.remindTimers)) {
-      this.remindTimers.forEach((timer: NodeJS.Timeout) => {
-        clearTimeout(timer);
+        if (result) {
+          vscode.commands.executeCommand("weekBangumi");
+        }
       });
-      this.remindTimers = [];
     }
+  }, timeDifference - aheadTimeM);
+}
+
+/**
+ * Destroy reminder
+ *
+ * @author sdttttt
+ */
+destroyReminder() {
+  if (!isEmptyArray(this.remindTimers)) {
+    this.remindTimers.forEach((timer: NodeJS.Timeout) => {
+      clearTimeout(timer);
+    });
+    this.remindTimers = [];
   }
+}
 };

@@ -1,3 +1,5 @@
+import { getResourceFile } from '../utils/file';
+import * as vscode from 'vscode';
 /**
  * Html Generator
  *
@@ -7,11 +9,18 @@
  */
 export default abstract class AbstractHTMLGenerator<T = any | undefined> {
 
-    protected abstract readonly htmlHead: string;
-    protected abstract readonly style: string;
-    protected abstract readonly htmlBody: string;
-    protected abstract readonly htmlFloor: string;
+    protected abstract style?: string;
+    
+    protected readonly htmlBody: string = '<body><div class="container">';
+    protected readonly htmlHead: string = "<html>";
+    protected readonly htmlFloor: string = "</div></body></html>";
+    
+    protected abstract html?: string;
 
     abstract generateHTML(data: T): string;
 
+    protected makeCssUri(path: string) {
+        const cssPath: vscode.Uri = getResourceFile(path);
+        this.style = `<link rel="stylesheet" href="${cssPath}">`;
+    }
 }

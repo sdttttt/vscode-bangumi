@@ -4,6 +4,10 @@ export const yinglili: string = "heiheihei.gif";
 
 export const huihui: string = "loading.gif";
 
+export const WeekBangumiCSS = "css/week_bangumi.css";
+export const BangumiCSS = "css/bangumi.css";
+export const LoadingCSS = "css/loading.css";
+
 let _context: vscode.ExtensionContext;
 
 /**
