@@ -53,9 +53,15 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 
 - 优化了周番界面的显示.
 
-# [1.3.0] - 2020-3-10
+# [1.3.1] - 2020-3-10
 
 ### Fix
 
 - 重构页面的资源加载
 - 优化性能，增加了请求缓存
+
+# [1.3.2] - 2020-3-11
+
+### Fix
+
+- 减小插件体积.压缩了**90%**以上.

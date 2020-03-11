@@ -6,9 +6,9 @@
 
 一款基于 **Vscode** 的番剧插件.
 
-![b1](./resources/b1.png)
+![b1](https://raw.githubusercontent.com/sdttttt/vscode-bangumi/master/resources/b1.png)
 
-![b2](./resources/b2.png)
+![b2](https://raw.githubusercontent.com/sdttttt/vscode-bangumi/master/resources/b2.png)
 
 ## Description
 
