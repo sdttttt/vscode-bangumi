@@ -43,3 +43,8 @@ jobs:
         prerelease: false
         # With tags: true, your Releases deployment will trigger if and only if the build is a tagged build.
         tags: ${{ github.ref }}
+    - uses: lannonbr/vsce-action@master
+      with:
+        args: "publish -p $VSCE_TOKEN"
+      env:
+        VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }}
