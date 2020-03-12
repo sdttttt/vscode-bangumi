@@ -1,6 +1,6 @@
 "use strict";
 
-import { WeekBangumiData, BangumisData } from "../request/structure";
+import { WeekBangumiData } from "../request/structure";
 import { toNumber } from "./type";
 
 /**

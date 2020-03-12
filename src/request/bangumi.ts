@@ -32,7 +32,7 @@ export async function getAllBangumi(burl: BangumiUrl): Promise<BangumisData | un
 
 	if (!cacheData) {
 		const res: AxiosResponse<BangumisResponse> =
-            await Axios.get<any, AxiosResponse<BangumisResponse>>(url);
+            await Axios.get<unknown, AxiosResponse<BangumisResponse>>(url);
 
 		const bangumisResponse: BangumisResponse = res.data;
 		isSuccess(bangumisResponse);
@@ -68,7 +68,7 @@ export async function getWeekBangumi(): Promise<Array<WeekBangumiData> | undefin
 
 	if (!cacheData) {
 		const res: AxiosResponse<WeekBangumiResponse> =
-            await Axios.get<any, AxiosResponse<WeekBangumiResponse>>(BANGUMI_WEEK);
+            await Axios.get<unknown, AxiosResponse<WeekBangumiResponse>>(BANGUMI_WEEK);
 
 		const weekBangumiResponse = res.data;
 		isSuccess(weekBangumiResponse);

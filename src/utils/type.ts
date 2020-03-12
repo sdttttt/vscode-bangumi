@@ -33,7 +33,7 @@ export function toNumber(text: string | undefined): number {
  *
  * @author sdttttt
  */
-export function isEmptyArray(array: Array<any>): boolean {
+export function isEmptyArray(array: Array<unknown>): boolean {
 	return array.length === 0;
 }
 
@@ -45,6 +45,6 @@ export function isEmptyArray(array: Array<any>): boolean {
  *
  * @author sdttttt
  */
-export function isEmptyObject(obj: any): boolean {
+export function isEmptyObject(obj: unknown): boolean {
 	return JSON.stringify(obj) === "{}";
 }

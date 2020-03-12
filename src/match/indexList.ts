@@ -10,7 +10,7 @@ import * as vscode from "vscode";
  * @author sdttttt
  */
 export default abstract class AbstractIndexList {
-    
+
     /**
      * List  of abstract index list
      * 
@@ -45,7 +45,7 @@ export default abstract class AbstractIndexList {
      * @author sdttttt
      */
     protected openBangumiHook(): void {
-    	vscode.commands.executeCommand("openBangumi");
+        vscode.commands.executeCommand("openBangumi");
     }
 
     /**
@@ -54,16 +54,15 @@ export default abstract class AbstractIndexList {
      * @author sdttttt
      */
     openIndexList(): void {
-    	vscode.window.showQuickPick(this.list).then(
-    		(index: string | undefined) => {
-    			if (index) {
-    				this.conditionHandler(index);
+        vscode.window.showQuickPick(this.list).then(
+            (index: string | undefined) => {
+                if (index) {
+                    this.conditionHandler(index);
 
-    				if (this.openIndexListAfter) 
-    				{ this.openIndexListAfter(); }
-    			}
-    			return;
-    		}
-    	);
+                    if (this.openIndexListAfter) { this.openIndexListAfter(); }
+                }
+                return;
+            }
+        );
     }
 }

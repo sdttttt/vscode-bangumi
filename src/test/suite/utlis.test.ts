@@ -15,10 +15,10 @@ import { expect } from "chai";
 suite("Utils TEST", () => {
 
 	test("toNumber", () => {
-		const str: string = "1";
+		const str = "1";
 		const num: number = toNumber(str);
 
-		const undef: undefined = undefined;
+		const undef = undefined;
 
 		expect(num).to.be.equal(1);
 
@@ -27,7 +27,7 @@ suite("Utils TEST", () => {
 	});
 
 	test("is empty Array TEST", () => {
-		const emptyArr: Array<any> = [];
+		const emptyArr: Array<unknown> = [];
 		const arr: Array<number> = [1, 2, 3];
 		const arr2: Array<string> = ["a", "b", "c"];
 		// tslint:disable-next-line: no-unused-expression
@@ -79,5 +79,4 @@ suite("Utils TEST", () => {
 		expect(toMinuteFromSecode(121)).to.be.equal(3);
 	});
 
-    
 });

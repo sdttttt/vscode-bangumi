@@ -12,17 +12,17 @@ import { huihui, LoadingCSS } from "../constants";
  * @author sdttttt
  */
 export default new class LoadingHTMLGenerator extends AbstractHTMLGenerator<undefined> {
-    protected style?: string;
+	protected style?: string;
 
-    protected html?: string;
+	protected html?: string;
 
-    generateHTML(): string {
-    	if (!this.html) {
-    		const loadimg: Uri = getResourceFile(huihui);
-    		this.makeCssUri(LoadingCSS);
-    		this.html = `<div class="load"><img style="width:120px;height:130px;" src="${loadimg}">Loading...</div>`;
-    		this.html = this.htmlHead + this.style + this.htmlBody + this.html + this.htmlFloor;
-    	}
-    	return this.html;
-    }
+	generateHTML(): string {
+		if (!this.html) {
+			const loadimg: Uri = getResourceFile(huihui);
+			this.makeCssUri(LoadingCSS);
+			this.html = `<div class="load"><img style="width:120px;height:130px;" src="${loadimg}">Loading...</div>`;
+			this.html = this.htmlHead + this.style + this.htmlBody + this.html + this.htmlFloor;
+		}
+		return this.html;
+	}
 };

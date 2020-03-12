@@ -11,7 +11,7 @@ import * as vscode from "vscode";
  *
  * @author sdttttt
  */
-export function getConfig(key: string): any {
+export function getConfig(key: string): unknown {
 	return vscode.workspace.getConfiguration().get(key);
 }
 
@@ -22,10 +22,10 @@ export function getConfig(key: string): any {
  * @author sdttttt
  */
 export function getReminderAheadTime(): number {
-	let aheadTime: any = getConfig("bangumiOpen.ReminderAheadTime");
-	aheadTime = <number>aheadTime;
-	if (isNaN(aheadTime) || aheadTime < 0) {
+	const aheadTime: unknown = getConfig("bangumiOpen.ReminderAheadTime");
+	const result: number = aheadTime as number ;
+	if (isNaN(result) || result < 0) {
 		return 0;
 	}
-	return aheadTime;
+	return result;
 }

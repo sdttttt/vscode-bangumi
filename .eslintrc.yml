@@ -1,7 +1,7 @@
 env:
   es6: true
-  node: true
 extends:
+  - "plugin:@typescript-eslint/recommended"
   - 'eslint:recommended'
   - 'plugin:@typescript-eslint/eslint-recommended'
 globals:
@@ -13,16 +13,4 @@ parserOptions:
   sourceType: module
 plugins:
   - '@typescript-eslint'
-rules:
-  indent:
-    - error
-    - tab
-  linebreak-style:
-    - error
-    - unix
-  quotes:
-    - error
-    - double
-  semi:
-    - error
-    - always
+rules: {}

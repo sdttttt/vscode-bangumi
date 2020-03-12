@@ -2,6 +2,7 @@ import * as path from "path";
 
 import { runTests } from "vscode-test";
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 async function main() {
 	try {
 		// The folder containing the Extension Manifest package.json

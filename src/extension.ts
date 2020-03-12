@@ -7,7 +7,7 @@ import { setContext } from "./constants";
 import { getConfig } from "./configuration";
 import MainIndexList from "./match/";
 
-let isInit: boolean = false;
+let isInit = false;
 
 /**
  * init work
@@ -15,7 +15,7 @@ let isInit: boolean = false;
  * @param {vscode.ExtensionContext} context
  * @author sdttttt
  */
-function initializer(context: vscode.ExtensionContext) {
+function initializer(context: vscode.ExtensionContext): void {
 	if (isInit) { return; }
 	setContext(context);
 	isInit = !isInit;
@@ -27,13 +27,13 @@ function initializer(context: vscode.ExtensionContext) {
  * @param {vscode.ExtensionContext} context
  * @author sdttttt
  */
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: vscode.ExtensionContext): void {
 
 	initializer(context);
 
-	const useReminder: any = getConfig("bangumiOpen.EnableReminder");
+	const useReminder: unknown = getConfig("bangumiOpen.EnableReminder");
 
-	if (<boolean>useReminder) {
+	if (useReminder as boolean) {
 		WeekBangumiView.enableBangumiUpdateReminder();
 	}
 
@@ -75,6 +75,6 @@ export function activate(context: vscode.ExtensionContext) {
  * @export
  * @author sdttttt
  */
-export function deactivate() {
+export function deactivate(): void {
 	WeekBangumiView.destroyReminder();
 }

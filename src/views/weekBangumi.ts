@@ -17,129 +17,128 @@ import { getReminderAheadTime } from "../configuration";
  * @author sdttttt
  */
 export default new class WeekBangumisView extends AbstractView {
-  protected readonly viewType = "html";
-  protected readonly title = "Week Bangumis";
+	protected readonly viewType = "html";
+	protected readonly title = "Week Bangumis";
 
-  private remindTimers: Array<NodeJS.Timeout> = [];
+	private remindTimers: Array<NodeJS.Timeout> = [];
 
-  constructor() {
-  	super();
-  }
+	constructor() {
+		super();
+	}
 
-  /**
-   * Creates Week bangumi view
+	/**
+	 * Creates Week bangumi view
+	 *
+	 * @param {Array<WeekBangumiData>} data
+	 * @author sdttttt
+	 */
+	private createWeekBangumiView(data: Array<WeekBangumiData>): void {
+		this.openWebViewPanel(
+			(pv: vscode.WebviewPanel) => {
+				pv.webview.html = WeekBangumisHTMLGenerator.generateHTML(data);
+			}
+		);
+	}
+
+	/**
+	 * Opens week bangumi
+	 *
+	 * @author sdttttt
+	 */
+	openWeekBangumi(): void {
+		this.showLoadingView();
+
+		getWeekBangumi().then((result: Array<WeekBangumiData> | undefined) => {
+			if (result) {
+				this.createWeekBangumiView(result);
+			}
+		});
+	}
+
+	/**
+   * Reminders bangumi update
    *
-   * @param {Array<WeekBangumiData>} data
+   * @returns
+   * @async
    * @author sdttttt
    */
-  private createWeekBangumiView(data: Array<WeekBangumiData>) {
-  	this.openWebViewPanel(
-  		(pv: vscode.WebviewPanel) => {
-  			pv.webview.html = WeekBangumisHTMLGenerator.generateHTML(data);
-  		}
-  	);
-  }
+	async enableBangumiUpdateReminder(): Promise<void> {
+		const bangumisData: Array<WeekBangumiData> | undefined =
+			await getWeekBangumi();
 
-  /**
-   * Opens week bangumi
-   *
-   * @author sdttttt
-   */
-  openWeekBangumi() {
-  	this.showLoadingView();
-  	const that = this;
+		if (!bangumisData) {
+			vscode.window.showWarningMessage("有这种事？每周番剧获取失败！🅰");
+			return;
+		}
 
-  	getWeekBangumi().then((result: Array<WeekBangumiData> | undefined) => {
-  		if (result) {
-  			that.createWeekBangumiView(result);
-  		}
-  	});
-  }
+		const todayIndex: number | undefined = getTodayIndexInWeekBangumi(bangumisData);
+		if (!todayIndex) {
+			vscode.window.showInformationMessage("没有找到今日的索引 ??");
+			return;
+		}
 
-  /**
- * Reminders bangumi update
- *
- * @returns
- * @async
- * @author sdttttt
- */
-  async enableBangumiUpdateReminder() {
-  	let bangumisData: Array<WeekBangumiData> | undefined =
-    await getWeekBangumi();
+		const currentTime: number = currentTimestamp();
+		const aheadTime: number = getReminderAheadTime();
 
-  	if (!bangumisData) {
-  		vscode.window.showWarningMessage("有这种事？每周番剧获取失败！🅰");
-  		return;
-  	}
+		for (let i = todayIndex; i <= todayIndex + 1; i++) {
+			for (const bangumi of bangumisData[i].seasons) {
+				const bangumiTime: number = bangumi.pub_ts * 1000;
+				if (currentTime < bangumiTime && bangumi.delay !== 1) {
+					const timeDifference: number = bangumiTime - currentTime;
+					const timer: NodeJS.Timeout = this.makeRemind(
+						bangumi.title, timeDifference, aheadTime);
 
-  	let todayIndex: number | undefined = getTodayIndexInWeekBangumi(bangumisData);
-  	if (!todayIndex) {
-  		vscode.window.showInformationMessage("没有找到今日的索引 ??");
-  		return;
-  	}
+					this.remindTimers.push(timer);
+				}
+			}
+		}
+	}
 
-  	const currentTime: number = currentTimestamp();
-  	let aheadTime: number = getReminderAheadTime();
+	/**
+	 * Makes remind
+	 *
+	 * @param bangumiName 
+	 * @param time 
+	 * @returns remind 
+	 * @author sdttttt
+	 */
+	private makeRemind(bangumiName: string, timeDifference: number, aheadTime: number): NodeJS.Timeout {
 
-  	for (let i = todayIndex; i <= todayIndex + 1; i++) {
-  		for (const bangumi of bangumisData[i].seasons) {
-  			const bangumiTime: number = bangumi.pub_ts * 1000;
-  			if (currentTime < bangumiTime && bangumi.delay !== 1) {
-  				const timeDifference: number = bangumiTime - currentTime;
-  				const timer: NodeJS.Timeout = this.makeRemind(
-  					bangumi.title, timeDifference, aheadTime);
+		const aheadTimeM: number = aheadTime * 1000;
 
-  				this.remindTimers.push(timer);
-  			}
-  		}
-  	}
-  }
-
-  /**
-   * Makes remind
-   *
-   * @param bangumiName 
-   * @param time 
-   * @returns remind 
-   * @author sdttttt
-   */
-  private makeRemind(bangumiName: string, timeDifference: number, aheadTime: number): NodeJS.Timeout {
-
-  	let aheadTimeM: number = aheadTime * 1000;
-
-  	return setTimeout(async () => {
-  		if (aheadTime === 0) {
-  			vscode.window.showInformationMessage(`
+		return setTimeout(async () => {
+			if (aheadTime === 0) {
+				vscode.window.showInformationMessage(`
         《${bangumiName}》 更新啦！🎉
         `, "Open WeekBangumi").then((result: string | undefined) => {
-  				if (result) {
-  					vscode.commands.executeCommand("weekBangumi");
-  				}
-  			});
-  		} else {
-  			let minute = toMinuteFromSecode(aheadTime);
-  			vscode.window.showInformationMessage(`
+					if (result) {
+						vscode.commands.executeCommand("weekBangumi");
+					}
+				});
+			} else {
+				const minute = toMinuteFromSecode(aheadTime);
+				vscode.window.showInformationMessage(`
         《${bangumiName}》 还有${minute}分钟就更新啦！ 🎉
         `, "Open WeekBangumi").then((result: string | undefined) => {
-  				if (result) {
-  					vscode.commands.executeCommand("weekBangumi");
-  				}
-  			});
-  		}
-  	}, timeDifference - aheadTimeM);
-  }
+					if (result) {
+						vscode.commands.executeCommand("weekBangumi");
+					}
+				});
+			}
+		}, timeDifference - aheadTimeM);
+	}
 
-  /**
- * Destroy reminder
- *
- * @author sdttttt
- */
-  destroyReminder() {
-  	if (!isEmptyArray(this.remindTimers)) {
-  		this.remindTimers.forEach((timer: NodeJS.Timeout) => {
-  			clearTimeout(timer);
-  		});
-  		this.remindTimers = [];
-  	}
-  }
+	/**
+   * Destroy reminder
+   *
+   * @author sdttttt
+   */
+	destroyReminder(): void {
+		if (!isEmptyArray(this.remindTimers)) {
+			this.remindTimers.forEach((timer: NodeJS.Timeout) => {
+				clearTimeout(timer);
+			});
+			this.remindTimers = [];
+		}
+	}
 };
