@@ -1,5 +1,7 @@
 env:
   es6: true
+  commonjs: true
+  node: true
 extends:
   - "plugin:@typescript-eslint/recommended"
   - 'eslint:recommended'
