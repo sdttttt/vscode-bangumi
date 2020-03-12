@@ -4,6 +4,8 @@ import BangumisView from "../views/bangumi";
 
 export default new class SeasonVersionList extends FinalIndexList {
 
+    protected readonly tag: string = "SeasonVersion";
+
     protected readonly list: Array<string> = [
         "全部", "正片", "电影", "其他"
     ];

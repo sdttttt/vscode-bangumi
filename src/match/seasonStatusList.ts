@@ -3,6 +3,9 @@ import { BangumiUrl } from '../request/bangumiUrl';
 import BangumisView from "../views/bangumi";
 
 export default new class SeasonStatusList extends FinalIndexList {
+
+    protected readonly tag: string = "SeasonStatus";
+
     protected readonly list: Array<string> = [
         "全部", "免费", "付费", "大会员",
     ];

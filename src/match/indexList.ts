@@ -1,6 +1,8 @@
 "use strict";
 
 import * as vscode from "vscode";
+import MainIndexList from "./";
+import { getDisplayIndexTags } from '../configuration';
 
 /**
  * Abstract index list
@@ -37,7 +39,17 @@ export abstract class AbstractIndexList {
      * @type {() => void}
      * @author sdttttt
      */
-    protected readonly abstract openIndexListAfter?: () => void;
+    protected readonly abstract openIndexListAfter: Array<(args?: string) => void>;
+
+    /**
+     * Hook of Open index list before
+     * 
+     * @abstract
+     * @readonly
+     * @type {() => void}
+     * @author sdttttt
+     */
+    protected readonly abstract openIndexListBefore: Array<(args?: string) => void>;
 
     /**
      * Opens bangumi hook
@@ -57,9 +69,24 @@ export abstract class AbstractIndexList {
         vscode.window.showQuickPick(this.list).then(
             (index: string | undefined) => {
                 if (index) {
-                    this.conditionHandler(index);
+                    
+                    // Run Before Hook.
+                    if (this.openIndexListBefore.length > 0) {
+                        for (const callback of this.openIndexListBefore) {
+                            callback(index);
+                        }
+                    }
+                    //------------------
 
-                    if (this.openIndexListAfter) { this.openIndexListAfter(); }
+                    this.conditionHandler(index);
+                    
+                    // Run After Hook.
+                    if (this.openIndexListAfter.length > 0) {
+                        for (const callback of this.openIndexListAfter) {
+                            callback();
+                        }
+                    }
+                    //-----------------
                 }
                 return;
             }
@@ -67,16 +94,70 @@ export abstract class AbstractIndexList {
     }
 }
 
-
 /**
  * Final index list
- * **我比较讨厌写重复的代码, 所以做了一个小封装**
+ * 没有子选项
  * 
  * @abstract
  * @author sdttttt
  */
 export abstract class FinalIndexList extends AbstractIndexList {
 
-    protected readonly openIndexListAfter: () => void
-        = this.openBangumiHook;
+    protected abstract readonly tag: string;
+
+    protected readonly openIndexListAfter: Array<() => void>;
+
+    protected readonly openIndexListBefore: Array<(v?: string) => void>;
+
+    constructor() {
+        super();
+        this.openIndexListBefore = [
+            this.pushTagHook
+        ];
+        this.openIndexListAfter = [
+            this.openBangumiHook,
+            this.showTagHook,
+        ];
+    }
+
+     /**
+     * Pushs tag Hook.
+     * 这里必须使用闭包来声明函数.不然会上下文丢失.
+     *
+     * @param {string} index
+     * @author sdttttt
+     */
+     protected pushTagHook: (index?: string) => void
+         = (index?: string) => {
+             if (getDisplayIndexTags()) {
+                 if (index) {
+                     const tags: Map<string, string> = MainIndexList.tags;
+                     tags.set(this.tag, index);
+                     MainIndexList.tags = tags;
+                 }
+             }
+         }
+
+     /**
+     * Shows tag hook
+     *
+     * @author sdttttt
+     */
+    private showTagHook(): void {
+        if (getDisplayIndexTags()) {
+            const tags: Map<string, string> = MainIndexList.tags;
+            if (tags.size > 0) {
+                let message = "";
+                message += "Tags: | ";
+                for (const tag of tags.values()) {
+                    message += tag;
+                    message += "|";
+                }
+                message += "";
+                vscode.window.showInformationMessage(message);
+                return;
+            }
+            vscode.window.showErrorMessage("Tags: 默认");
+        }
+    }
 }

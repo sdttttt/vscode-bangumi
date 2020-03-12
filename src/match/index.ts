@@ -18,11 +18,28 @@ import BangumisView from "../views/bangumi";
 */
 export default new class MainIndexList extends AbstractIndexList {
 
-	protected readonly openIndexListAfter?: () => void;
+	protected readonly openIndexListAfter: Array<(v?: string) => void> = [];
+
+	protected readonly openIndexListBefore: Array<(v?: string) => void> = [];
 
 	protected readonly list: Array<string> = [
 		"类型", "地区", "状态", "版权", "付费", "季度", "时间", "风格", "(恢复默认)"
 	];
+
+	/**
+	 * Hit Tag
+	 * 
+	 * @author sdttttt
+	 */
+	private _tags: Map<string, string> = new Map();
+
+	set tags(value: Map<string,string>) {
+		this._tags = value;
+	}
+
+	get tags(): Map<string, string> {
+		return this._tags;
+	}
 
 	protected conditionHandler(index: string): void {
 		switch (index) {
@@ -49,10 +66,10 @@ export default new class MainIndexList extends AbstractIndexList {
 				break;
 			case "(恢复默认)":
 				BangumisView.bangumiUrl.restoreDefault();
+				this._tags.clear();
 				break;
 			default:
 				vscode.window.showInformationMessage("果咩,还在施工中");
 		}
 	}
 };
-

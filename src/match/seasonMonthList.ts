@@ -3,6 +3,9 @@ import BangumisView from "../views/bangumi";
 import { BangumiUrl } from '../request/bangumiUrl';
 
 export default new class SeasonMonthList extends FinalIndexList {
+    
+    protected readonly tag: string = "SeasonMonth";
+    
     protected readonly list: Array<string> = [
         "全部", "一月", "四月", "七月", "十月",
     ];

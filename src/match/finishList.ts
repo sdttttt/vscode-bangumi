@@ -3,6 +3,9 @@ import { BangumiUrl } from '../request/bangumiUrl';
 import BangumisView from '../views/bangumi';
 
 export default new class FinishList extends FinalIndexList {
+    
+    protected readonly tag: string = "FinishList";
+
     protected readonly list: Array<string> = [
         "全部", "完结", "连载",
     ];

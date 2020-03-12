@@ -3,8 +3,8 @@ import { BangumiUrl } from '../request/bangumiUrl';
 import BangumisView from "../views/bangumi";
 
 export default new class AreaList extends FinalIndexList {
-    protected readonly openIndexListAfter: () => void
-        = this.openBangumiHook;
+
+    protected readonly tag: string = "Area";
 
     protected readonly list: Array<string> = [
         "全部", "日本" ,"美国", "其他"

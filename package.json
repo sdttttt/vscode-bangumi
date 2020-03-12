@@ -81,6 +81,11 @@
           "type": "integer",
           "default": 0,
           "description": "[Unit: seconds] Sometimes, you may need Reminder to remind you in advance."
+        },
+        "bangumiOpen.DisplayIndexTags": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to display the tags that have been selected ?"
         }
       }
     }

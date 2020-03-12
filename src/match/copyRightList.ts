@@ -3,6 +3,9 @@ import { BangumiUrl } from '../request/bangumiUrl';
 import BangumisView from "../views/bangumi";
 
 export default new class CopyRightList extends FinalIndexList {
+
+    protected readonly tag: string = "CopyRight";
+
     protected readonly list: Array<string> = [
         "全部", "独家", "其他",
     ];

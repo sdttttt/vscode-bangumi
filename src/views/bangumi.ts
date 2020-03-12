@@ -19,6 +19,7 @@ export default new class BangumisView extends AbstractView {
   protected readonly viewType: string = "html";
   protected readonly title: string = "bangumis";
 
+
   private _pageNumber: number;
 
   private _bangumiUrl: BangumiUrl;

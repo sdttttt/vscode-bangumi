@@ -29,3 +29,14 @@ export function getReminderAheadTime(): number {
 	}
 	return result;
 }
+
+/**
+ * Gets display index tags
+ * 
+ * @returns true if display index tags 
+ * @author sdttttt
+ */
+export function getDisplayIndexTags(): boolean {
+	const displayStatus: unknown = getConfig("bangumiOpen.DisplayIndexTags");
+	return displayStatus as boolean;
+}
