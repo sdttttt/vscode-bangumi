@@ -1,13 +1,10 @@
 "use strict";
 
-import AbstractIndexList from "./indexList";
 import BangumisView from "../views/bangumi";
 import { numberOfStringPlus } from "../utils/strings";
+import { FinalIndexList } from './indexList';
 
-export default new class YearIndexList extends AbstractIndexList {
-
-	protected readonly openIndexListAfter: () => void
-		= this.openBangumiHook;
+export default new class YearList extends FinalIndexList {
 
 	protected readonly list: Array<string> = [
 		"2020", "2019", "2018", "2017", "2016", "2015", "2010-2014",
@@ -15,8 +12,8 @@ export default new class YearIndexList extends AbstractIndexList {
 	];
 
 	private encodeYear(years: Array<string>): string {
-		return encodeURI(`[${years[0]},${years[1]})`);
-	}
+        return encodeURI(`[${years[0]},${years[1]})`);
+    }
 
 	protected conditionHandler(index: string): void {
 		const url = BangumisView.bangumiUrl;

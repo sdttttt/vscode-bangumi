@@ -16,9 +16,7 @@ const BANGUMI_SHOW = "https://api.bilibili.com/pgc/season/index/result?";
 export class BangumiUrl {
 
 	constructor() {
-
 		this._finalUrl = BANGUMI_SHOW;
-
 		this._seasonVersion = "-1";
 		this._area = "-1";
 		this._isFinish = "-1";
@@ -35,6 +33,7 @@ export class BangumiUrl {
 		this._pagesize = "20";
 		this._type = "1";
 	}
+
 
 	private _finalUrl: string;
 
@@ -53,6 +52,29 @@ export class BangumiUrl {
 	private _seasonType: string;
 	private _pagesize: string;
 	private _type: string;
+
+	/**
+	 * Default bangumi url
+	 * 
+	 * @author sdttttt
+	 */
+	restoreDefault(): void {
+		this._seasonVersion = "-1";
+		this._area = "-1";
+		this._isFinish = "-1";
+		this._copyright = "-1";
+		this._seasonStatus = "-1";
+		this._seasonMonth = "-1";
+		this._year = "-1";
+		this._styleId = "-1";
+		this._order = "3";
+		this._sort = "0";
+		this._st = "1";
+		this._page = 1;
+		this._seasonType = "1";
+		this._pagesize = "20";
+		this._type = "1";
+	}
 
 	setSeasonVersion(value: string): this {
 		this._seasonVersion = value;
@@ -97,6 +119,11 @@ export class BangumiUrl {
 
 	setSeasonStatus(value: string): this {
 		this._seasonStatus = value;
+		return this;
+	}
+
+	setSeasonMonth(value: string): this {
+		this._seasonMonth = value;
 		return this;
 	}
 

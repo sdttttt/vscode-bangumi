@@ -9,7 +9,7 @@ import * as vscode from "vscode";
  * @class
  * @author sdttttt
  */
-export default abstract class AbstractIndexList {
+export abstract class AbstractIndexList {
 
     /**
      * List  of abstract index list
@@ -65,4 +65,18 @@ export default abstract class AbstractIndexList {
             }
         );
     }
+}
+
+
+/**
+ * Final index list
+ * **我比较讨厌写重复的代码, 所以做了一个小封装**
+ * 
+ * @abstract
+ * @author sdttttt
+ */
+export abstract class FinalIndexList extends AbstractIndexList {
+
+    protected readonly openIndexListAfter: () => void
+        = this.openBangumiHook;
 }
