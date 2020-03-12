@@ -1,10 +1,12 @@
+"use strict";
+
 import Axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
 const config: AxiosRequestConfig = {
-    timeout: 8888,
-    headers: {
-        "Content-Type": "application/json"
-    }
+	timeout: 8888,
+	headers: {
+		"Content-Type": "application/json"
+	}
 };
 
 const instance: AxiosInstance = Axios.create(config);

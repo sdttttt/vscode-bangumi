@@ -1,4 +1,6 @@
-import * as vscode from 'vscode';
+"use strict";
+
+import * as vscode from "vscode";
 
 /**
  * Determines whether success is
@@ -9,15 +11,15 @@ import * as vscode from 'vscode';
  */
 export function isSuccess(res: BiliResponse): boolean {
 
-    if (res.code === 0 && res.message === "success") {
-        return true;
-    }
+	if (res.code === 0 && res.message === "success") {
+		return true;
+	}
 
-    vscode.window.showInformationMessage(`
+	vscode.window.showInformationMessage(`
         Oops! B站可能炸了! 或许是API地址更改了./(ㄒoㄒ)/~~d
     `);
 
-    return false;
+	return false;
 }
 
 /**

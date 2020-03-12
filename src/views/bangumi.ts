@@ -1,10 +1,12 @@
+"use strict";
+
 import * as vscode from "vscode";
 import { getAllBangumi } from "../request/bangumi";
-import BangumisHTMLGenerator from '../html/bangumi_html';
-import { BangumiUrl } from "../request/bangumi_url";
-import { Bangumi, BangumisData } from '../request/structure';
-import { toNumber } from '../utils/type';
-import AbstractView from './view';
+import BangumisHTMLGenerator from "../html/bangumiHtml";
+import { BangumiUrl } from "../request/bangumiUrl";
+import { Bangumi, BangumisData } from "../request/structure";
+import { toNumber } from "../utils/type";
+import AbstractView from "./view";
 
 /**
  * Bangumi View.
@@ -22,9 +24,9 @@ export default new class BangumisView extends AbstractView {
   private _bangumiUrl: BangumiUrl;
 
   constructor() {
-    super();
-    this._bangumiUrl = new BangumiUrl;
-    this._pageNumber = 1;
+  	super();
+  	this._bangumiUrl = new BangumiUrl;
+  	this._pageNumber = 1;
   }
 
   /**
@@ -34,13 +36,13 @@ export default new class BangumisView extends AbstractView {
     * @author sdttttt
     */
   private createBangumiView(bangumiRes: BangumisData) {
-    const bangumis: Array<Bangumi> = bangumiRes.list;
+  	const bangumis: Array<Bangumi> = bangumiRes.list;
 
-    this.openWebViewPanel(
-      (pv: vscode.WebviewPanel) => {
-        pv.webview.html = BangumisHTMLGenerator.generateHTML(bangumis);
-      }
-    );
+  	this.openWebViewPanel(
+  		(pv: vscode.WebviewPanel) => {
+  			pv.webview.html = BangumisHTMLGenerator.generateHTML(bangumis);
+  		}
+  	);
   }
 
   /**
@@ -48,7 +50,7 @@ export default new class BangumisView extends AbstractView {
   * @author sdttttt
   */
   private showPageNumber() {
-    vscode.window.showInformationMessage(`🐶 第${this._pageNumber}页`);
+  	vscode.window.showInformationMessage(`🐶 第${this._pageNumber}页`);
   }
 
   /**
@@ -57,7 +59,7 @@ export default new class BangumisView extends AbstractView {
    * @author sdttttt
    */
   get bangumiUrl(): BangumiUrl {
-    return this._bangumiUrl;
+  	return this._bangumiUrl;
   }
 
   /**
@@ -66,7 +68,7 @@ export default new class BangumisView extends AbstractView {
    * @author sdttttt
    */
   set bangumiUrl(url: BangumiUrl) {
-    this._bangumiUrl = url;
+  	this._bangumiUrl = url;
   }
 
   /**
@@ -75,15 +77,15 @@ export default new class BangumisView extends AbstractView {
   * @author sdttttt
   */
   openBangumi() {
-    this.showLoadingView();
-    const that = this;
+  	this.showLoadingView();
+  	const that = this;
 
-    getAllBangumi(this._bangumiUrl.setPage(this._pageNumber))
-      .then((data: BangumisData | undefined) => {
-        if (data) {
-          that.createBangumiView(data);
-        }
-      });
+  	getAllBangumi(this._bangumiUrl.setPage(this._pageNumber))
+  		.then((data: BangumisData | undefined) => {
+  			if (data) {
+  				that.createBangumiView(data);
+  			}
+  		});
   }
 
   /**
@@ -93,9 +95,9 @@ export default new class BangumisView extends AbstractView {
   * @author sdttttt
   */
   nextPage() {
-    this._pageNumber++;
-    this.showPageNumber();
-    this.openBangumi();
+  	this._pageNumber++;
+  	this.showPageNumber();
+  	this.openBangumi();
   }
 
   /**
@@ -105,15 +107,15 @@ export default new class BangumisView extends AbstractView {
   * @author sdttttt
   */
   backPage() {
-    if (this._pageNumber > 1) {
-      this._pageNumber--;
-      this.showPageNumber();
-      this.openBangumi();
-    } else {
-      this._pageNumber = 1;
-      vscode.window.showInformationMessage("😰真的一滴都没有了!");
-      this.openBangumi();
-    }
+  	if (this._pageNumber > 1) {
+  		this._pageNumber--;
+  		this.showPageNumber();
+  		this.openBangumi();
+  	} else {
+  		this._pageNumber = 1;
+  		vscode.window.showInformationMessage("😰真的一滴都没有了!");
+  		this.openBangumi();
+  	}
   }
 
   /**
@@ -124,30 +126,30 @@ export default new class BangumisView extends AbstractView {
   */
   jumpPage() {
 
-    const inputOptions: vscode.InputBoxOptions = {
-      value: "1",
-      prompt: `TIP: 最大页数大概在150左右 🚀`
-    };
+  	const inputOptions: vscode.InputBoxOptions = {
+  		value: "1",
+  		prompt: "TIP: 最大页数大概在150左右 🚀"
+  	};
 
-    const inputResult = vscode.window.showInputBox(
-      inputOptions
-    );
+  	const inputResult = vscode.window.showInputBox(
+  		inputOptions
+  	);
 
-    const that = this;
+  	const that = this;
 
-    inputResult.then((text: string | undefined) => {
-      const number = toNumber(text);
-      if (number === 0) {
-        vscode.window.showInformationMessage(`
+  	inputResult.then((text: string | undefined) => {
+  		const number = toNumber(text);
+  		if (number === 0) {
+  			vscode.window.showInformationMessage(`
         输入的内容,不能是0或者非数字
         数字大小不做限制.
       `);
-        return;
-      } else {
-        that._pageNumber = number;
-        that.openBangumi();
-      }
-    });
+  			return;
+  		} else {
+  			that._pageNumber = number;
+  			that.openBangumi();
+  		}
+  	});
   }
 
 };

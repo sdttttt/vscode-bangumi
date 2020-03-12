@@ -1,6 +1,8 @@
+"use strict";
+
 import { Bangumi } from "../request/structure";
-import AbstractHTMLGenerator from './generator';
-import { BangumiCSS } from '../constants';
+import AbstractHTMLGenerator from "./generator";
+import { BangumiCSS } from "../constants";
 
 /**
  * Bangumis HTML Generator
@@ -21,14 +23,14 @@ export default new class BangumisHTMLGenerator extends AbstractHTMLGenerator<Arr
    * @author sdttttt
    */
   private makeLine(bangumi: Bangumi): string {
-    return `
+  	return `
       <div class="cover" >
         <div class="big"><img src="${bangumi.cover}" alt="抱歉啊" /></div>
         <div class="info">
 
         ${ bangumi.title.length > 17 ?
-        "<h4>" + bangumi.title + "</h4>" :
-        "<h3>" + bangumi.title + "</h3>"}
+		"<h4>" + bangumi.title + "</h4>" :
+		"<h3>" + bangumi.title + "</h3>"}
 
         <h4>关注度： ${bangumi.order}</h4>
         ${bangumi.badge !== "" ? "<h5>" + bangumi.badge + "</h5>" : "<h5>❤白嫖</h5>"}
@@ -51,13 +53,13 @@ export default new class BangumisHTMLGenerator extends AbstractHTMLGenerator<Arr
    */
   generateHTML(bangumis: Array<Bangumi>): string {
 
-    this.makeCssUri(BangumiCSS);
+  	this.makeCssUri(BangumiCSS);
 
-    this.html = "";
-    for (let bangumi of bangumis) {
-      this.html += this.makeLine(bangumi);
-    }
+  	this.html = "";
+  	for (let bangumi of bangumis) {
+  		this.html += this.makeLine(bangumi);
+  	}
 
-    return this.htmlHead + this.style + this.htmlBody + this.html + this.htmlFloor;
+  	return this.htmlHead + this.style + this.htmlBody + this.html + this.htmlFloor;
   }
 };

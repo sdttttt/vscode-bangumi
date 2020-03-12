@@ -5,7 +5,7 @@
   "repository": "https://github.com/sdttttt/vscode-Bangumi",
   "displayName": "Bangumi Open",
   "description": "The favorite of otakuo friends.",
-  "preview":true,
+  "preview": true,
   "version": "2.0.0",
   "license": "SEE LICENSE IN LICENSE",
   "icon": "Icon.png",
@@ -93,24 +93,31 @@
     "vscode:prepublish": "webpack --mode production",
     "webpack:compile": "webpack --mode none",
     "lint": "tslint ./src/**/*.ts -t verbose",
-    "package": "vsce package"
+    "package": "vsce package",
+    "eslint": "eslint src --ext .ts",
+    "eslint-fix": "yarn run eslint --fix"
   },
   "devDependencies": {
+    "@types/axios": "^0.14.0",
     "@types/chai": "^4.2.8",
     "@types/glob": "^7.1.1",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.11.7",
     "@types/vscode": "^1.41.0",
+    "@typescript-eslint/eslint-plugin": "^2.23.0",
+    "@typescript-eslint/parser": "^2.23.0",
+    "axios": "^0.19.2",
     "chai": "^4.2.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-typescript": "^0.14.0",
     "glob": "^7.1.5",
     "mocha": "^6.2.2",
     "ts-loader": "^6.2.1",
     "tslint": "^5.20.0",
     "typescript": "^3.6.4",
+    "typescript-eslint-parser": "^22.0.0",
     "vscode-test": "^1.2.2",
     "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10",
-    "@types/axios": "^0.14.0",
-    "axios": "^0.19.2"
+    "webpack-cli": "^3.3.10"
   }
 }

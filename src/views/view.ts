@@ -1,7 +1,9 @@
-import * as vscode from 'vscode';
-import * as path from 'path';
-import { getContext } from '../constants';
-import LoadingHTMLGenerator from "../html/loading_html";
+"use strict";
+
+import * as vscode from "vscode";
+import * as path from "path";
+import { getContext } from "../constants";
+import LoadingHTMLGenerator from "../html/loadingHtml";
 
 /**
  * Abstract view.
@@ -22,10 +24,10 @@ export default abstract class AbstractView {
      * initializer an instance of abstract view.
      */
     protected constructor() {
-        this.columToShowIn = vscode.window.activeTextEditor ?
-            vscode.window.activeTextEditor.viewColumn :
-            undefined;
-        this.panelView = undefined;
+    	this.columToShowIn = vscode.window.activeTextEditor ?
+    		vscode.window.activeTextEditor.viewColumn :
+    		undefined;
+    	this.panelView = undefined;
     }
 
     /**
@@ -41,26 +43,26 @@ export default abstract class AbstractView {
      */
     createWebviewPanel(closeListener: () => any): vscode.WebviewPanel {
 
-        const context: vscode.ExtensionContext = getContext();
+    	const context: vscode.ExtensionContext = getContext();
 
-        const panel = vscode.window.createWebviewPanel(
-            this.viewType,
-            this.title,
-            vscode.ViewColumn.Two,
-            {
-                retainContextWhenHidden: false,
-                enableFindWidget: true,
-                localResourceRoots: [vscode.Uri.file(
-                    path.join(context.extensionPath, 'resources'))]
-            }
-        );
+    	const panel = vscode.window.createWebviewPanel(
+    		this.viewType,
+    		this.title,
+    		vscode.ViewColumn.Two,
+    		{
+    			retainContextWhenHidden: false,
+    			enableFindWidget: true,
+    			localResourceRoots: [vscode.Uri.file(
+    				path.join(context.extensionPath, "resources"))]
+    		}
+    	);
 
-        panel.onDidDispose(
-            closeListener,
-            null,
-            context.subscriptions
-        );
-        return panel;
+    	panel.onDidDispose(
+    		closeListener,
+    		null,
+    		context.subscriptions
+    	);
+    	return panel;
     }
 
     /**
@@ -70,17 +72,17 @@ export default abstract class AbstractView {
      * @param {(pv: vscode.WebviewPanel) => void} callback
      */
     protected openWebViewPanel(callback: (pv: vscode.WebviewPanel) => void) {
-        if (this.panelView) {
-            this.panelView.reveal(this.columToShowIn);
-            callback(this.panelView);
-        } else {
-            const that: this = this;
-            this.panelView = this.createWebviewPanel(() => {
-                that.panelView = undefined;
-            });
+    	if (this.panelView) {
+    		this.panelView.reveal(this.columToShowIn);
+    		callback(this.panelView);
+    	} else {
+    		const that: this = this;
+    		this.panelView = this.createWebviewPanel(() => {
+    			that.panelView = undefined;
+    		});
 
-            callback(this.panelView);
-        }
+    		callback(this.panelView);
+    	}
     }
 
     /**
@@ -89,8 +91,8 @@ export default abstract class AbstractView {
      * @author sdttttt
      */
     protected showLoadingView() {
-        this.openWebViewPanel((pv: vscode.WebviewPanel) => {
-            pv.webview.html = LoadingHTMLGenerator.generateHTML();
-        });
+    	this.openWebViewPanel((pv: vscode.WebviewPanel) => {
+    		pv.webview.html = LoadingHTMLGenerator.generateHTML();
+    	});
     }
 }

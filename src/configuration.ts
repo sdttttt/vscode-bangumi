@@ -1,3 +1,5 @@
+"use strict";
+
 import * as vscode from "vscode";
 
 /**
@@ -10,7 +12,7 @@ import * as vscode from "vscode";
  * @author sdttttt
  */
 export function getConfig(key: string): any {
-    return vscode.workspace.getConfiguration().get(key);
+	return vscode.workspace.getConfiguration().get(key);
 }
 
 /**
@@ -20,10 +22,10 @@ export function getConfig(key: string): any {
  * @author sdttttt
  */
 export function getReminderAheadTime(): number {
-    let aheadTime: any = getConfig("bangumiOpen.ReminderAheadTime");
-    aheadTime = <number>aheadTime;
-    if (isNaN(aheadTime) || aheadTime < 0) {
-        return 0;
-    }
-    return aheadTime;
+	let aheadTime: any = getConfig("bangumiOpen.ReminderAheadTime");
+	aheadTime = <number>aheadTime;
+	if (isNaN(aheadTime) || aheadTime < 0) {
+		return 0;
+	}
+	return aheadTime;
 }
