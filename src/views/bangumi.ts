@@ -128,7 +128,7 @@ export default new class BangumisView extends AbstractView {
 
     const inputOptions: vscode.InputBoxOptions = {
       value: "1",
-      prompt: "TIP: 最大页数大概在150左右 🚀"
+      prompt: "TIP: 如果一直在加载，那应该是没这一页了 🚀"
     };
 
     const inputResult = vscode.window.showInputBox(
