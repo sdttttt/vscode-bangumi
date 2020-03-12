@@ -1,4 +1,5 @@
 import { WeekBangumiData, BangumisData } from '../request/structure';
+import { toNumber } from './type';
 
 /**
  * To week day
@@ -78,4 +79,16 @@ export function getTodayIndexInWeekBangumi(bangumis: Array<WeekBangumiData>): nu
  */
 export function toMinuteFromSecode(time: number): number{
    return Math.ceil(time / 60);
+}
+
+/**
+ * Numbers of string plus
+ * 
+ * @param str 
+ * @param num 
+ * @returns of string plus
+ * @author sdttttt 
+ */
+export function numberOfStringPlus(str: string, num: number): string {
+    return (toNumber(str) + num).toString();
 }

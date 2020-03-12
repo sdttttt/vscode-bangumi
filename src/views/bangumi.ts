@@ -17,14 +17,14 @@ export default new class BangumisView extends AbstractView {
   protected readonly viewType: string = "html";
   protected readonly title: string = "bangumis";
 
-  private pageNumber: number;
+  private _pageNumber: number;
 
-  private readonly bangumiUrl: BangumiUrl;
+  private _bangumiUrl: BangumiUrl;
 
   constructor() {
     super();
-    this.bangumiUrl = new BangumiUrl;
-    this.pageNumber = 1;
+    this._bangumiUrl = new BangumiUrl;
+    this._pageNumber = 1;
   }
 
   /**
@@ -48,7 +48,25 @@ export default new class BangumisView extends AbstractView {
   * @author sdttttt
   */
   private showPageNumber() {
-    vscode.window.showInformationMessage(`🐶 第${this.pageNumber}页`);
+    vscode.window.showInformationMessage(`🐶 第${this._pageNumber}页`);
+  }
+
+  /**
+   * Gets bangumi url
+   * 
+   * @author sdttttt
+   */
+  get bangumiUrl(): BangumiUrl {
+    return this._bangumiUrl;
+  }
+
+  /**
+   * Sets bangumi url
+   * 
+   * @author sdttttt
+   */
+  set bangumiUrl(url: BangumiUrl) {
+    this._bangumiUrl = url;
   }
 
   /**
@@ -60,7 +78,7 @@ export default new class BangumisView extends AbstractView {
     this.showLoadingView();
     const that = this;
 
-    getAllBangumi(this.bangumiUrl.setPage(this.pageNumber))
+    getAllBangumi(this._bangumiUrl.setPage(this._pageNumber))
       .then((data: BangumisData | undefined) => {
         if (data) {
           that.createBangumiView(data);
@@ -75,7 +93,7 @@ export default new class BangumisView extends AbstractView {
   * @author sdttttt
   */
   nextPage() {
-    this.pageNumber++;
+    this._pageNumber++;
     this.showPageNumber();
     this.openBangumi();
   }
@@ -87,12 +105,12 @@ export default new class BangumisView extends AbstractView {
   * @author sdttttt
   */
   backPage() {
-    if (this.pageNumber > 1) {
-      this.pageNumber--;
+    if (this._pageNumber > 1) {
+      this._pageNumber--;
       this.showPageNumber();
       this.openBangumi();
     } else {
-      this.pageNumber = 1;
+      this._pageNumber = 1;
       vscode.window.showInformationMessage("😰真的一滴都没有了!");
       this.openBangumi();
     }
@@ -126,9 +144,10 @@ export default new class BangumisView extends AbstractView {
       `);
         return;
       } else {
-        that.pageNumber = number;
+        that._pageNumber = number;
         that.openBangumi();
       }
     });
   }
+
 };

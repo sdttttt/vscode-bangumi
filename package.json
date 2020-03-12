@@ -6,7 +6,7 @@
   "displayName": "Bangumi Open",
   "description": "The favorite of otakuo friends.",
   "preview":true,
-  "version": "1.3.2",
+  "version": "2.0.0",
   "license": "SEE LICENSE IN LICENSE",
   "icon": "Icon.png",
   "engines": {
@@ -45,6 +45,10 @@
       {
         "command": "weekBangumi",
         "title": "Bangumi Open: Week Bangumi"
+      },
+      {
+        "command": "index",
+        "title": "Bangumi Open: Index"
       }
     ],
     "keybindings": [

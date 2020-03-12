@@ -3,6 +3,7 @@ import BangumiView from "./views/bangumi";
 import WeekBangumiView from "./views/week_bangumi";
 import { setContext } from "./constants";
 import { getConfig } from "./configuration";
+import MainIndexList from "./match/";
 
 let isInit: boolean = false;
 
@@ -58,6 +59,10 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(
       "weekBangumi",
       () => WeekBangumiView.openWeekBangumi()
+    ),
+    vscode.commands.registerCommand(
+      "index",
+      () => MainIndexList.openIndexList()
     ),
   );
 }
