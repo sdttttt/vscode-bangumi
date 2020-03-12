@@ -65,3 +65,15 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 ### Fix
 
 - 减小插件体积.压缩了**90%**以上.
+
+# [2.0.0] - 2020-3-13
+
+### Add 
+
+- 增加了番剧索引功能.
+- 完善番剧索引列表 (除了 "风格" Tag 还没有完成)
+- 优化索引使用体验, 增加`Tag`提示,可在配置文件中关闭.
+
+### Fix 
+
+- 遵循ESLint代码规范.

@@ -1,7 +1,9 @@
-import * as vscode from 'vscode';
-import * as path from 'path';
-import { getContext } from '../constants';
-import LoadingHTMLGenerator from "../html/loading_html";
+"use strict";
+
+import * as vscode from "vscode";
+import * as path from "path";
+import { getContext } from "../constants";
+import LoadingHTMLGenerator from "../html/loadingHtml";
 
 /**
  * Abstract view.
@@ -39,7 +41,7 @@ export default abstract class AbstractView {
      *
      * @author sdttttt
      */
-    createWebviewPanel(closeListener: () => any): vscode.WebviewPanel {
+    createWebviewPanel(closeListener: () => unknown): vscode.WebviewPanel {
 
         const context: vscode.ExtensionContext = getContext();
 
@@ -51,7 +53,7 @@ export default abstract class AbstractView {
                 retainContextWhenHidden: false,
                 enableFindWidget: true,
                 localResourceRoots: [vscode.Uri.file(
-                    path.join(context.extensionPath, 'resources'))]
+                    path.join(context.extensionPath, "resources"))]
             }
         );
 
@@ -69,14 +71,13 @@ export default abstract class AbstractView {
      *
      * @param {(pv: vscode.WebviewPanel) => void} callback
      */
-    protected openWebViewPanel(callback: (pv: vscode.WebviewPanel) => void) {
+    protected openWebViewPanel(callback: (pv: vscode.WebviewPanel) => void): void {
         if (this.panelView) {
             this.panelView.reveal(this.columToShowIn);
             callback(this.panelView);
         } else {
-            const that: this = this;
             this.panelView = this.createWebviewPanel(() => {
-                that.panelView = undefined;
+                this.panelView = undefined;
             });
 
             callback(this.panelView);
@@ -88,7 +89,7 @@ export default abstract class AbstractView {
      *
      * @author sdttttt
      */
-    protected showLoadingView() {
+    protected showLoadingView(): void {
         this.openWebViewPanel((pv: vscode.WebviewPanel) => {
             pv.webview.html = LoadingHTMLGenerator.generateHTML();
         });

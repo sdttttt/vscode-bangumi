@@ -1,10 +1,12 @@
+"use strict";
+
 import * as vscode from "vscode";
 import { getAllBangumi } from "../request/bangumi";
-import BangumisHTMLGenerator from '../html/bangumi_html';
-import { BangumiUrl } from "../request/bangumi_url";
-import { Bangumi, BangumisData } from '../request/structure';
-import { toNumber } from '../utils/type';
-import AbstractView from './view';
+import BangumisHTMLGenerator from "../html/bangumiHtml";
+import { BangumiUrl } from "../request/bangumiUrl";
+import { Bangumi, BangumisData } from "../request/structure";
+import { toNumber } from "../utils/type";
+import AbstractView from "./view";
 
 /**
  * Bangumi View.
@@ -17,14 +19,15 @@ export default new class BangumisView extends AbstractView {
   protected readonly viewType: string = "html";
   protected readonly title: string = "bangumis";
 
-  private pageNumber: number;
 
-  private readonly bangumiUrl: BangumiUrl;
+  private _pageNumber: number;
+
+  private _bangumiUrl: BangumiUrl;
 
   constructor() {
     super();
-    this.bangumiUrl = new BangumiUrl;
-    this.pageNumber = 1;
+    this._bangumiUrl = new BangumiUrl;
+    this._pageNumber = 1;
   }
 
   /**
@@ -33,7 +36,7 @@ export default new class BangumisView extends AbstractView {
     * @param bangumis
     * @author sdttttt
     */
-  private createBangumiView(bangumiRes: BangumisData) {
+  private createBangumiView(bangumiRes: BangumisData): void {
     const bangumis: Array<Bangumi> = bangumiRes.list;
 
     this.openWebViewPanel(
@@ -47,8 +50,26 @@ export default new class BangumisView extends AbstractView {
   * show number of Page
   * @author sdttttt
   */
-  private showPageNumber() {
-    vscode.window.showInformationMessage(`🐶 第${this.pageNumber}页`);
+  private showPageNumber(): void {
+    vscode.window.showInformationMessage(`🐶 第${this._pageNumber}页`);
+  }
+
+  /**
+   * Gets bangumi url
+   * 
+   * @author sdttttt
+   */
+  get bangumiUrl(): BangumiUrl {
+    return this._bangumiUrl;
+  }
+
+  /**
+   * Sets bangumi url
+   * 
+   * @author sdttttt
+   */
+  set bangumiUrl(url: BangumiUrl) {
+    this._bangumiUrl = url;
   }
 
   /**
@@ -56,14 +77,13 @@ export default new class BangumisView extends AbstractView {
   *
   * @author sdttttt
   */
-  openBangumi() {
+  openBangumi(): void {
     this.showLoadingView();
-    const that = this;
 
-    getAllBangumi(this.bangumiUrl.setPage(this.pageNumber))
+    getAllBangumi(this._bangumiUrl.setPage(this._pageNumber))
       .then((data: BangumisData | undefined) => {
         if (data) {
-          that.createBangumiView(data);
+          this.createBangumiView(data);
         }
       });
   }
@@ -74,8 +94,8 @@ export default new class BangumisView extends AbstractView {
   * @export
   * @author sdttttt
   */
-  nextPage() {
-    this.pageNumber++;
+  nextPage(): void {
+    this._pageNumber++;
     this.showPageNumber();
     this.openBangumi();
   }
@@ -86,13 +106,13 @@ export default new class BangumisView extends AbstractView {
   * @export
   * @author sdttttt
   */
-  backPage() {
-    if (this.pageNumber > 1) {
-      this.pageNumber--;
+  backPage(): void {
+    if (this._pageNumber > 1) {
+      this._pageNumber--;
       this.showPageNumber();
       this.openBangumi();
     } else {
-      this.pageNumber = 1;
+      this._pageNumber = 1;
       vscode.window.showInformationMessage("😰真的一滴都没有了!");
       this.openBangumi();
     }
@@ -104,18 +124,16 @@ export default new class BangumisView extends AbstractView {
   * @export
   * @author sdttttt
   */
-  jumpPage() {
+  jumpPage(): void {
 
     const inputOptions: vscode.InputBoxOptions = {
       value: "1",
-      prompt: `TIP: 最大页数大概在150左右 🚀`
+      prompt: "TIP: 如果一直在加载，那应该是没这一页了 🚀"
     };
 
     const inputResult = vscode.window.showInputBox(
       inputOptions
     );
-
-    const that = this;
 
     inputResult.then((text: string | undefined) => {
       const number = toNumber(text);
@@ -126,9 +144,10 @@ export default new class BangumisView extends AbstractView {
       `);
         return;
       } else {
-        that.pageNumber = number;
-        that.openBangumi();
+        this._pageNumber = number;
+        this.openBangumi();
       }
     });
   }
+
 };

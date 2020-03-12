@@ -1,13 +1,13 @@
-import * as vscode from "vscode";
-import { WeekBangumiData, WBangumi } from '../request/structure';
-import { toWeekDay, isToday } from '../utils/strings';
-import AbstractHTMLGenerator from './generator';
-import { toNumber } from '../utils/type';
-import { getConfig } from "../configuration";
-import { getResourceFile } from '../utils/file';
-import { yinglili, WeekBangumiCSS } from '../constants';
+"use strict";
 
-const HTML_HEAD = "<html>";
+import * as vscode from "vscode";
+import { WeekBangumiData, WBangumi } from "../request/structure";
+import { toWeekDay, isToday } from "../utils/strings";
+import AbstractHTMLGenerator from "./generator";
+import { toNumber } from "../utils/type";
+import { getConfig } from "../configuration";
+import { getResourceFile } from "../utils/file";
+import { yinglili, WeekBangumiCSS } from "../constants";
 
 /**
  * Week Bangumis HTML Generator
@@ -17,7 +17,7 @@ const HTML_HEAD = "<html>";
  */
 export default new class WeekBangumisHTMLGenerator extends AbstractHTMLGenerator<Array<WeekBangumiData>> {
 
-    protected style: string = "";
+    protected style = "";
 
     protected html?: string;
 
@@ -32,18 +32,18 @@ export default new class WeekBangumisHTMLGenerator extends AbstractHTMLGenerator
             toDayBadge = getResourceFile(yinglili);
         }
 
-        let daysHtml: string = `
+        let daysHtml = `
     <div class="item ${ isToday(day.date) ? "today" : ""}">
             <div class="day">
                 <h2>${toWeekDay(day.day_of_week)} ${toDayBadge ?
-                '<div class="today-badge" ><img src="' + toDayBadge + '"></div>' : ""}
+                "<div class=\"today-badge\" ><img src=\"" + toDayBadge + "\"></div>" : ""}
                 </h2>
                 ${day.date}
             </div>
     `;
 
-        let bangumiDate: string = "";
-        for (let bangumi of day.seasons) {
+        let bangumiDate = "";
+        for (const bangumi of day.seasons) {
             if (bangumi.pub_time !== bangumiDate) {
                 daysHtml += `<div class="time-point">
                 🕒${bangumi.pub_time}
@@ -107,14 +107,14 @@ export default new class WeekBangumisHTMLGenerator extends AbstractHTMLGenerator
 
         this.html = "";
         this.makeCssUri(WeekBangumiCSS);
-        const isDisplayHistory: any = getConfig("bangumiOpen.DisplayHistory");
+        const isDisplayHistory: unknown = getConfig("bangumiOpen.DisplayHistory");
 
-        if (<boolean>isDisplayHistory) {
-            for (let day of data) {
+        if (isDisplayHistory as boolean ) {
+            for (const day of data) {
                 this.html += this.makeOneDay(day);
             }
         } else {
-            for (let index in data) {
+            for (const index in data) {
                 if (toNumber(index) >= 5) {
                     this.html += this.makeOneDay(data[index]);
                 }

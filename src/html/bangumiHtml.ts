@@ -1,6 +1,8 @@
+"use strict";
+
 import { Bangumi } from "../request/structure";
-import AbstractHTMLGenerator from './generator';
-import { BangumiCSS } from '../constants';
+import AbstractHTMLGenerator from "./generator";
+import { BangumiCSS } from "../constants";
 
 /**
  * Bangumis HTML Generator
@@ -54,7 +56,7 @@ export default new class BangumisHTMLGenerator extends AbstractHTMLGenerator<Arr
     this.makeCssUri(BangumiCSS);
 
     this.html = "";
-    for (let bangumi of bangumis) {
+    for (const bangumi of bangumis) {
       this.html += this.makeLine(bangumi);
     }
 
