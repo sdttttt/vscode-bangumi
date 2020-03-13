@@ -5,6 +5,7 @@
 
 const webpack = require("webpack");
 const path = require("path");
+const BundleAnalyzerPlugin = require("@bundle-analyzer/webpack-plugin");
 
 /**@type {import('webpack').Configuration}*/
 const config = {
@@ -27,7 +28,8 @@ const config = {
     extensions: [".ts", ".js"]
   },
   plugins: [
-    new webpack.ProgressPlugin()
+    new webpack.ProgressPlugin(),
+    new BundleAnalyzerPlugin({ token: '1a14f122016cfbbbe51e4d1a193abfa8fad133fb' })
   ],
   module: {
     rules: [

@@ -103,6 +103,7 @@
     "eslint-fix": "yarn run eslint --fix"
   },
   "devDependencies": {
+    "@bundle-analyzer/webpack-plugin": "^0.5.1",
     "@types/axios": "^0.14.0",
     "@types/chai": "^4.2.8",
     "@types/glob": "^7.1.1",
