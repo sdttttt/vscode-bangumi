@@ -60,6 +60,17 @@
 
 *由于一些不明原因,有的时候快捷键会失灵 ??*
 
+## About i18n
+
+**At present, not intended to provide i18n. The reasons are as follows:**
+- Bilibili does not seem to provide an i18n interface.
+- Bilibili's Bangumi seems to be available only in Chinese.
+
+If you are a **non-Chinese user**.
+I'm Sorry.(´；ω；‘)
+
+*If you have any ideas about i18n, you can **issue** me.*
+
 ## Contribution
 
 |  contributer   | cover  |
