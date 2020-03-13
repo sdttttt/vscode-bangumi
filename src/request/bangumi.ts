@@ -39,7 +39,7 @@ export async function getAllBangumi(burl: BangumiUrl): Promise<BangumisData | un
 
 		if (isEmptyObject(bangumisResponse.data) || isEmptyArray(bangumisResponse.data.list)) {
 			vscode.window.showInformationMessage(`
-                获取数据为空🤔
+			咳咳，什么都没有找到🤔
             `);
 			return;
 		}
@@ -75,7 +75,7 @@ export async function getWeekBangumi(): Promise<Array<WeekBangumiData> | undefin
 
 		if (isEmptyArray(weekBangumiResponse.result)) {
 			vscode.window.showInformationMessage(`
-            获取数据为空🤔
+            咳咳，什么都没有找到🤔
         `);
 			return;
 		}

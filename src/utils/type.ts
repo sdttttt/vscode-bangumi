@@ -34,7 +34,7 @@ export function toNumber(text: string | undefined): number {
  * @author sdttttt
  */
 export function isEmptyArray(array: Array<unknown>): boolean {
-	return array.length === 0;
+	return array === undefined || array.length === 0;
 }
 
 /**
