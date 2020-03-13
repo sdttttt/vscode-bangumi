@@ -11,4 +11,4 @@ vsc-extension-quickstart.md
 **/webpack.config.js
 **/yarn.lock
 resources/*.png
-resources/*.gif
+resources/b1.gif

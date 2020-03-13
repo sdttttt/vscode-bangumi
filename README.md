@@ -3,7 +3,9 @@
 [![Build Status](https://travis-ci.com/sdttttt/vscode-bangumi.svg?branch=master)](https://travis-ci.com/sdttttt/vscode-bangumi)
 [![Build Status](https://dev.azure.com/shiinazch/Vscode%20Bangumi/_apis/build/status/sdttttt.vscode-bangumi?branchName=master)](https://dev.azure.com/shiinazch/Vscode%20Bangumi/_build/latest?definitionId=4&branchName=master)
 [![CodeFactor](https://www.codefactor.io/repository/github/sdttttt/vscode-bangumi/badge/master)](https://www.codefactor.io/repository/github/sdttttt/vscode-bangumi/overview/master)
-
+[![vsmarketplacebadge](https://vsmarketplacebadge.apphb.com/version/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)
+[![downloads](https://vsmarketplacebadge.apphb.com/downloads/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)
+[![rating](https://vsmarketplacebadge.apphb.com/rating/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)
 
 
 一款基于 **Vscode** 的番剧插件.希望能在编码中给你一点点快乐.
@@ -59,6 +61,17 @@
 `Back Page` 可用 `Ctrl+alt+k` 代替
 
 *由于一些不明原因,有的时候快捷键会失灵 ??*
+
+## About i18n
+
+**At present, not intended to provide i18n. The reasons are as follows:**
+- Bilibili does not seem to provide an i18n interface.
+- Bilibili's Bangumi seems to be available only in Chinese.
+
+If you are a **non-Chinese user**.
+I'm Sorry.(´；ω；‘)
+
+*If you have any ideas about i18n, you can **issue** me.*
 
 ## Contribution
 
