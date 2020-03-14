@@ -19,7 +19,6 @@ export default new class BangumisView extends AbstractView {
   protected readonly viewType: string = "html";
   protected readonly title: string = "bangumis";
 
-
   private _pageNumber: number;
 
   private _bangumiUrl: BangumiUrl;
@@ -36,7 +35,13 @@ export default new class BangumisView extends AbstractView {
     * @param bangumis
     * @author sdttttt
     */
-  private createBangumiView(bangumiRes: BangumisData): void {
+  private createBangumiView(bangumiRes: BangumisData | undefined): void {
+
+    if (!bangumiRes) {
+      this.showNotFoundView();
+      return;
+    }
+
     const bangumis: Array<Bangumi> = bangumiRes.list;
 
     this.openWebViewPanel(
@@ -81,11 +86,7 @@ export default new class BangumisView extends AbstractView {
     this.showLoadingView();
 
     getAllBangumi(this._bangumiUrl.setPage(this._pageNumber))
-      .then((data: BangumisData | undefined) => {
-        if (data) {
-          this.createBangumiView(data);
-        }
-      });
+      .then((data: BangumisData | undefined) => this.createBangumiView(data));
   }
 
   /**

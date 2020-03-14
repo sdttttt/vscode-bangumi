@@ -94,3 +94,17 @@ export function toMinuteFromSecode(time: number): number{
 export function numberOfStringPlus(str: string, num: number): string {
 	return (toNumber(str) + num).toString();
 }
+
+
+/**
+ *	return Number of Random Integer.
+ *
+ * @export
+ * @param {number} min
+ * @param {number} max
+ * @returns {number}
+ * @author sdttttt
+ */
+export function randomInteger(min: number, max: number): number {
+	return Math.floor(Math.random() * (max - min)) + min;
+}

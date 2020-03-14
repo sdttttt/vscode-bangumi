@@ -11,7 +11,8 @@ import {
 	WeekBangumiData,
 	WeekBangumiResponse,
 	BangumisData,
-	isSuccess
+	isSuccess,
+	isValidBangumisRequest as isValidBangumisRequest
 } from "./structure";
 
 
@@ -35,12 +36,8 @@ export async function getAllBangumi(burl: BangumiUrl): Promise<BangumisData | un
             await Axios.get<unknown, AxiosResponse<BangumisResponse>>(url);
 
 		const bangumisResponse: BangumisResponse = res.data;
-		isSuccess(bangumisResponse);
 
-		if (isEmptyObject(bangumisResponse.data) || isEmptyArray(bangumisResponse.data.list)) {
-			vscode.window.showInformationMessage(`
-			咳咳，什么都没有找到🤔
-            `);
+		if (!isValidBangumisRequest(bangumisResponse)) {
 			return;
 		}
 		result = bangumisResponse.data;
@@ -71,12 +68,11 @@ export async function getWeekBangumi(): Promise<Array<WeekBangumiData> | undefin
             await Axios.get<unknown, AxiosResponse<WeekBangumiResponse>>(BANGUMI_WEEK);
 
 		const weekBangumiResponse = res.data;
-		isSuccess(weekBangumiResponse);
 
-		if (isEmptyArray(weekBangumiResponse.result)) {
+		if ( !isSuccess(weekBangumiResponse) || isEmptyArray(weekBangumiResponse.result)) {
 			vscode.window.showInformationMessage(`
-            咳咳，什么都没有找到🤔
-        `);
+            	咳咳，什么都没有找到🤔
+        	`);
 			return;
 		}
 		result = weekBangumiResponse.result;

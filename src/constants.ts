@@ -7,6 +7,8 @@ export const yinglili = "heiheihei.gif";
 
 export const huihui = "loading.gif";
 
+export const enterprise = "enterprise.jpg";
+
 export const WeekBangumiCSS = "css/weekBangumi.css";
 export const BangumiCSS = "css/bangumi.css";
 export const LoadingCSS = "css/loading.css";
