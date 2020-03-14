@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 import Axios from "./instance";
 import { AxiosResponse } from "axios";
 import { BangumiUrl, BANGUMI_WEEK } from "./bangumiUrl";
-import { isEmptyArray, isEmptyObject } from "../utils/type";
+import { isEmptyArray } from "../utils/type";
 import { BangumiCache, WeekBangumiCache } from "./cache";
 import {
 	BangumisResponse,
