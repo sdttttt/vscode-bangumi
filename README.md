@@ -1,4 +1,7 @@
-# Bangumi Open
+<h1 align="center">
+  Bangumi Open
+</h1>
+
 
 [![Build Status](https://travis-ci.com/sdttttt/vscode-bangumi.svg?branch=master)](https://travis-ci.com/sdttttt/vscode-bangumi)
 [![Build Status](https://dev.azure.com/shiinazch/Vscode%20Bangumi/_apis/build/status/sdttttt.vscode-bangumi?branchName=master)](https://dev.azure.com/shiinazch/Vscode%20Bangumi/_build/latest?definitionId=4&branchName=master)
@@ -7,8 +10,7 @@
 [![downloads](https://vsmarketplacebadge.apphb.com/downloads/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)
 [![rating](https://vsmarketplacebadge.apphb.com/rating/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)
 
-
-一款基于 **Vscode** 的番剧插件.希望能在编码中给你一点点快乐.
+> 一款基于 **Vscode** 的番剧插件.希望能在编码中给你一点点快乐.💕
 
 ![b1](https://raw.githubusercontent.com/sdttttt/vscode-bangumi/master/resources/b1.gif)
 
@@ -16,19 +18,18 @@
 
 ## Description
 
-使用 BILIBLI 的 API.
-提供的`番剧索引`.以及`番剧更新表`.
+使用 BILIBLI 的 API. 
+提供的`番剧索引`功能. 以及`番剧更新表`.
 
-## Functions in testing
-
-**插件有自带提醒的功能.在番剧更新时会提醒你.**
+> **插件有自带提醒的功能.在番剧更新时会以提示窗的形式提醒你.** 🎉
 该功能可以在配置文件中关闭.
 
-**索引功能终于出来了.** 
+## Functions in testing 🚧
 
+**索引功能终于出来了.**  🎉
 目前属于实验阶段.
 
-## Configuration
+## Configuration 🛠
 
 ```json
     //Default Config
@@ -46,13 +47,13 @@
     "bangumiOpen.DisplayIndexTags": true
 ```
 
-## Usage
+## Usage 💖
 
-`Ctrl+Shift+P` 调出命令栏后,输入`Open Bangumi`或 `Bangumi Open: Week Bangumi` 即可打开视图.
+`Ctrl+Shift+P` 调出命令栏后,输入`Open Bangumi`或 `Bangumi Open: Week Bangumi` 即可打开视图. 🕵️‍♂️
 
 使用 `Bangumi Open: Index` 可打开索引. 选中索引后自动触发`Open Bangumi`命令.
 
-在一级索引中选中`(恢复默认)`可清除所有已经选中的Tag.
+> 在一级索引中选中`(恢复默认)`可清除所有已经选中的Tag. 📑
 
 `Next Page` 和 `Back Page` 提供翻页功能.
 
@@ -60,9 +61,9 @@
 
 `Back Page` 可用 `Ctrl+alt+k` 代替
 
-*由于一些不明原因,有的时候快捷键会失灵 ??*
+> *由于一些不明原因,有的时候快捷键会失灵 ??*
 
-## About i18n
+## About i18n 🌍
 
 **At present, not intended to provide i18n. The reasons are as follows:**
 - Bilibili does not seem to provide an i18n interface.
@@ -71,12 +72,12 @@
 If you are a **non-Chinese user**.
 I'm Sorry.(´；ω；‘)
 
-*If you have any ideas about i18n, you can **issue** me.*
+> *If you have any ideas about i18n, you can **issue** me.* 👋
 
-## Contribution
+## Contribution ☕
 
 |  contributer   | cover  |
 |  ----  | ----  |
 | sdttttt  | ![sdttttt](https://avatars1.githubusercontent.com/u/42728902?s=96&v=4) |
 
-# Enjoy!
+**(゜-゜)つロ 干杯~-bilibili**

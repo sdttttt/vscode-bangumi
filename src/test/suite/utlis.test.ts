@@ -4,7 +4,8 @@ import { toNumber, isEmptyArray, isEmptyObject } from "../../utils/type";
 import { isToday, 
 	currentTimestamp, 
 	toWeekDay, 
-	toMinuteFromSecode } from "../../utils/strings";
+	toMinuteFromSecode, 
+	randomInteger} from "../../utils/strings";
 import { expect } from "chai";
 
 /**
@@ -77,6 +78,14 @@ suite("Utils TEST", () => {
 		expect(toMinuteFromSecode(119)).to.be.equal(2);
 
 		expect(toMinuteFromSecode(121)).to.be.equal(3);
+	});
+
+	test("Random TEST", () => {
+		const num1: number = randomInteger(0 , 2);
+		expect(num1).to.be.least(0).that.most(2);
+
+		const num2: number = randomInteger(4, 15);
+		expect(num2).to.be.least(4).that.most(15);
 	});
 
 });

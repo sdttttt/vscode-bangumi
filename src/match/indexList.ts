@@ -4,6 +4,10 @@ import * as vscode from "vscode";
 import MainIndexList from "./";
 import { getDisplayIndexTags } from '../configuration';
 
+
+export type Hook = (args?: string) => void;
+export type Hooks = Array<Hook>;
+
 /**
  * Abstract index list
  * 
@@ -39,7 +43,7 @@ export abstract class AbstractIndexList {
      * @type {() => void}
      * @author sdttttt
      */
-    protected readonly abstract openIndexListAfter: Array<(args?: string) => void>;
+    protected readonly abstract openIndexListAfter: Hooks;
 
     /**
      * Hook of Open index list before
@@ -49,7 +53,7 @@ export abstract class AbstractIndexList {
      * @type {() => void}
      * @author sdttttt
      */
-    protected readonly abstract openIndexListBefore: Array<(args?: string) => void>;
+    protected readonly abstract openIndexListBefore: Hooks;
 
     /**
      * Opens bangumi hook
@@ -105,12 +109,13 @@ export abstract class FinalIndexList extends AbstractIndexList {
 
     protected abstract readonly tag: string;
 
-    protected readonly openIndexListAfter: Array<() => void>;
+    protected readonly openIndexListAfter: Hooks;
 
-    protected readonly openIndexListBefore: Array<(v?: string) => void>;
+    protected readonly openIndexListBefore: Hooks;
 
     constructor() {
         super();
+        // Add Hook
         this.openIndexListBefore = [
             this.pushTagHook
         ];
@@ -121,14 +126,13 @@ export abstract class FinalIndexList extends AbstractIndexList {
     }
 
      /**
-     * Pushs tag Hook.
+     * Push tag Hook.
      * 这里必须使用闭包来声明函数.不然会上下文丢失.
      *
      * @param {string} index
      * @author sdttttt
      */
-     protected pushTagHook: (index?: string) => void
-         = (index?: string) => {
+     protected pushTagHook: Hook = (index?: string): void => {
              if (getDisplayIndexTags()) {
                  if (index) {
                      const tags: Map<string, string> = MainIndexList.tags;

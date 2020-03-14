@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 import { getContext } from "../constants";
 import LoadingHTMLGenerator from "../html/loadingHtml";
+import NotFoundHTMLGenerator from "../html/NotFoundHtml";
 
 /**
  * Abstract view.
@@ -41,7 +42,7 @@ export default abstract class AbstractView {
      *
      * @author sdttttt
      */
-    createWebviewPanel(closeListener: () => unknown): vscode.WebviewPanel {
+    private createWebviewPanel(closeListener: () => unknown): vscode.WebviewPanel {
 
         const context: vscode.ExtensionContext = getContext();
 
@@ -92,6 +93,20 @@ export default abstract class AbstractView {
     protected showLoadingView(): void {
         this.openWebViewPanel((pv: vscode.WebviewPanel) => {
             pv.webview.html = LoadingHTMLGenerator.generateHTML();
+        });
+    }
+
+    
+    /**
+     * Show NotFound View.
+     *
+     * @protected
+     * @memberof AbstractView
+     * @author sdttttt
+     */
+    protected showNotFoundView(): void {
+        this.openWebViewPanel((pv: vscode.WebviewPanel) => {
+            pv.webview.html = NotFoundHTMLGenerator.generateHTML();
         });
     }
 }

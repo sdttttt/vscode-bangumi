@@ -77,3 +77,11 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 ### Fix 
 
 - 遵循ESLint代码规范.
+
+
+# [2.0.1] - 2020-3-14
+
+### Fix
+
+- 修复页数过大时一直在加载页面的问题.
+- 优化使用体验.

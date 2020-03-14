@@ -1,6 +1,6 @@
 "use strict";
 
-import { AbstractIndexList } from "./indexList";
+import { AbstractIndexList, Hooks } from "./indexList";
 import YearList from "./yearList";
 import SeasonVersionList from "./seasonVersionList";
 import AreaList from "./areaList";
@@ -18,9 +18,9 @@ import BangumisView from "../views/bangumi";
 */
 export default new class MainIndexList extends AbstractIndexList {
 
-	protected readonly openIndexListAfter: Array<(v?: string) => void> = [];
+	protected readonly openIndexListAfter: Hooks = [];
 
-	protected readonly openIndexListBefore: Array<(v?: string) => void> = [];
+	protected readonly openIndexListBefore: Hooks = [];
 
 	protected readonly list: Array<string> = [
 		"类型", "地区", "状态", "版权", "付费", "季度", "时间", "风格", "(恢复默认)"
