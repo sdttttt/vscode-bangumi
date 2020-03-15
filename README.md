@@ -5,7 +5,7 @@
 
 [![Build Status](https://travis-ci.com/sdttttt/vscode-bangumi.svg?branch=master)](https://travis-ci.com/sdttttt/vscode-bangumi)
 [![Build Status](https://dev.azure.com/shiinazch/Vscode%20Bangumi/_apis/build/status/sdttttt.vscode-bangumi?branchName=master)](https://dev.azure.com/shiinazch/Vscode%20Bangumi/_build/latest?definitionId=4&branchName=master)
-[![CodeFactor](https://www.codefactor.io/repository/github/sdttttt/vscode-bangumi/badge/master)](https://www.codefactor.io/repository/github/sdttttt/vscode-bangumi/overview/master)
+[![codebeat badge](https://codebeat.co/badges/cd0a8650-e9e0-42fd-94c7-0aa866878b00)](https://codebeat.co/projects/github-com-sdttttt-vscode-bangumi-master)
 [![vsmarketplacebadge](https://vsmarketplacebadge.apphb.com/version/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)
 [![downloads](https://vsmarketplacebadge.apphb.com/downloads/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)
 [![rating](https://vsmarketplacebadge.apphb.com/rating/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)
