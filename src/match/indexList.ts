@@ -4,7 +4,6 @@ import * as vscode from "vscode";
 import MainIndexList from "./";
 import { getDisplayIndexTags } from '../configuration';
 
-
 export type Hook = (args?: string) => void;
 export type Hooks = Array<Hook>;
 
@@ -65,6 +64,22 @@ export abstract class AbstractIndexList {
     }
 
     /**
+     * run OpenIndexList Hook.
+     *
+     * @private
+     * @param {string} [index]
+     * @memberof AbstractIndexList
+     * @author sdttttt
+     */
+    private runOpenIndexListHook(index?: string): void {
+        if (this.openIndexListBefore.length > 0) {
+            for (const callback of this.openIndexListBefore) {
+                callback(index);
+            }
+        }
+    }
+
+    /**
      * Opens index list
      * 
      * @author sdttttt
@@ -73,24 +88,12 @@ export abstract class AbstractIndexList {
         vscode.window.showQuickPick(this.list).then(
             (index: string | undefined) => {
                 if (index) {
-                    
                     // Run Before Hook.
-                    if (this.openIndexListBefore.length > 0) {
-                        for (const callback of this.openIndexListBefore) {
-                            callback(index);
-                        }
-                    }
-                    //------------------
-
+                    this.runOpenIndexListHook(index);
+                    // Core
                     this.conditionHandler(index);
-                    
                     // Run After Hook.
-                    if (this.openIndexListAfter.length > 0) {
-                        for (const callback of this.openIndexListAfter) {
-                            callback();
-                        }
-                    }
-                    //-----------------
+                    this.runOpenIndexListHook(index);
                 }
                 return;
             }
