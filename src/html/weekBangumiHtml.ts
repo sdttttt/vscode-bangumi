@@ -4,7 +4,6 @@ import * as vscode from "vscode";
 import { WeekBangumiData, WBangumi } from "../request/structure";
 import { toWeekDay, isToday } from "../utils/strings";
 import AbstractHTMLGenerator from "./generator";
-import { toNumber } from "../utils/type";
 import { getConfig } from "../configuration";
 import { getResourceFile } from "../utils/file";
 import { yinglili, WeekBangumiCSS } from "../constants";
