@@ -85,3 +85,10 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 
 - 修复页数过大时一直在加载页面的问题.
 - 优化使用体验.
+
+## [2.1.0] - 2020-3-16
+
+### Add
+
+- 完成了 "Style" Tag.
+- 重构部分代码.
