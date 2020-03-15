@@ -28,7 +28,7 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 - 这次的几乎重构了超过 **85%** 的代码. 对大量逻辑进行了抽象拆分. 对性能上的影响未知.
 - 修改`KeyBind`,解决`快捷键`冲突问题.
 
-# [1.2.0] - 2020-2-22
+## [1.2.0] - 2020-2-22
 
 ### Add
 
@@ -36,14 +36,14 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 - 增加加载页面.
 - 使用选项配置是否开启番剧提醒.
 
-# [1.2.1] - 2020-3-5
+## [1.2.1] - 2020-3-5
 
 ### Fix
 
 - 在每周新番中会,如果是`今天`会标注一个败犬的badge.
 - 追番提醒中多一个打开`WeekBangumi`的选项.
 
-# [1.3.0] - 2020-3-8
+## [1.3.0] - 2020-3-8
 
 ### Add
 
@@ -53,20 +53,20 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 
 - 优化了周番界面的显示.
 
-# [1.3.1] - 2020-3-10
+## [1.3.1] - 2020-3-10
 
 ### Fix
 
 - 重构页面的资源加载
 - 优化性能，增加了请求缓存
 
-# [1.3.2] - 2020-3-11
+## [1.3.2] - 2020-3-11
 
 ### Fix
 
 - 减小插件体积.压缩了**90%**以上.
 
-# [2.0.0] - 2020-3-13
+## [2.0.0] - 2020-3-13
 
 ### Add 
 
@@ -79,9 +79,16 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 - 遵循ESLint代码规范.
 
 
-# [2.0.1] - 2020-3-14
+## [2.0.1] - 2020-3-14
 
 ### Fix
 
 - 修复页数过大时一直在加载页面的问题.
 - 优化使用体验.
+
+## [2.1.0] - 2020-3-16
+
+### Add
+
+- 完成了 "Style" Tag.
+- 重构部分代码.

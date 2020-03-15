@@ -36,7 +36,7 @@ suite("TEST API", function () {
 					expect(bangumi).to.be.exist;
 
 				} else {
-					Error("数据获取为空🅰");
+					return Error("数据获取为空🅰");
 				}
 			};
 
@@ -108,7 +108,7 @@ suite("TEST API", function () {
 						}
 					}
 				} else {
-					Error("数据获取为空🅰");
+					return Error("数据获取为空🅰");
 				}
 			};
 		await getWeekBangumi().then(callback);

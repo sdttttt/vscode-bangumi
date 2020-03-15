@@ -71,7 +71,7 @@ export async function getWeekBangumi(): Promise<Array<WeekBangumiData> | undefin
 
 		if ( !isSuccess(weekBangumiResponse) || isEmptyArray(weekBangumiResponse.result)) {
 			vscode.window.showInformationMessage(`
-            	咳咳，什么都没有找到🤔
+            	诶?!没有找到番剧时间表诶...
         	`);
 			return;
 		}

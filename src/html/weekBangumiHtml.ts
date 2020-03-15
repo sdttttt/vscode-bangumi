@@ -4,7 +4,6 @@ import * as vscode from "vscode";
 import { WeekBangumiData, WBangumi } from "../request/structure";
 import { toWeekDay, isToday } from "../utils/strings";
 import AbstractHTMLGenerator from "./generator";
-import { toNumber } from "../utils/type";
 import { getConfig } from "../configuration";
 import { getResourceFile } from "../utils/file";
 import { yinglili, WeekBangumiCSS } from "../constants";
@@ -114,10 +113,12 @@ export default new class WeekBangumisHTMLGenerator extends AbstractHTMLGenerator
                 this.html += this.makeOneDay(day);
             }
         } else {
-            for (const index in data) {
-                if (toNumber(index) >= 5) {
-                    this.html += this.makeOneDay(data[index]);
+            let index = 0;
+            for (const item of data) {
+                if (index >= 5) {
+                    this.html += this.makeOneDay(item);
                 }
+                index++;
             }
         }
 
