@@ -10,6 +10,7 @@ import * as vscode from 'vscode';
 import SeasonStatusList from "./seasonStatusList";
 import SeasonMonthList from "./seasonMonthList";
 import BangumisView from "../views/bangumi";
+import StyleList from "./styleList";
 
 /**
 *	Main List
@@ -63,6 +64,9 @@ export default new class MainIndexList extends AbstractIndexList {
 				break;
 			case "时间":
 				YearList.openIndexList();
+				break;
+			case "风格":
+				StyleList.openIndexList();
 				break;
 			case "(恢复默认)":
 				BangumisView.bangumiUrl.restoreDefault();

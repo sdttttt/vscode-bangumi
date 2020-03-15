@@ -63,20 +63,42 @@ export abstract class AbstractIndexList {
         vscode.commands.executeCommand("openBangumi");
     }
 
+
     /**
-     * run OpenIndexList Hook.
+     * Run All Hook of List.
      *
      * @private
+     * @param {Hooks} hooks
      * @param {string} [index]
      * @memberof AbstractIndexList
      * @author sdttttt
      */
-    private runOpenIndexListHook(index?: string): void {
-        if (this.openIndexListBefore.length > 0) {
-            for (const callback of this.openIndexListBefore) {
+    private runHooks(hooks: Hooks, index?: string): void {
+        if (hooks.length > 0) {
+            for (const callback of hooks) {
                 callback(index);
             }
         }
+    }
+
+    /**
+     * run OpenIndex Hook List.
+     *
+     * @memberof AbstractIndexList
+     * @author sdttttt
+     */
+    private runBeforeOpenIndexListHook(index?: string): void {
+        this.runHooks(this.openIndexListBefore, index);
+    }
+
+    /**
+     * run OpenIndex Hook List
+     *
+     * @memberof AbstractIndexList
+     * @author sdttttt
+     */
+    private runAfterOpenIndexListHook(index?: string): void {
+        this.runHooks(this.openIndexListAfter, index);
     }
 
     /**
@@ -89,11 +111,11 @@ export abstract class AbstractIndexList {
             (index: string | undefined) => {
                 if (index) {
                     // Run Before Hook.
-                    this.runOpenIndexListHook(index);
+                    this.runBeforeOpenIndexListHook(index);
                     // Core
                     this.conditionHandler(index);
                     // Run After Hook.
-                    this.runOpenIndexListHook(index);
+                    this.runAfterOpenIndexListHook(index);
                 }
                 return;
             }
@@ -103,7 +125,7 @@ export abstract class AbstractIndexList {
 
 /**
  * Final index list
- * 没有子选项
+ * 没有子选项的选项，它们是最后的选项，需要触发一些特殊操作
  * 
  * @abstract
  * @author sdttttt
