@@ -19,5 +19,6 @@
         "vsce",
         "vsix"
     ],
-    "commentTranslate.targetLanguage": "zh-CN"
+    "commentTranslate.targetLanguage": "zh-CN",
+    "deepscan.enable": true
 }
