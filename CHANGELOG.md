@@ -91,4 +91,13 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 ### Add
 
 - 完成了 "Style" Tag.
+
+### Fix
+
 - 重构部分代码.
+
+## [2.1.1] - 2020-3-17
+
+### Fix
+
+- 重构 Index List 大部分代码.
