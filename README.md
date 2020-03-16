@@ -18,11 +18,17 @@
 
 ## Description
 
-使用 BILIBLI 的 API. 
-提供的`番剧索引`功能. 以及`番剧更新表`.
+**Search:**
 
-> **插件有自带提醒的功能.在番剧更新时会以提示窗的形式提醒你.** 🎉
-该功能可以在配置文件中关闭.
+使用 BILIBLI 的 API. 
+提供的`番剧索引`功能. 以及`新番时间表`🕰.
+
+**Reminder:**
+
+插件有自带提醒的功能.在番剧更新时会以提示窗的形式提醒你. 🎉
+如果你喜欢在评论区里快人一步(qiang lou)🏁, `BangumiOpen`也提供了能**提前**提醒时间的配置选项`ReminderAheadTime`
+
+***(提醒功能可以在配置文件中关闭).***
 
 ## Functions in testing 🚧
 
@@ -80,4 +86,4 @@ I'm Sorry.(´；ω；‘)
 |  ----  | ----  |
 | sdttttt  | ![sdttttt](https://avatars1.githubusercontent.com/u/42728902?s=96&v=4) |
 
-**(゜-゜)つロ 干杯~-bilibili**
+**(゜-゜)つ🍻 干杯~-bilibili**
