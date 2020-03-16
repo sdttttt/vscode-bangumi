@@ -3,6 +3,8 @@
 import * as vscode from "vscode";
 import MainIndexList from "./";
 import { getDisplayIndexTags } from '../configuration';
+import { BangumiUrl } from "../request/bangumiUrl";
+import BangumisView from "../views/bangumi";
 
 export type Hook = (args?: string) => void;
 export type Hooks = Array<Hook>;
@@ -39,7 +41,7 @@ export abstract class AbstractIndexList {
      * 
      * @abstract
      * @readonly
-     * @type {() => void}
+     * @type {Hooks}
      * @author sdttttt
      */
     protected readonly abstract openIndexListAfter: Hooks;
@@ -49,7 +51,7 @@ export abstract class AbstractIndexList {
      * 
      * @abstract
      * @readonly
-     * @type {() => void}
+     * @type {Hooks}
      * @author sdttttt
      */
     protected readonly abstract openIndexListBefore: Hooks;
@@ -150,28 +152,28 @@ export abstract class FinalIndexList extends AbstractIndexList {
         ];
     }
 
-     /**
-     * Push tag Hook.
-     * 这里必须使用闭包来声明函数.不然会上下文丢失.
-     *
-     * @param {string} index
-     * @author sdttttt
-     */
-     protected pushTagHook: Hook = (index?: string): void => {
-             if (getDisplayIndexTags()) {
-                 if (index) {
-                     const tags: Map<string, string> = MainIndexList.tags;
-                     tags.set(this.tag, index);
-                     MainIndexList.tags = tags;
-                 }
-             }
-         }
+    /**
+    * Push tag Hook.
+    * 这里必须使用闭包来声明函数.不然会上下文丢失.
+    *
+    * @param {string} index
+    * @author sdttttt
+    */
+    protected pushTagHook: Hook = (index?: string): void => {
+        if (getDisplayIndexTags()) {
+            if (index) {
+                const tags: Map<string, string> = MainIndexList.tags;
+                tags.set(this.tag, index);
+                MainIndexList.tags = tags;
+            }
+        }
+    }
 
-     /**
-     * Shows tag hook
-     *
-     * @author sdttttt
-     */
+    /**
+    * Shows tag hook
+    *
+    * @author sdttttt
+    */
     private showTagHook(): void {
         if (getDisplayIndexTags()) {
             const tags: Map<string, string> = MainIndexList.tags;
@@ -188,5 +190,61 @@ export abstract class FinalIndexList extends AbstractIndexList {
             }
             vscode.window.showErrorMessage("Tags: 默认");
         }
+    }
+}
+
+/**
+ * Simple FinalIndexList
+ * FinalIndexList 的偷懒版
+ * 当选中的Tag和Url所需要的值,呈现**简单的键值对应关系**.
+ *  比如: "原创"Tag 只需要在
+ * 继承这个抽象类可以极大的帮助你简化代码.
+ *
+ * @export
+ * @abstract
+ * @class SimpleFinalIndexList
+ * @extends {FinalIndexList}
+ * @author sdttttt
+ */
+export abstract class SimpleFinalIndexList extends FinalIndexList {
+
+    protected readonly list: Array<string> = [];
+
+    protected readonly abstract map: Map<string, string>;
+
+    protected abstract updateUrlParams(url: BangumiUrl, index: string): void;
+
+    constructor() {
+        super();
+    }
+
+    /**
+     *  Require Run !!
+     * 它在你的子类构造函数里必须被运行!!
+     *
+     * @protected
+     * @memberof SimpleFinalIndexList
+     * @author sdttttt
+     */
+    protected init(): void {
+        this.list.push(...this.map.keys());
+    }
+
+    /**
+     * condition Handler.
+     * 一步到胃!
+     * 
+     * @param index
+     * @author sdttttt
+     */
+    protected conditionHandler(index: string): void {
+        const url: BangumiUrl = BangumisView.bangumiUrl;
+        const param: string | undefined = this.map.get(index);
+
+        if (param) {
+            this.updateUrlParams(url, param);
+        }
+
+        BangumisView.bangumiUrl = url;
     }
 }

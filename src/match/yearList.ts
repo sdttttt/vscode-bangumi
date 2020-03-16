@@ -1,5 +1,3 @@
-"use strict";
-
 import BangumisView from "../views/bangumi";
 import { numberOfStringPlus } from "../utils/strings";
 import { FinalIndexList } from './indexList';

@@ -1,142 +1,29 @@
-import { FinalIndexList } from './indexList';
+import { SimpleFinalIndexList } from './indexList';
 import { BangumiUrl } from '../request/bangumiUrl';
-import BangumisView from "../views/bangumi";
 
-export default new class StyleList extends FinalIndexList {
+export default new class StyleList extends SimpleFinalIndexList {
 
     protected readonly tag: string = "Style";
 
-    protected readonly list: Array<string> = [
-        "全部", "漫画改", "小说改", "游戏改", "布袋戏",
-        "原创", "热血", "穿越", "奇幻", "战斗", "搞笑",
-        "日常", "科幻", "萌系", "治愈", "校园", "少儿",
-        "恋爱", "泡面", "少女", "魔法", "冒险", "历史",
-        "架空", "机战", "神魔", "声控", "运动", "励志",
-        "音乐", "推理", "社团", "智斗", "催泪", "美食",
-        "偶像", "乙女", "职场"
-    ];
+    protected readonly map: Map<string, string> = new Map([
+        ["全部", "-1"], ["原创", "10010"], ["漫画改", "10011"], ["小说改", "10012"],
+        ["游戏改", "10013"], ["布袋戏", "10015"], ["热血", "10016"], ["穿越", "10017"],
+        ["奇幻", "10018"], ["战斗", "10020"], ["搞笑", "10021"], ["日常", "10022"],
+        ["科幻", "10023"], ["萌系", "10024"], ["治愈", "10025"], ["校园", "10026"],
+        ["少儿", "10027"], ["泡面", "10028"], ["恋爱", "10029"], ["少女", "10030"],
+        ["魔法", "10031"], ["冒险", "10032"], ["历史", "10033"], ["架空", "10034"],
+        ["机战", "10035"], ["神魔", "10036"], ["声控", "10037"], ["运动", "10038"],
+        ["励志", "10039"], ["音乐", "10040"], ["推理", "10041"], ["社团", "10042"],
+        ["智斗", "10043"], ["催泪", "10044"], ["美食", "10045"], ["偶像", "10046"],
+        ["乙女", "10047"], ["职场", "10048"],
+    ]);
 
-    protected conditionHandler(index: string): void {
-        const url: BangumiUrl = BangumisView.bangumiUrl;
+    protected updateUrlParams(url: BangumiUrl, index: string): void {
+        url.setStyleId(index);
+    }
 
-        switch (index) {
-            case "全部":
-                url.setStyleId("-1");
-                break;
-            case "原创":
-                url.setStyleId("10010");
-                break;
-            case "漫画改":
-                url.setStyleId("10011");
-                break;
-            case "小说改":
-                url.setStyleId("10012");
-                break;
-            case "游戏改":
-                url.setStyleId("10013");
-                break;
-            case "布袋戏":
-                url.setStyleId("10015");
-                break;
-            case "热血":
-                url.setStyleId("10016");
-                break;
-            case "穿越":
-                url.setStyleId("10017");
-                break;
-            case "奇幻":
-                url.setStyleId("10018");
-                break;
-            case "战斗":
-                url.setStyleId("10020");
-                break;
-            case "搞笑":
-                url.setStyleId("10021");
-                break;
-            case "日常":
-                url.setStyleId("10022");
-                break;
-            case "科幻":
-                url.setStyleId("10023");
-                break;
-            case "萌系":
-                url.setStyleId("10024");
-                break;
-            case "治愈":
-                url.setStyleId("10025");
-                break;
-            case "校园":
-                url.setStyleId("10026");
-                break;
-            case "少儿":
-                url.setStyleId("10027");
-                break;
-            case "泡面":
-                url.setStyleId("10028");
-                break;
-            case "恋爱":
-                url.setStyleId("10029");
-                break;
-            case "少女":
-                url.setStyleId("10030");
-                break;
-            case "魔法":
-                url.setStyleId("10031");
-                break;
-            case "冒险":
-                url.setStyleId("10032");
-                break;
-            case "历史":
-                url.setStyleId("10033");
-                break;
-            case "架空":
-                url.setStyleId("10034");
-                break;
-            case "机战":
-                url.setStyleId("10035");
-                break;
-            case "神魔":
-                url.setStyleId("10036");
-                break;
-            case "声控":
-                url.setStyleId("10037");
-                break;
-            case "运动":
-                url.setStyleId("10038");
-                break;
-            case "励志":
-                url.setStyleId("10039");
-                break;
-            case "音乐":
-                url.setStyleId("10040");
-                break;
-            case "推理":
-                url.setStyleId("10041");
-                break;
-            case "社团":
-                url.setStyleId("10042");
-                break;
-            case "智斗":
-                url.setStyleId("10043");
-                break;
-            case "催泪":
-                url.setStyleId("10044");
-                break;
-            case "美食":
-                url.setStyleId("10045");
-                break;
-            case "偶像":
-                url.setStyleId("10046");
-                break;
-            case "乙女":
-                url.setStyleId("10047");
-                break;
-            case "职场":
-                url.setStyleId("10048");
-                break;
-            default:
-                break;
-        }
-        BangumisView.bangumiUrl = url;
+    constructor() {
+        super();
+        this.init();
     }
 };

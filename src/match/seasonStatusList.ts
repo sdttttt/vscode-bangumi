@@ -1,33 +1,20 @@
-import { FinalIndexList } from './indexList';
+import { SimpleFinalIndexList } from './indexList';
 import { BangumiUrl } from '../request/bangumiUrl';
-import BangumisView from "../views/bangumi";
 
-export default new class SeasonStatusList extends FinalIndexList {
+export default new class SeasonStatusList extends SimpleFinalIndexList {
 
     protected readonly tag: string = "SeasonStatus";
 
-    protected readonly list: Array<string> = [
-        "全部", "免费", "付费", "大会员",
-    ];
+    protected readonly map: Map<string, string> = new Map([
+        ["全部", "-1"], ["免费", "1"], ["付费", "2"], ["大会员", "4"]
+    ]);
 
-    protected conditionHandler(index: string): void {
-        const url: BangumiUrl = BangumisView.bangumiUrl;
-        
-        switch (index) {
-            case "全部":
-                url.setSeasonStatus("-1");
-                break;
-            case "免费":
-                url.setSeasonStatus("1");
-                break;
-            case "付费":
-                url.setSeasonStatus("2");
-                break;
-            case "大会员":
-                url.setSeasonStatus("4");
-                break;
-        }
+    constructor() {
+        super();
+        this.init();
+    }
 
-        BangumisView.bangumiUrl = url;
+    protected updateUrlParams(url: BangumiUrl, param: string): void {
+        url.setSeasonStatus(param);
     }
 };
