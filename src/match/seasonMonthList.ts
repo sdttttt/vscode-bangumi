@@ -1,36 +1,21 @@
-import { FinalIndexList } from './indexList';
-import BangumisView from "../views/bangumi";
+import { SimpleFinalIndexList } from './indexList';
 import { BangumiUrl } from '../request/bangumiUrl';
 
-export default new class SeasonMonthList extends FinalIndexList {
+
+export default new class SeasonMonthList extends SimpleFinalIndexList {
     
     protected readonly tag: string = "SeasonMonth";
     
-    protected readonly list: Array<string> = [
-        "全部", "一月", "四月", "七月", "十月",
-    ];
+    protected readonly map: Map<string, string> = new Map([
+        ["全部", "-1"], ["一月", "1"], ["四月", "4"], ["七月", "7"], ["十月", "10"]
+    ]);
 
-    protected conditionHandler(index: string): void {
-        const url: BangumiUrl = BangumisView.bangumiUrl;
+    constructor() {
+        super();
+        this.init();
+    }
 
-        switch (index) {
-            case "全部":
-                url.setSeasonMonth("-1");
-                break;
-            case "一月":
-                url.setSeasonMonth("1");
-                break;
-            case "四月":
-                url.setSeasonMonth("4");   
-                break;
-            case "七月":
-                url.setSeasonMonth("7");
-                break;
-            case "十月":
-                url.setSeasonMonth("10");
-                break;
-        }
-
-        BangumisView.bangumiUrl = url;
+    protected updateUrlParams(url: BangumiUrl, index: string): void {
+        url.setSeasonMonth(index);
     }
 };

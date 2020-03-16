@@ -1,5 +1,3 @@
-"use strict";
-
 import { AbstractIndexList, Hooks } from "./indexList";
 import YearList from "./yearList";
 import SeasonVersionList from "./seasonVersionList";

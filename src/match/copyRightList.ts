@@ -1,28 +1,20 @@
-import { FinalIndexList } from './indexList';
+import { SimpleFinalIndexList } from './indexList';
 import { BangumiUrl } from '../request/bangumiUrl';
-import BangumisView from "../views/bangumi";
 
-export default new class CopyRightList extends FinalIndexList {
+export default new class CopyRightList extends SimpleFinalIndexList {
 
     protected readonly tag: string = "CopyRight";
 
-    protected readonly list: Array<string> = [
-        "全部", "独家", "其他",
-    ];
+    protected readonly map: Map<string, string> = new Map([
+        ["全部", "-1"], ["独家", "3"], ["其他", "1"]
+    ]);
 
-    protected conditionHandler(index: string): void {
-        const url: BangumiUrl = BangumisView.bangumiUrl;
-        switch (index) {
-            case "全部":
-                url.setCopyright("-1");
-                break;
-            case "独家":
-                url.setCopyright("3");
-                break;
-            case "其他":
-                url.setCopyright("1");
-                break;
-        }
-        BangumisView.bangumiUrl = url;
+    protected updateUrlParams(url: BangumiUrl, index: string): void {
+        url.setCopyright(index);
+    }
+
+    constructor() {
+        super();
+        this.init();
     }
 };

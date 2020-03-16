@@ -1,33 +1,20 @@
-import { FinalIndexList } from './indexList';
+import {  SimpleFinalIndexList } from './indexList';
 import { BangumiUrl } from '../request/bangumiUrl';
-import BangumisView from "../views/bangumi";
 
-export default new class SeasonVersionList extends FinalIndexList {
+export default new class SeasonVersionList extends SimpleFinalIndexList {
 
     protected readonly tag: string = "SeasonVersion";
 
-    protected readonly list: Array<string> = [
-        "全部", "正片", "电影", "其他"
-    ];
+    protected readonly map: Map<string, string> = new Map([
+        ["全部", "-1"], ["正片", "1"], ["电影", "2"], ["其他", "3"]
+    ]);
 
-    protected conditionHandler(index: string): void {
-        const url: BangumiUrl = BangumisView.bangumiUrl;
+    constructor() {
+        super();
+        this.init();
+    }
 
-        switch (index) {
-            case "全部":
-                url.setSeasonVersion("-1");
-                break;
-            case "正片":
-                url.setSeasonVersion("1");
-                break;
-            case "电影":
-                url.setSeasonVersion("2");
-                break;
-            case "其他":
-                url.setSeasonVersion("3");
-                break;
-        }
-
-        BangumisView.bangumiUrl = url;
+    protected updateUrlParams(url: BangumiUrl, param: string): void {
+        url.setSeasonVersion(param);
     }
 };
