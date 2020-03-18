@@ -101,3 +101,9 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 ### Fix
 
 - 重构 Index List 大部分代码.
+
+## [2.1.2] - 2020-3-19
+
+### Fix
+
+- 压缩插件大小.
