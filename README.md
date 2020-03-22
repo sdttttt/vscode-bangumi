@@ -2,7 +2,7 @@
   Bangumi Open
 </h1>
 
-
+[![Gitter](https://badges.gitter.im/vscode-bangumi/community.svg)](https://gitter.im/vscode-bangumi/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Build Status](https://travis-ci.com/sdttttt/vscode-bangumi.svg?branch=master)](https://travis-ci.com/sdttttt/vscode-bangumi)
 [![Build Status](https://dev.azure.com/shiinazch/Vscode%20Bangumi/_apis/build/status/sdttttt.vscode-bangumi?branchName=master)](https://dev.azure.com/shiinazch/Vscode%20Bangumi/_build/latest?definitionId=4&branchName=master)
 [![codebeat badge](https://codebeat.co/badges/cd0a8650-e9e0-42fd-94c7-0aa866878b00)](https://codebeat.co/projects/github-com-sdttttt-vscode-bangumi-master)
