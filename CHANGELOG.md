@@ -107,3 +107,9 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 ### Fix
 
 - 压缩插件大小.
+
+## [2.1.3] - 2020-3-23
+
+### Add
+
+- **README** 中加入聊天室地址
