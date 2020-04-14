@@ -114,6 +114,10 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 
 - 修改README.
 
+### Add
+
+- **README** 中加入聊天室地址
+
 ## [2.1.4] - 2020-4-14
 
 ### Fix
