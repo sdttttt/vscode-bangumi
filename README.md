@@ -89,6 +89,3 @@ I'm Sorry.(´；ω；‘)
 | sdttttt  | ![sdttttt](https://avatars1.githubusercontent.com/u/42728902?s=96&v=4) |
 
 **(゜-゜)つ🍻 干杯~-bilibili**
-
-
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsdttttt%2Fvscode-bangumi.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsdttttt%2Fvscode-bangumi?ref=badge_large)
