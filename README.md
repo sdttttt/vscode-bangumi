@@ -9,6 +9,7 @@
 [![downloads](https://vsmarketplacebadge.apphb.com/downloads/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)
 [![rating](https://vsmarketplacebadge.apphb.com/rating/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)
 [![Known Vulnerabilities](https://snyk.io/test/github/sdttttt/vscode-bangumi/badge.svg?targetFile=package.json)](https://snyk.io/test/github/sdttttt/vscode-bangumi?targetFile=package.json)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsdttttt%2Fvscode-bangumi.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsdttttt%2Fvscode-bangumi?ref=badge_shield)
 
 > 一款基于 **Vscode** 的番剧插件, 该扩展请配合`Bilibili`食用( ゜- ゜)つロ
 
@@ -91,3 +92,7 @@ I'm Sorry.(´；ω；‘)
 **(゜-゜)つ🍻 干杯~-bilibili**
 
 
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsdttttt%2Fvscode-bangumi.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsdttttt%2Fvscode-bangumi?ref=badge_large)
