@@ -116,7 +116,7 @@
     "eslint": "^7.0.0",
     "eslint-plugin-typescript": "^0.14.0",
     "glob": "^7.1.5",
-    "mocha": "^7.1.0",
+    "mocha": "^8.0.1",
     "ts-loader": "^7.0.0",
     "tslint": "^6.1.0",
     "typescript": "^3.6.4",
