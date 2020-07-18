@@ -16,9 +16,10 @@ jobs:
       with:
         node-version: 10.x
     - name: Initializer ENV
-    - run: npm install -g vsce
-    - run: npm install -g yarn
-    - run: yarn
+    - run: |
+        npm install -g vsce
+        npm install -g yarn
+        yarn
     - name: Run tests
       uses: GabrielBB/xvfb-action@v1.2
       with:
