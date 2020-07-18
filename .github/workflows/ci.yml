@@ -20,7 +20,6 @@ jobs:
       uses: GabrielBB/xvfb-action@v1.2
       with:
         run: |
-          npm install -g vsce
           npm install -g yarn
           yarn
           yarn compile
