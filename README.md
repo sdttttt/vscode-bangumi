@@ -3,7 +3,7 @@
 </h1>
 
 [![Join the chat at https://gitter.im/vscode-bangumi/community](https://badges.gitter.im/vscode-bangumi/community.svg)](https://gitter.im/vscode-bangumi/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://dev.azure.com/shiinazch/Vscode%20Bangumi/_apis/build/status/sdttttt.vscode-bangumi?branchName=master)](https://dev.azure.com/shiinazch/Vscode%20Bangumi/_build/latest?definitionId=4&branchName=master)
+![CI](https://github.com/sdttttt/vscode-bangumi/workflows/CI/badge.svg)
 [![codebeat badge](https://codebeat.co/badges/cd0a8650-e9e0-42fd-94c7-0aa866878b00)](https://codebeat.co/projects/github-com-sdttttt-vscode-bangumi-master)
 [![vsmarketplacebadge](https://vsmarketplacebadge.apphb.com/version/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)
 [![downloads](https://vsmarketplacebadge.apphb.com/downloads/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)
@@ -81,6 +81,8 @@ I'm Sorry.(´；ω；‘)
 > *If you have any ideas about i18n, you can **issue** me.* 👋
 
 ## Contribution ☕
+
+**欢迎PR！ ( ´･∀･｀)**
 
 |  contributer   | cover  |
 |  ----  | ----  |
