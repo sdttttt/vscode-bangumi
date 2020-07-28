@@ -123,3 +123,10 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 ### Fix
 
 - 修改README.
+
+## [2.1.5] - 2020-7-25
+
+### Fix
+
+- 修改README.
+- 转移CI.
