@@ -2,7 +2,8 @@
   Bangumi Open
 </h1>
 
-[![Join the chat at https://gitter.im/vscode-bangumi/community](https://badges.gitter.im/vscode-bangumi/community.svg)](https://gitter.im/vscode-bangumi/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![](https://img.shields.io/badge/Telegram-Group-blue.svg?logo=telegram)](https://t.me/bangumiopen)
+[![https://t.me/sdzzzzz](https://img.shields.io/badge/Telegram-SDTTTTT-blue.svg?logo=telegram)](https://t.me/sdzzzzz)
 ![CI](https://github.com/sdttttt/vscode-bangumi/workflows/CI/badge.svg)
 [![codebeat badge](https://codebeat.co/badges/cd0a8650-e9e0-42fd-94c7-0aa866878b00)](https://codebeat.co/projects/github-com-sdttttt-vscode-bangumi-master)
 [![vsmarketplacebadge](https://vsmarketplacebadge.apphb.com/version/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)

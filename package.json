@@ -6,7 +6,7 @@
   "displayName": "Bangumi Open",
   "description": "Support Browse Bangumi for vscode.",
   "preview": false,
-  "version": "2.1.4",
+  "version": "2.1.5",
   "license": "SEE LICENSE IN LICENSE",
   "icon": "Icon.png",
   "engines": {
@@ -100,7 +100,8 @@
     "lint": "tslint ./src/**/*.ts -t verbose",
     "package": "vsce package",
     "eslint": "eslint src --ext .ts",
-    "eslint-fix": "yarn run eslint --fix"
+    "eslint-fix": "yarn run eslint --fix",
+    "commit": "git add . && npx git-cz"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
