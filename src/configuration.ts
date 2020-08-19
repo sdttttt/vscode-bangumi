@@ -2,6 +2,9 @@
 
 import * as vscode from "vscode";
 
+const ReminderAheadTime = "bangumiOpen.ReminderAheadTime"
+const DisplayIndexTags = "bangumiOpen.DisplayIndexTags"
+
 /**
  * Quick Gets config
  *
@@ -22,8 +25,8 @@ export function getConfig(key: string): unknown {
  * @author sdttttt
  */
 export function getReminderAheadTime(): number {
-	const aheadTime: unknown = getConfig("bangumiOpen.ReminderAheadTime");
-	const result: number = aheadTime as number ;
+	const aheadTime: unknown = getConfig(ReminderAheadTime);
+	const result: number = aheadTime as number;
 	if (isNaN(result) || result < 0) {
 		return 0;
 	}
@@ -37,6 +40,6 @@ export function getReminderAheadTime(): number {
  * @author sdttttt
  */
 export function getDisplayIndexTags(): boolean {
-	const displayStatus: unknown = getConfig("bangumiOpen.DisplayIndexTags");
+	const displayStatus: unknown = getConfig(DisplayIndexTags);
 	return displayStatus as boolean;
 }
