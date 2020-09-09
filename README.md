@@ -2,7 +2,6 @@
   Bangumi Open
 </h1>
 
-[![](https://img.shields.io/badge/Telegram-Group-blue.svg?logo=telegram)](https://t.me/bangumiopen)
 [![https://t.me/sdzzzzz](https://img.shields.io/badge/Telegram-SDTTTTT-blue.svg?logo=telegram)](https://t.me/sdzzzzz)
 ![CI](https://github.com/sdttttt/vscode-bangumi/workflows/CI/badge.svg)
 [![codebeat badge](https://codebeat.co/badges/cd0a8650-e9e0-42fd-94c7-0aa866878b00)](https://codebeat.co/projects/github-com-sdttttt-vscode-bangumi-master)
