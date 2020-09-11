@@ -22,7 +22,7 @@ jobs:
         node-version: 10.x
 
     - name: Cache Depend on UNIX
-      if: ${{ runner.os != 'windows-latest' }}
+      if: ${{ runner.os != 'Windows' }}
       uses: actions/cache@v2
       with:
         path: ~/.npm
@@ -31,13 +31,13 @@ jobs:
           ${{ runner.os }}-node-
  
     - name: Get npm cache directory
-      if: ${{ runner.os == 'windows-latest' }}
+      if: ${{ runner.os == 'Windows' }}
       id: npm-cache
       run: |
         echo "::set-output name=dir::$(npm config get cache)"
     
     - name: Cache Depend on Windows
-      if: ${{ runner.os == 'windows-latest' }}
+      if: ${{ runner.os == 'Windows' }}
       uses: actions/cache@v2
       with:
         path: ${{ steps.npm-cache.outputs.dir }}
