@@ -20,6 +20,31 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 10.x
+
+    - name: Cache Depend on UNIX
+      if: ${{ runner.os != 'windows-latest' }}
+      uses: actions/cache@v2
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+ 
+    - name: Get npm cache directory
+      if: ${{ runner.os == 'windows-latest' }}
+      id: npm-cache
+      run: |
+        echo "::set-output name=dir::$(npm config get cache)"
+    
+    - name: Cache Depend on Windows
+      if: ${{ runner.os == 'windows-latest' }}
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.npm-cache.outputs.dir }}
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+      
     - name: Initializer ENV
       run: |
         npm install -g vsce
