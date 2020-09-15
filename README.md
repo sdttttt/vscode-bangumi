@@ -67,8 +67,6 @@
 
 `Back Page` 可用 `Ctrl+alt+k` 代替
 
-> *由于一些不明原因,有的时候快捷键会失灵 ??*
-
 ## About i18n 🌍
 
 **At present, not intended to provide i18n. The reasons are as follows:**
