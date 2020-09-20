@@ -1,6 +1,6 @@
 # 致亲爱的 Bangumi Open 使用者
 
-<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=1354615606&auto=1&height=66"></iframe>
+<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=1354615606&auto=0&height=66"></iframe>
 
 🔥🐔, 你来了!
 
@@ -16,4 +16,4 @@
 
 > 如果你喜欢我的东西, 或许我们能成为朋友.  ---SDTTTTT
 
-![](https://ftp.bmp.ovh/imgs/2020/09/e209256d1ed7269e.jpg)
+![](https://ftp.bmp.ovh/imgs/2020/09/0fe8f87ae2756d3c.png)
