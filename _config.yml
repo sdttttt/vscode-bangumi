@@ -1,0 +1,8 @@
+title: Bangumi Open
+description: The Bangumi plugin for Vscode. we welcome PR!  ( ´･∀･｀)
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-merlot
+
+gems:
+  - jekyll-mentions
