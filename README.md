@@ -10,6 +10,11 @@
 [![rating](https://vsmarketplacebadge.apphb.com/rating/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)
 [![Known Vulnerabilities](https://snyk.io/test/github/sdttttt/vscode-bangumi/badge.svg?targetFile=package.json)](https://snyk.io/test/github/sdttttt/vscode-bangumi?targetFile=package.json)
 
+|NAME|STATE
+|--|--
+| BILIBILI API TEST | ![CI](https://github.com/sdttttt/vscode-bangumi/workflows/CI/badge.svg)
+| VSCE | ![VSCE Publish](https://github.com/sdttttt/vscode-bangumi/workflows/VSCE%20Publish/badge.svg)
+
 > 一款基于 **Vscode** 的番剧插件, 该扩展请配合`Bilibili`食用( ゜- ゜)つロ
 
 ![b1](https://raw.githubusercontent.com/sdttttt/vscode-bangumi/master/resources/b1.gif)
