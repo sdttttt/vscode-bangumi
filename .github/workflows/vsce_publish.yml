@@ -34,5 +34,4 @@ jobs:
     
     - name: Publish to Open-VSX
       run: |
-        npx ovsx create-namespace SDTTTTT -p ${{ secrets.OVSX_ACCESS_KEY }}
         npx ovsx publish -p ${{ secrets.OVSX_ACCESS_KEY }}
