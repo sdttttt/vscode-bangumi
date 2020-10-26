@@ -130,3 +130,10 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 
 - 修改README.
 - 转移CI.
+
+## [2.1.6] - 2020-10-26
+
+### Add
+
+- 修改README.
+- 加入`Open VSX`市场.
