@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
@@ -5,6 +6,18 @@
 
 const webpack = require("webpack");
 const path = require("path");
+const TsCheckPlugin = require("fork-ts-checker-webpack-plugin");
+
+const tsCheckConfig = {
+	typescript: {
+		enabled: true,
+		profile: true
+	},
+	eslint: {
+		enabled: true,
+		files: './src/**/*.{ts,js}'
+	}
+};
 
 /**@type {import('webpack').Configuration}*/
 const config = {
@@ -26,7 +39,8 @@ const config = {
 		extensions: [".ts", ".js"]
 	},
 	plugins: [
-		new webpack.ProgressPlugin()
+		new webpack.ProgressPlugin(),
+		new TsCheckPlugin(tsCheckConfig)
 	],
 	module: {
 		rules: [
@@ -46,7 +60,7 @@ const config = {
 						// 		"@babel/plugin-proposal-object-rest-spread"
 						// 	]
 						// }
-						loader: "ts-loader"
+						loader: "ts-loader",
 					}
 				]
 			}

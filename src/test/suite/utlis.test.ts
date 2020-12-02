@@ -40,8 +40,8 @@ suite("Utils TEST", () => {
 	});
 
 	test("is empty Object TEST", () => {
-		const emptyObj: object = {};
-		const obj: object = { a: 1 };
+		const emptyObj: unknown = {};
+		const obj: unknown = { a: 1 };
 
 		// tslint:disable-next-line: no-unused-expression
 		expect(isEmptyObject(emptyObj)).to.be.true;

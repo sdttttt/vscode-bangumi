@@ -21,11 +21,9 @@ suite("Cache Test", () => {
 		expect(cache2.get("one")).to.be.equal("1");
 		expect(cache2.get("two")).to.be.equal("2");
 
-		const cache3: Cache<object> = new Cache(10);
-		const obj: object = {one: 1, two: "2"};
-        
+		const cache3: Cache<unknown> = new Cache(10);
+		const obj: unknown = {one: 1, two: "2"};
 		cache3.set("object", obj);
-        
 		expect(cache3.get("object")).to.be.equal(obj);
 	});
 
