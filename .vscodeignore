@@ -15,3 +15,5 @@ resources/b1.gif
 .github/**
 package.json
 azure-pipelines.yml
+*.vsix
+*.log
