@@ -1,6 +1,7 @@
 .vscode/**
 .vscode-test/**
-out/test/**
+node_modules/**
+out/**
 src/**
 .gitignore
 vsc-extension-quickstart.md
@@ -18,3 +19,7 @@ azure-pipelines.yml
 *.vsix
 *.log
 .github/**
+*.yml
+.babelrc
+tslint.json
+tsconfig.json
