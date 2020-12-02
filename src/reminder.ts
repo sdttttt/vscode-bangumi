@@ -1,5 +1,5 @@
 import { getWeekBangumi } from "./request/bangumi";
-import * as vscode from "vscode";
+import { window, StatusBarItem, StatusBarAlignment } from "vscode";
 import { WeekBangumiData, WBangumi } from "./request/structure";
 import { isEmptyArray } from "./utils/type";
 import { getReminderAheadTime } from "./configuration";
@@ -11,10 +11,17 @@ import {
 } from "./utils/strings";
 
 export default new (class Reminder {
+	private remindTimers: Array<NodeJS.Timeout> = [];
 
-  private remindTimers: Array<NodeJS.Timeout> = [];
+	private statusBar: StatusBarItem = window.createStatusBarItem(
+		StatusBarAlignment.Right
+	);
 
-  /**
+  constructor() {
+    this.statusBar.color = "#FFC0CB";
+  }
+
+	/**
 	 * Reminders bangumi update
 	 *
 	 * @returns
@@ -34,18 +41,22 @@ export default new (class Reminder {
 			bangumisData
 		);
 		if (!todayIndex) {
-			vscode.window.showInformationMessage("没有找到今日的索引 ??");
+			window.showInformationMessage("没有找到今日的索引 ??");
 			return;
 		}
 
 		const currentTime: number = currentTimestamp();
 		const aheadTime: number = getReminderAheadTime();
 
-		for (let i = todayIndex; i <= todayIndex + 1; i++) {
-			for (const bangumi of bangumisData[i].seasons) {
-				this.makeReminder(currentTime, aheadTime, bangumi);
+    for (let i = todayIndex; i <= todayIndex + 1; i++) {
+      const bangumiSize = bangumisData[i].seasons.length;
+      for (let k = 0; k < bangumiSize; k++) {
+        const bangumi: WBangumi = bangumisData[i].seasons[k];
+        const nextBangumi: WBangumi | undefined = (k + 1) < bangumiSize ? bangumisData[i].seasons[k + 1] : undefined;
+        this.makeReminder(currentTime, aheadTime, bangumi, nextBangumi);
 			}
-		}
+    }
+    this.updateStatusBar(bangumisData[todayIndex].seasons[0]);
 	}
 
 	/**
@@ -58,45 +69,38 @@ export default new (class Reminder {
 	private makeReminder(
 		currentTime: number,
 		aheadTime: number,
-		bangumi: WBangumi
+    bangumi: WBangumi,
+    nextBangumi: WBangumi | undefined
 	): void {
 		const bangumiTime: number = bangumi.pub_ts * 1000;
 		if (currentTime < bangumiTime && bangumi.delay !== 1) {
 			const timeDifference: number = bangumiTime - currentTime;
-			const timer: NodeJS.Timeout = this.makeTimer(
-				bangumi.title,
-				timeDifference,
-				aheadTime
-			);
-
+			const aheadTimeM = aheadTime * 1000;
+			const timer: NodeJS.Timeout = setTimeout(async () => {
+				if (aheadTime === 0) {
+					showRemind(`《${bangumi.title}》 更新啦！🎉`);
+				} else {
+					const minute = toMinuteFromSecode(aheadTime);
+					showRemind(
+						`《${bangumi.title}》 还有${minute}分钟就更新啦！ 🎉`
+					);
+        }
+        this.updateStatusBar(nextBangumi);
+			}, timeDifference - aheadTimeM);
 			this.remindTimers.push(timer);
 		}
 	}
 
-	/**
-	 * Makes remind
-	 *
-	 * @param bangumiName
-	 * @param time
-	 * @returns remind
-	 * @author sdttttt
-	 */
-	private makeTimer(
-		bangumiName: string,
-		timeDifference: number,
-		aheadTime: number
-	): NodeJS.Timeout {
-		const aheadTimeM: number = aheadTime * 1000;
-
-		return setTimeout(async () => {
-			if (aheadTime === 0) {
-				showRemind(`《${bangumiName}》 更新啦！🎉`);
-			} else {
-				const minute = toMinuteFromSecode(aheadTime);
-				showRemind(`《${bangumiName}》 还有${minute}分钟就更新啦！ 🎉`);
-			}
-		}, timeDifference - aheadTimeM);
-	}
+  private updateStatusBar(bangumi: WBangumi | undefined) {
+    if (bangumi) {
+      const { title, pub_time: targetTime } = bangumi;
+      const shortTitle = title.length > 7 ? `${title.slice(0, 7)}...` : title;
+      this.statusBar.text = `《${shortTitle}》在 ${targetTime} 更新噢⌛`;
+    } else {
+      this.statusBar.text = "番剧暂时没有了诶"
+    }
+    this.statusBar.show();
+  }
 
 	/**
 	 * Destroy reminder
