@@ -19,7 +19,7 @@ jobs:
     - name: Install Node.js
       uses: actions/setup-node@v1
       with:
-        node-version: 10.x
+        node-version: 13.x
 
     - name: Cache Depend on UNIX
       if: ${{ runner.os != 'Windows' }}
@@ -44,7 +44,7 @@ jobs:
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
           ${{ runner.os }}-node-
-      
+
     - name: Initializer ENV
       run: |
         npm install -g vsce
