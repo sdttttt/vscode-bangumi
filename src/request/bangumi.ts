@@ -33,7 +33,7 @@ export async function getAllBangumi(burl: BangumiUrl): Promise<BangumisData | un
 
 	if (!cacheData) {
 		const res: AxiosResponse<BangumisResponse> =
-            await Axios.get<unknown, AxiosResponse<BangumisResponse>>(url);
+			await Axios.get<unknown, AxiosResponse<BangumisResponse>>(url);
 
 		const bangumisResponse: BangumisResponse = res.data;
 
@@ -59,17 +59,17 @@ export async function getAllBangumi(burl: BangumiUrl): Promise<BangumisData | un
 export async function getWeekBangumi(): Promise<Array<WeekBangumiData> | undefined> {
 
 	const cacheData: Array<WeekBangumiData> | undefined =
-        WeekBangumiCache.get(BANGUMI_WEEK);
+		WeekBangumiCache.get(BANGUMI_WEEK);
 
 	let result: Array<WeekBangumiData> | undefined = cacheData;
 
 	if (!cacheData) {
 		const res: AxiosResponse<WeekBangumiResponse> =
-            await Axios.get<unknown, AxiosResponse<WeekBangumiResponse>>(BANGUMI_WEEK);
+			await Axios.get<unknown, AxiosResponse<WeekBangumiResponse>>(BANGUMI_WEEK);
 
 		const weekBangumiResponse = res.data;
 
-		if ( !isSuccess(weekBangumiResponse) || isEmptyArray(weekBangumiResponse.result)) {
+		if (!isSuccess(weekBangumiResponse) || isEmptyArray(weekBangumiResponse.result)) {
 			vscode.window.showInformationMessage(`
             	诶?!没有找到番剧时间表诶...
         	`);

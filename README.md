@@ -2,14 +2,17 @@
   Bangumi Open
 </h1>
 
-[![](https://img.shields.io/badge/Telegram-Group-blue.svg?logo=telegram)](https://t.me/bangumiopen)
 [![https://t.me/sdzzzzz](https://img.shields.io/badge/Telegram-SDTTTTT-blue.svg?logo=telegram)](https://t.me/sdzzzzz)
-![CI](https://github.com/sdttttt/vscode-bangumi/workflows/CI/badge.svg)
 [![codebeat badge](https://codebeat.co/badges/cd0a8650-e9e0-42fd-94c7-0aa866878b00)](https://codebeat.co/projects/github-com-sdttttt-vscode-bangumi-master)
 [![vsmarketplacebadge](https://vsmarketplacebadge.apphb.com/version/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)
 [![downloads](https://vsmarketplacebadge.apphb.com/downloads/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)
 [![rating](https://vsmarketplacebadge.apphb.com/rating/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)
 [![Known Vulnerabilities](https://snyk.io/test/github/sdttttt/vscode-bangumi/badge.svg?targetFile=package.json)](https://snyk.io/test/github/sdttttt/vscode-bangumi?targetFile=package.json)
+
+|NAME|STATE
+|--|--
+| BILIBILI API TEST | ![CI](https://github.com/sdttttt/vscode-bangumi/workflows/CI/badge.svg)
+| VSCE | ![VSCE Publish](https://github.com/sdttttt/vscode-bangumi/workflows/VSCE%20Publish/badge.svg)
 
 > 一款基于 **Vscode** 的番剧插件, 该扩展请配合`Bilibili`食用( ゜- ゜)つロ
 
@@ -67,8 +70,6 @@
 `Next Page` 可用 `Ctrl+alt+l` 代替
 
 `Back Page` 可用 `Ctrl+alt+k` 代替
-
-> *由于一些不明原因,有的时候快捷键会失灵 ??*
 
 ## About i18n 🌍
 
