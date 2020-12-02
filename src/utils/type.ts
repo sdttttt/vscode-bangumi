@@ -1,5 +1,3 @@
-"use strict";
-
 /**
  * Detroit: Become Number
  *

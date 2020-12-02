@@ -1,5 +1,3 @@
-"use strict";
-
 import * as vscode from "vscode";
 import { getAllBangumi } from "../request/bangumi";
 import BangumisHTMLGenerator from "../html/bangumiHtml";

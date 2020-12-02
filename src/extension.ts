@@ -1,11 +1,10 @@
-"use strict";
-
 import * as vscode from "vscode";
 import BangumiView from "./views/bangumi";
 import WeekBangumiView from "./views/weekBangumi";
 import { setContext } from "./constants";
 import { getConfig } from "./configuration";
 import MainIndexList from "./match/";
+import Reminder from "./reminder";
 
 let isInit = false;
 
@@ -35,7 +34,7 @@ export function activate(context: vscode.ExtensionContext): void {
 	const useReminder: unknown = getConfig("bangumiOpen.EnableReminder");
 
 	if (useReminder as boolean) {
-		WeekBangumiView.enableBangumiUpdateReminder();
+		Reminder.enableBangumiUpdateReminder();
 	}
 
 	// The command has been defined in the package.json file
@@ -71,5 +70,5 @@ export function activate(context: vscode.ExtensionContext): void {
  * @author sdttttt
  */
 export function deactivate(): void {
-	WeekBangumiView.destroyReminder();
+	Reminder.destroyReminder();
 }
