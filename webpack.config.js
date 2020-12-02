@@ -18,7 +18,6 @@ const config = {
 		libraryTarget: "commonjs2",
 		devtoolModuleFilenameTemplate: "../[resource-path]"
 	},
-	devtool: "source-map",
 	externals: {
 		vscode: "commonjs vscode" // vscode-module是热更新的临时目录，所以要排除掉。 在这里添加其他不应该被webpack打包的文件, 📖 -> https://webpack.js.org/configuration/externals/
 	},

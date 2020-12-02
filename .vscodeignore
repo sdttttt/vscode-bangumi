@@ -9,7 +9,7 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 **/webpack.config.js
-**/yarn.lock
+yarn.lock
 resources/*.png
 resources/b1.gif
 .github/**
@@ -17,3 +17,4 @@ package.json
 azure-pipelines.yml
 *.vsix
 *.log
+.github/**

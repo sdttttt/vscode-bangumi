@@ -6,7 +6,7 @@
   "displayName": "Bangumi Open",
   "description": "Support Browse Bangumi for vscode.",
   "preview": false,
-  "version": "2.1.6",
+  "version": "2.1.7",
   "license": "SEE LICENSE IN LICENSE",
   "icon": "Icon.png",
   "engines": {
@@ -95,7 +95,7 @@
     "watch": "webpack --mode none --watch",
     "pretest": "yarn run compile",
     "test": "node ./out/test/runTest.js",
-    "vscode:prepublish": "webpack --mode production",
+    "vscode:prepublish": "yarn run webpack:prepublish",
     "webpack:prepublish": "webpack --mode production",
     "webpack:compile": "webpack --mode none",
     "lint": "tslint ./src/**/*.ts -t verbose",
@@ -103,7 +103,8 @@
     "eslint": "eslint src --ext .ts",
     "eslint-fix": "yarn run eslint --fix",
     "commit": "git add . && npx git-cz",
-    "rollup:compile": "rollup -c"
+    "rollup:compile": "rollup -c",
+    "rollup:prepublish": "rollup -c && uglifyjs ./dist/extension.js -m -c -o ./dist/extension.js"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
@@ -134,6 +135,7 @@
     "tslint": "^6.1.0",
     "typescript": "^3.6.4",
     "typescript-eslint-parser": "^22.0.0",
+    "uglify-js": "^3.12.1",
     "vscode-test": "^1.2.2",
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10"
