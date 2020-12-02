@@ -137,3 +137,13 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 
 - 修改README.
 - 加入`Open VSX`市场.
+
+
+## [2.1.7] - 2020-10-27
+
+### Fix
+
+- 修复发布问题.
+
+
+## [2.2.0] - 2020-12-2

@@ -2,8 +2,8 @@
 
 import * as vscode from "vscode";
 
-const ReminderAheadTime = "bangumiOpen.ReminderAheadTime"
-const DisplayIndexTags = "bangumiOpen.DisplayIndexTags"
+const ReminderAheadTime = "bangumiOpen.ReminderAheadTime";
+const DisplayIndexTags = "bangumiOpen.DisplayIndexTags";
 
 /**
  * Quick Gets config
@@ -21,7 +21,7 @@ export function getConfig(key: string): unknown {
 /**
  * Gets reminder ahead time
  *
- * @returns reminder ahead time 
+ * @returns reminder ahead time
  * @author sdttttt
  */
 export function getReminderAheadTime(): number {
@@ -35,8 +35,8 @@ export function getReminderAheadTime(): number {
 
 /**
  * Gets display index tags
- * 
- * @returns true if display index tags 
+ *
+ * @returns true if display index tags
  * @author sdttttt
  */
 export function getDisplayIndexTags(): boolean {

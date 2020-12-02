@@ -11,7 +11,7 @@ import { Uri } from "vscode";
  * @class NotFoundHTMLGenerator
  * @author sdttttt
  */
-export default new class NotFoundHTMLGenerator extends AbstractHTMLGenerator<undefined> {
+export default new (class NotFoundHTMLGenerator extends AbstractHTMLGenerator<undefined> {
 	protected style?: string;
 	protected html?: string;
 
@@ -20,8 +20,13 @@ export default new class NotFoundHTMLGenerator extends AbstractHTMLGenerator<und
 			const loadImg: Uri = getResourceFile(enterprise);
 			this.makeCssUri(LoadingCSS);
 			this.html = `<div class="load"><img src="${loadImg}"><h3>没有数据!</h3></div>`;
-			this.html = this.htmlHead + this.style + this.htmlBody + this.html + this.htmlFloor;
+			this.html =
+				this.htmlHead +
+				this.style +
+				this.htmlBody +
+				this.html +
+				this.htmlFloor;
 		}
 		return this.html;
 	}
-};
+})();

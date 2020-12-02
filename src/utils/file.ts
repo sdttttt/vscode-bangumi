@@ -7,9 +7,9 @@ import { getContext } from "../constants";
 /**
  * Gets resource file
  *
- * @param filename 
+ * @param filename
  * @returns resource file
- * @author sdttttt 
+ * @author sdttttt
  */
 export function getResourceFile(filename: string): vscode.Uri {
 	const onDiskPath = vscode.Uri.file(

@@ -16,7 +16,9 @@ let isInit = false;
  * @author sdttttt
  */
 function initializer(context: vscode.ExtensionContext): void {
-	if (isInit) { return; }
+	if (isInit) {
+		return;
+	}
 	setContext(context);
 	isInit = !isInit;
 }
@@ -28,7 +30,6 @@ function initializer(context: vscode.ExtensionContext): void {
  * @author sdttttt
  */
 export function activate(context: vscode.ExtensionContext): void {
-
 	initializer(context);
 
 	const useReminder: unknown = getConfig("bangumiOpen.EnableReminder");
@@ -42,30 +43,24 @@ export function activate(context: vscode.ExtensionContext): void {
 	// The commandId parameter must match the command field in package.json
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand(
-			"openBangumi",
-			() => BangumiView.openBangumi()
+		vscode.commands.registerCommand("openBangumi", () =>
+			BangumiView.openBangumi()
 		),
-		vscode.commands.registerCommand(
-			"nextPage",
-			() => BangumiView.nextPage()
+		vscode.commands.registerCommand("nextPage", () =>
+			BangumiView.nextPage()
 		),
-		vscode.commands.registerCommand(
-			"backPage",
-			() => BangumiView.backPage()
+		vscode.commands.registerCommand("backPage", () =>
+			BangumiView.backPage()
 		),
-		vscode.commands.registerCommand(
-			"jumpPage",
-			() => BangumiView.jumpPage()
+		vscode.commands.registerCommand("jumpPage", () =>
+			BangumiView.jumpPage()
 		),
-		vscode.commands.registerCommand(
-			"weekBangumi",
-			() => WeekBangumiView.openWeekBangumi()
+		vscode.commands.registerCommand("weekBangumi", () =>
+			WeekBangumiView.openWeekBangumi()
 		),
-		vscode.commands.registerCommand(
-			"index",
-			() => MainIndexList.openIndexList()
-		),
+		vscode.commands.registerCommand("index", () =>
+			MainIndexList.openIndexList()
+		)
 	);
 }
 

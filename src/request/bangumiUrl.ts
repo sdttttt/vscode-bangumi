@@ -1,11 +1,11 @@
 "use strict";
 
 // bilibili API => Week Bangumi
-export const BANGUMI_WEEK = "https://bangumi.bilibili.com/web_api/timeline_global";
+export const BANGUMI_WEEK =
+	"https://bangumi.bilibili.com/web_api/timeline_global";
 
 // bilibili API => Base Url of show all Bangumi
 const BANGUMI_SHOW = "https://api.bilibili.com/pgc/season/index/result?";
-
 
 /**
  * Bangumi url
@@ -14,7 +14,6 @@ const BANGUMI_SHOW = "https://api.bilibili.com/pgc/season/index/result?";
  * @author sdttttt
  */
 export class BangumiUrl {
-
 	constructor() {
 		this._finalUrl = BANGUMI_SHOW;
 		this._seasonVersion = "-1";
@@ -33,7 +32,6 @@ export class BangumiUrl {
 		this._pagesize = "20";
 		this._type = "1";
 	}
-
 
 	private _finalUrl: string;
 
@@ -55,7 +53,7 @@ export class BangumiUrl {
 
 	/**
 	 * Default bangumi url
-	 * 
+	 *
 	 * @author sdttttt
 	 */
 	restoreDefault(): void {
@@ -116,7 +114,6 @@ export class BangumiUrl {
 		return this;
 	}
 
-
 	setSeasonStatus(value: string): this {
 		this._seasonStatus = value;
 		return this;
@@ -163,19 +160,17 @@ export class BangumiUrl {
 		return this.add(key, value).and();
 	}
 
-    /**
-     * Build finalUrl of BangumiUrl
-     *
-     * @returns {this}
-     * @memberof BangumiUrl
-     * @author sdttttt
-     */
+	/**
+	 * Build finalUrl of BangumiUrl
+	 *
+	 * @returns {this}
+	 * @memberof BangumiUrl
+	 * @author sdttttt
+	 */
 	build(): this {
-
 		this._finalUrl = BANGUMI_SHOW;
 
-		return this
-			.next("season_version", this._seasonVersion)
+		return this.next("season_version", this._seasonVersion)
 			.next("area", this._area)
 			.next("is_finish", this._isFinish)
 			.next("copyright", this._copyright)
@@ -192,13 +187,13 @@ export class BangumiUrl {
 			.add("type", this._type);
 	}
 
-    /**
-     * Get finalUrl on Builded
-     *
-     * @readonly
-     * @type {string}
-     * @memberof BangumiUrl
-     */
+	/**
+	 * Get finalUrl on Builded
+	 *
+	 * @readonly
+	 * @type {string}
+	 * @memberof BangumiUrl
+	 */
 	get finalUrl(): string {
 		return this._finalUrl;
 	}

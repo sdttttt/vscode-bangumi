@@ -1,19 +1,28 @@
 import BangumisView from "../views/bangumi";
 import { numberOfStringPlus } from "../utils/strings";
-import { FinalIndexList } from './indexList';
+import { FinalIndexList } from "./indexList";
 
-export default new class YearList extends FinalIndexList {
-
+export default new (class YearList extends FinalIndexList {
 	protected readonly tag: string = "Year";
 
 	protected readonly list: Array<string> = [
-		"2020", "2019", "2018", "2017", "2016", "2015", "2010-2014",
-		"2005-2009", "2000-2004", "90年代", "80年代", "你还没出生时候"
+		"2020",
+		"2019",
+		"2018",
+		"2017",
+		"2016",
+		"2015",
+		"2010-2014",
+		"2005-2009",
+		"2000-2004",
+		"90年代",
+		"80年代",
+		"你还没出生时候",
 	];
 
 	private encodeYear(years: Array<string>): string {
-        return encodeURI(`[${years[0]},${years[1]})`);
-    }
+		return encodeURI(`[${years[0]},${years[1]})`);
+	}
 
 	protected conditionHandler(index: string): void {
 		const url = BangumisView.bangumiUrl;
@@ -45,4 +54,4 @@ export default new class YearList extends FinalIndexList {
 	openIndexList(): void {
 		super.openIndexList();
 	}
-};
+})();
