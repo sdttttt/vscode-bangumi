@@ -36,9 +36,7 @@ export default new (class WeekBangumisHTMLGenerator extends AbstractHTMLGenerato
             <div class="day">
                 <h2>${toWeekDay(day.day_of_week)} ${
 			toDayBadge
-				? '<div class="today-badge" ><img src="' +
-				  toDayBadge +
-				  '"></div>'
+				? `<div class="today-badge" ><img src="${toDayBadge}"></div>`
 				: ""
 		}
                 </h2>

@@ -1,5 +1,3 @@
-"use strict";
-
 import * as vscode from "vscode";
 import Axios from "./instance";
 import { AxiosResponse } from "axios";
@@ -44,7 +42,6 @@ export async function getAllBangumi(
 		result = bangumisResponse.data;
 		BangumiCache.set(url, result);
 	}
-
 	return result;
 }
 
