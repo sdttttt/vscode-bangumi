@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { src, dest, watch } =  require("gulp");
+const { src, dest, watch, series } =  require("gulp");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { createProject } =  require( "gulp-typescript");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -20,7 +20,7 @@ async function optimizeimgTask() {
 }
 
 async function cleanTask() {
-	src(["resources/mincss","out", "dist"])
+	src(["out","resources/mincss"])
 	.pipe(clean())
 }
 
@@ -46,3 +46,4 @@ exports.clean = cleanTask;
 exports.optimizeimg = optimizeimgTask
 exports.optimizecss = optimizecssTask
 exports.compile = compileTask
+exports.default = series(optimizeimgTask, optimizecssTask, compileTask)

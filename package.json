@@ -97,6 +97,7 @@
 	},
 	"scripts": {
 		"compile": "gulp compile",
+		"build": "gulp",
 		"format": "prettier --write src/** && yarn run eslint:fix",
 		"watch": "webpack --mode none --watch",
 		"pretest": "yarn run compile",
