@@ -4,35 +4,42 @@ import SeasonVersionList from "./seasonVersionList";
 import AreaList from "./areaList";
 import FinishList from "./finishList";
 import CopyRightList from "./copyRightList";
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
 import SeasonStatusList from "./seasonStatusList";
 import SeasonMonthList from "./seasonMonthList";
 import BangumisView from "../views/bangumi";
 import StyleList from "./styleList";
 
 /**
-*	Main List
-*
-*	@author sdttttt
-*/
-export default new class MainIndexList extends AbstractIndexList {
-
+ *	Main List
+ *
+ *	@author sdttttt
+ */
+export default new (class MainIndexList extends AbstractIndexList {
 	protected readonly openIndexListAfter: Hooks = [];
 
 	protected readonly openIndexListBefore: Hooks = [];
 
 	protected readonly list: Array<string> = [
-		"类型", "地区", "状态", "版权", "付费", "季度", "时间", "风格", "(恢复默认)"
+		"类型",
+		"地区",
+		"状态",
+		"版权",
+		"付费",
+		"季度",
+		"时间",
+		"风格",
+		"(恢复默认)",
 	];
 
 	/**
 	 * Hit Tag
-	 * 
+	 *
 	 * @author sdttttt
 	 */
 	private _tags: Map<string, string> = new Map();
 
-	set tags(value: Map<string,string>) {
+	set tags(value: Map<string, string>) {
 		this._tags = value;
 	}
 
@@ -74,4 +81,4 @@ export default new class MainIndexList extends AbstractIndexList {
 				vscode.window.showInformationMessage("果咩,还在施工中");
 		}
 	}
-};
+})();

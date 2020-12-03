@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [13.x]
 
     steps:
     - uses: actions/checkout@v2
@@ -34,5 +34,4 @@ jobs:
     
     - name: Publish to Open-VSX
       run: |
-        npx ovsx create-namespace SDTTTTT -p ${{ secrets.OVSX_ACCESS_KEY }}
         npx ovsx publish -p ${{ secrets.OVSX_ACCESS_KEY }}

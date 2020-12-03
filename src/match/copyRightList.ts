@@ -1,20 +1,21 @@
-import { SimpleFinalIndexList } from './indexList';
-import { BangumiUrl } from '../request/bangumiUrl';
+import { SimpleFinalIndexList } from "./indexList";
+import { BangumiUrl } from "../request/bangumiUrl";
 
-export default new class CopyRightList extends SimpleFinalIndexList {
+export default new (class CopyRightList extends SimpleFinalIndexList {
+	protected readonly tag: string = "CopyRight";
 
-    protected readonly tag: string = "CopyRight";
+	protected readonly map: Map<string, string> = new Map([
+		["全部", "-1"],
+		["独家", "3"],
+		["其他", "1"],
+	]);
 
-    protected readonly map: Map<string, string> = new Map([
-        ["全部", "-1"], ["独家", "3"], ["其他", "1"]
-    ]);
+	protected updateUrlParams(url: BangumiUrl, index: string): void {
+		url.setCopyright(index);
+	}
 
-    protected updateUrlParams(url: BangumiUrl, index: string): void {
-        url.setCopyright(index);
-    }
-
-    constructor() {
-        super();
-        this.init();
-    }
-};
+	constructor() {
+		super();
+		this.init();
+	}
+})();

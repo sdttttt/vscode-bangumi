@@ -4,9 +4,9 @@ import * as vscode from "vscode";
 import { WeekBangumiData, WBangumi } from "../request/structure";
 import { toWeekDay, isToday } from "../utils/strings";
 import AbstractHTMLGenerator from "./generator";
-import { getConfig } from "../configuration";
+import { isDisplayHistory } from "../configuration";
 import { getResourceFile } from "../utils/file";
-import { yinglili, WeekBangumiCSS } from "../constants";
+import { YING_LILI, WEEK_BANGUMI_CSS } from "../constants";
 
 /**
  * Week Bangumis HTML Generator
@@ -14,53 +14,56 @@ import { yinglili, WeekBangumiCSS } from "../constants";
  * @class WeekBangumisHTMLGenerator
  * @author sdttttt
  */
-export default new class WeekBangumisHTMLGenerator extends AbstractHTMLGenerator<Array<WeekBangumiData>> {
+export default new (class WeekBangumisHTMLGenerator extends AbstractHTMLGenerator<
+	Array<WeekBangumiData>
+> {
+	protected style = "";
 
-    protected style = "";
+	protected html?: string;
 
-    protected html?: string;
+	constructor() {
+		super();
+	}
 
-    constructor() {
-        super();
-    }
+	private makeOneDay(day: WeekBangumiData): string {
+		let toDayBadge: vscode.Uri | undefined = undefined;
+		if (isToday(day.date)) {
+			toDayBadge = getResourceFile(YING_LILI);
+		}
 
-    private makeOneDay(day: WeekBangumiData): string {
-
-        let toDayBadge: vscode.Uri | undefined = undefined;
-        if (isToday(day.date)) {
-            toDayBadge = getResourceFile(yinglili);
-        }
-
-        let daysHtml = `
-    <div class="item ${ isToday(day.date) ? "today" : ""}">
+		let daysHtml = `
+    <div class="item ${isToday(day.date) ? "today" : ""}">
             <div class="day">
-                <h2>${toWeekDay(day.day_of_week)} ${toDayBadge ?
-                "<div class=\"today-badge\" ><img src=\"" + toDayBadge + "\"></div>" : ""}
+                <h2>${toWeekDay(day.day_of_week)} ${
+			toDayBadge
+				? `<div class="today-badge" ><img src="${toDayBadge}"></div>`
+				: ""
+		}
                 </h2>
                 ${day.date}
             </div>
     `;
 
-        let bangumiDate = "";
-        for (const bangumi of day.seasons) {
-            if (bangumi.pub_time !== bangumiDate) {
-                daysHtml += `<div class="time-point">
+		let bangumiDate = "";
+		for (const bangumi of day.seasons) {
+			if (bangumi.pub_time !== bangumiDate) {
+				daysHtml += `<div class="time-point">
                 🕒${bangumi.pub_time}
             </div>`;
-            }
-            daysHtml += this.makeOneBangumi(bangumi);
-            bangumiDate = bangumi.pub_time;
-        }
+			}
+			daysHtml += this.makeOneBangumi(bangumi);
+			bangumiDate = bangumi.pub_time;
+		}
 
-        daysHtml += "</div>";
+		daysHtml += "</div>";
 
-        return daysHtml;
-    }
+		return daysHtml;
+	}
 
-    private makeOneBangumi(bangumi: WBangumi): string {
-
-        if (bangumi.delay === 1) { // 拖更了！
-            return `
+	private makeOneBangumi(bangumi: WBangumi): string {
+		if (bangumi.delay === 1) {
+			// 拖更了！
+			return `
             <div class="bangumi delay">
                 <div class="cover">
                     <a href="${bangumi.url}">
@@ -79,9 +82,9 @@ export default new class WeekBangumisHTMLGenerator extends AbstractHTMLGenerator
                 </div>
             </div>
             `;
-        }
+		}
 
-        return `
+		return `
             <div class="bangumi">
                 <div class="cover">
                     <a href="${bangumi.url}">
@@ -99,29 +102,32 @@ export default new class WeekBangumisHTMLGenerator extends AbstractHTMLGenerator
                 </div>
             </div>
             `;
+	}
 
-    }
+	generateHTML(data: Array<WeekBangumiData>): string {
+		this.html = "";
+		this.makeCssUri(WEEK_BANGUMI_CSS);
 
-    generateHTML(data: Array<WeekBangumiData>): string {
+		if (isDisplayHistory()) {
+			for (const day of data) {
+				this.html += this.makeOneDay(day);
+			}
+		} else {
+			let index = 0;
+			for (const item of data) {
+				if (index >= 5) {
+					this.html += this.makeOneDay(item);
+				}
+				index++;
+			}
+		}
 
-        this.html = "";
-        this.makeCssUri(WeekBangumiCSS);
-        const isDisplayHistory: unknown = getConfig("bangumiOpen.DisplayHistory");
-
-        if (isDisplayHistory as boolean ) {
-            for (const day of data) {
-                this.html += this.makeOneDay(day);
-            }
-        } else {
-            let index = 0;
-            for (const item of data) {
-                if (index >= 5) {
-                    this.html += this.makeOneDay(item);
-                }
-                index++;
-            }
-        }
-
-        return this.htmlHead + this.style + this.htmlBody + this.html + this.htmlFloor;
-    }
-};
+		return (
+			this.htmlHead +
+			this.style +
+			this.htmlBody +
+			this.html +
+			this.htmlFloor
+		);
+	}
+})();

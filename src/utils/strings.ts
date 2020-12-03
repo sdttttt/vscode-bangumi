@@ -1,5 +1,3 @@
-"use strict";
-
 import { WeekBangumiData } from "../request/structure";
 import { toNumber } from "./type";
 
@@ -12,25 +10,24 @@ import { toNumber } from "./type";
  */
 export function toWeekDay(day: number): string {
 	switch (day) {
-	case 1:
-		return "星期一";
-	case 2:
-		return "星期二";
-	case 3:
-		return "星期三";
-	case 4:
-		return "星期四";
-	case 5:
-		return "星期五";
-	case 6:
-		return "星期六";
-	case 7:
-		return "星期日";
-	default:
-		return "";
+		case 1:
+			return "星期一";
+		case 2:
+			return "星期二";
+		case 3:
+			return "星期三";
+		case 4:
+			return "星期四";
+		case 5:
+			return "星期五";
+		case 6:
+			return "星期六";
+		case 7:
+			return "星期日";
+		default:
+			return "";
 	}
 }
-
 
 /**
  * To judge whether it is today or not.
@@ -41,7 +38,7 @@ export function toWeekDay(day: number): string {
  */
 export function isToday(day: string): boolean {
 	const currentTime: Date = new Date();
-	const today = (currentTime.getMonth() + 1) + "-" + currentTime.getDate();
+	const today = currentTime.getMonth() + 1 + "-" + currentTime.getDate();
 	return today === day;
 }
 
@@ -59,12 +56,14 @@ export function currentTimestamp(): number {
 /**
  * Gets today index in week bangumi
  *
- * @param bangumis 
+ * @param bangumis
  * @returns today index in week bangumi
  * @export
  * @author sdttttt
  */
-export function getTodayIndexInWeekBangumi(bangumis: Array<WeekBangumiData>): number | undefined {
+export function getTodayIndexInWeekBangumi(
+	bangumis: Array<WeekBangumiData>
+): number | undefined {
 	for (let i = 0; i < bangumis.length; i++) {
 		if (isToday(bangumis[i].date)) {
 			return i;
@@ -75,26 +74,25 @@ export function getTodayIndexInWeekBangumi(bangumis: Array<WeekBangumiData>): nu
 /**
  * To minute from secode
  *
- * @param {number} time 
+ * @param {number} time
  * @returns {number} minute from secode
- * @author sdttttt 
+ * @author sdttttt
  */
-export function toMinuteFromSecode(time: number): number{
+export function toMinuteFromSecode(time: number): number {
 	return Math.ceil(time / 60);
 }
 
 /**
  * Numbers of string plus
- * 
- * @param str 
- * @param num 
+ *
+ * @param str
+ * @param num
  * @returns of string plus
- * @author sdttttt 
+ * @author sdttttt
  */
 export function numberOfStringPlus(str: string, num: number): string {
 	return (toNumber(str) + num).toString();
 }
-
 
 /**
  *	return Number of Random Integer.

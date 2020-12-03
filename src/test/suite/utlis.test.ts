@@ -1,11 +1,13 @@
 "use strict";
 
 import { toNumber, isEmptyArray, isEmptyObject } from "../../utils/type";
-import { isToday, 
-	currentTimestamp, 
-	toWeekDay, 
-	toMinuteFromSecode, 
-	randomInteger} from "../../utils/strings";
+import {
+	isToday,
+	currentTimestamp,
+	toWeekDay,
+	toMinuteFromSecode,
+	randomInteger,
+} from "../../utils/strings";
 import { expect } from "chai";
 
 /**
@@ -14,7 +16,6 @@ import { expect } from "chai";
  * @author sdttttt
  */
 suite("Utils TEST", () => {
-
 	test("toNumber", () => {
 		const str = "1";
 		const num: number = toNumber(str);
@@ -40,8 +41,8 @@ suite("Utils TEST", () => {
 	});
 
 	test("is empty Object TEST", () => {
-		const emptyObj: object = {};
-		const obj: object = { a: 1 };
+		const emptyObj: unknown = {};
+		const obj: unknown = { a: 1 };
 
 		// tslint:disable-next-line: no-unused-expression
 		expect(isEmptyObject(emptyObj)).to.be.true;
@@ -51,7 +52,8 @@ suite("Utils TEST", () => {
 
 	test("today TEST", () => {
 		const currentTime: Date = new Date();
-		const today: string = (currentTime.getMonth() + 1) + "-" + currentTime.getDate();
+		const today: string =
+			currentTime.getMonth() + 1 + "-" + currentTime.getDate();
 
 		// tslint:disable-next-line: no-unused-expression
 		expect(isToday(today)).to.be.true;
@@ -81,11 +83,10 @@ suite("Utils TEST", () => {
 	});
 
 	test("Random TEST", () => {
-		const num1: number = randomInteger(0 , 2);
+		const num1: number = randomInteger(0, 2);
 		expect(num1).to.be.least(0).that.most(2);
 
 		const num2: number = randomInteger(4, 15);
 		expect(num2).to.be.least(4).that.most(15);
 	});
-
 });
