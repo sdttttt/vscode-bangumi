@@ -7,7 +7,7 @@
 ### A brief explanation on the source code structure
 
 所有的主要源代码都在src目录下.
-或许你会觉得我的代码风格非常的..OOP?确实,这是我编写C#&Java时留下的毛病.每个单独的小模块都是以Class风格编写的.
+或许你会觉得我的代码风格非常的..OOP?确实,这是我编写`C#`&`Java`时留下的毛病.每个单独的小模块都是以Class风格编写的.
 
 **目录说明:**
 
