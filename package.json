@@ -96,7 +96,7 @@
 		}
 	},
 	"scripts": {
-		"compile": "tsc -p ./",
+		"compile": "yarn run gulp",
 		"format": "prettier --write src/** && yarn run eslint:fix",
 		"watch": "webpack --mode none --watch",
 		"pretest": "yarn run compile",
@@ -110,7 +110,7 @@
 		"eslint:fix": "eslint --fix src --ext .ts",
 		"commit": "git add . && npx git-cz",
 		"rollup:compile": "rollup -c",
-		"rollup:prepublish": "rollup -c && uglifyjs ./dist/extension.js -m -c -o ./dist/extension.js"
+		"gulp": "gulp"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.12.9",
@@ -135,6 +135,9 @@
 		"eslint-plugin-typescript": "^0.14.0",
 		"fork-ts-checker-webpack-plugin": "^6.0.4",
 		"glob": "^7.1.5",
+		"gulp": "^4.0.2",
+		"gulp-cli": "^2.3.0",
+		"gulp-typescript": "^6.0.0-alpha.1",
 		"mocha": "^7.1.0",
 		"prettier": "^2.2.1",
 		"rollup": "^2.34.0",
