@@ -2,7 +2,7 @@
 
 import * as vscode from "vscode";
 import MainIndexList from "./";
-import { getDisplayIndexTags } from "../configuration";
+import { isDisplayIndexTags } from "../configuration";
 import { BangumiUrl } from "../request/bangumiUrl";
 import BangumisView from "../views/bangumi";
 
@@ -152,7 +152,7 @@ export abstract class FinalIndexList extends AbstractIndexList {
 	 * @author sdttttt
 	 */
 	protected pushTagHook: Hook = (index?: string): void => {
-		if (getDisplayIndexTags()) {
+		if (isDisplayIndexTags()) {
 			if (index) {
 				const tags: Map<string, string> = MainIndexList.tags;
 				tags.set(this.tag, index);
@@ -167,7 +167,7 @@ export abstract class FinalIndexList extends AbstractIndexList {
 	 * @author sdttttt
 	 */
 	private showTagHook(): void {
-		if (getDisplayIndexTags()) {
+		if (isDisplayIndexTags()) {
 			const tags: Map<string, string> = MainIndexList.tags;
 			if (tags.size > 0) {
 				let message = "";

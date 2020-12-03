@@ -1,5 +1,3 @@
-"use strict";
-
 import { WeekBangumiData } from "../request/structure";
 import { toNumber } from "./type";
 

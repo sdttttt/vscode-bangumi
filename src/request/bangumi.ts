@@ -1,4 +1,4 @@
-import * as vscode from "vscode";
+import { window } from "vscode";
 import Axios from "./instance";
 import { AxiosResponse } from "axios";
 import { BangumiUrl, BANGUMI_WEEK } from "./bangumiUrl";
@@ -73,9 +73,7 @@ export async function getWeekBangumi(): Promise<
 			!isSuccess(weekBangumiResponse) ||
 			isEmptyArray(weekBangumiResponse.result)
 		) {
-			vscode.window.showInformationMessage(`
-            	诶?!没有找到番剧时间表诶...
-        	`);
+			window.showInformationMessage(`诶?!没有找到番剧时间表诶...`);
 			return;
 		}
 		result = weekBangumiResponse.result;

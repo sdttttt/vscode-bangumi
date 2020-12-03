@@ -17,7 +17,7 @@ export default new (class YearList extends FinalIndexList {
 		"2000-2004",
 		"90年代",
 		"80年代",
-		"你还没出生时候",
+		"很久很久以前",
 	];
 
 	private encodeYear(years: Array<string>): string {
@@ -41,7 +41,7 @@ export default new (class YearList extends FinalIndexList {
 			case "80年代":
 				url.setYear(this.encodeYear(["1980", "1990"]));
 				return;
-			case "你还没出生时候":
+			case "很久很久以前":
 				url.setYear(this.encodeYear(["", "1980"]));
 				return;
 		}

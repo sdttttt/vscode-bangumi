@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 import { WeekBangumiData, WBangumi } from "../request/structure";
 import { toWeekDay, isToday } from "../utils/strings";
 import AbstractHTMLGenerator from "./generator";
-import { getConfig } from "../configuration";
+import { isDisplayHistory } from "../configuration";
 import { getResourceFile } from "../utils/file";
 import { YING_LILI, WEEK_BANGUMI_CSS } from "../constants";
 
@@ -107,11 +107,8 @@ export default new (class WeekBangumisHTMLGenerator extends AbstractHTMLGenerato
 	generateHTML(data: Array<WeekBangumiData>): string {
 		this.html = "";
 		this.makeCssUri(WEEK_BANGUMI_CSS);
-		const isDisplayHistory: unknown = getConfig(
-			"bangumiOpen.DisplayHistory"
-		);
 
-		if (isDisplayHistory as boolean) {
+		if (isDisplayHistory()) {
 			for (const day of data) {
 				this.html += this.makeOneDay(day);
 			}

@@ -2,8 +2,11 @@ import { getWeekBangumi } from "./request/bangumi";
 import { window, StatusBarItem, StatusBarAlignment } from "vscode";
 import { WeekBangumiData, WBangumi } from "./request/structure";
 import { isEmptyArray } from "./utils/type";
-import { getReminderAheadTime } from "./configuration";
-import { showRemind } from "./utils/display";
+import { getReminderAheadTime, isDisplayStatusBar } from "./configuration";
+import {
+	showBangumiUpdateRemind,
+	showBeforeBangumiUpdateRemind,
+} from "./utils/display";
 import {
 	currentTimestamp,
 	getTodayIndexInWeekBangumi,
@@ -19,6 +22,12 @@ export default new (class Reminder {
 
 	constructor() {
 		this.statusBar.color = "#FFC0CB";
+		this.statusBar.command = "weekBangumi";
+		if (isDisplayStatusBar()) {
+			this.statusBar.show();
+		} else {
+			this.statusBar.hide();
+		}
 	}
 
 	/**
@@ -81,12 +90,10 @@ export default new (class Reminder {
 			const aheadTimeM = aheadTime * 1000;
 			const timer: NodeJS.Timeout = setTimeout(async () => {
 				if (aheadTime === 0) {
-					showRemind(`《${bangumi.title}》 更新啦！🎉`);
+					showBangumiUpdateRemind(bangumi.title);
 				} else {
 					const minute = toMinuteFromSecode(aheadTime);
-					showRemind(
-						`《${bangumi.title}》 还有${minute}分钟就更新啦！ 🎉`
-					);
+					showBeforeBangumiUpdateRemind(bangumi.title, minute);
 				}
 				this.updateStatusBar(nextBangumi);
 			}, timeDifference - aheadTimeM);
@@ -99,11 +106,16 @@ export default new (class Reminder {
 			const { title, pub_time: targetTime } = bangumi;
 			const shortTitle =
 				title.length > 7 ? `${title.slice(0, 7)}...` : title;
-			this.statusBar.text = `《${shortTitle.trim()}》在 ${targetTime} 更新噢⌛`;
+			this.updateStatusBarContent(
+				`《${shortTitle.trim()}》在 ${targetTime} 更新噢⌛`
+			);
 		} else {
-			this.statusBar.text = "番剧暂时没有了诶";
+			this.updateStatusBarContent("番剧暂时没有了诶");
 		}
-		this.statusBar.show();
+	}
+
+	private updateStatusBarContent(content: string): void {
+		this.statusBar.text = content;
 	}
 
 	/**
