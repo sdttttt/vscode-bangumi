@@ -17,9 +17,9 @@ export default new (class Reminder {
 		StatusBarAlignment.Right
 	);
 
-  constructor() {
-    this.statusBar.color = "#FFC0CB";
-  }
+	constructor() {
+		this.statusBar.color = "#FFC0CB";
+	}
 
 	/**
 	 * Reminders bangumi update
@@ -48,15 +48,18 @@ export default new (class Reminder {
 		const currentTime: number = currentTimestamp();
 		const aheadTime: number = getReminderAheadTime();
 
-    for (let i = todayIndex; i <= todayIndex + 1; i++) {
-      const bangumiSize = bangumisData[i].seasons.length;
-      for (let k = 0; k < bangumiSize; k++) {
-        const bangumi: WBangumi = bangumisData[i].seasons[k];
-        const nextBangumi: WBangumi | undefined = (k + 1) < bangumiSize ? bangumisData[i].seasons[k + 1] : undefined;
-        this.makeReminder(currentTime, aheadTime, bangumi, nextBangumi);
+		for (let i = todayIndex; i <= todayIndex + 1; i++) {
+			const bangumiSize = bangumisData[i].seasons.length;
+			for (let k = 0; k < bangumiSize; k++) {
+				const bangumi: WBangumi = bangumisData[i].seasons[k];
+				const nextBangumi: WBangumi | undefined =
+					k + 1 < bangumiSize
+						? bangumisData[i].seasons[k + 1]
+						: undefined;
+				this.makeReminder(currentTime, aheadTime, bangumi, nextBangumi);
 			}
-    }
-    this.updateStatusBar(bangumisData[todayIndex].seasons[0]);
+		}
+		this.updateStatusBar(bangumisData[todayIndex].seasons[0]);
 	}
 
 	/**
@@ -69,8 +72,8 @@ export default new (class Reminder {
 	private makeReminder(
 		currentTime: number,
 		aheadTime: number,
-    bangumi: WBangumi,
-    nextBangumi: WBangumi | undefined
+		bangumi: WBangumi,
+		nextBangumi: WBangumi | undefined
 	): void {
 		const bangumiTime: number = bangumi.pub_ts * 1000;
 		if (currentTime < bangumiTime && bangumi.delay !== 1) {
@@ -84,23 +87,24 @@ export default new (class Reminder {
 					showRemind(
 						`《${bangumi.title}》 还有${minute}分钟就更新啦！ 🎉`
 					);
-        }
-        this.updateStatusBar(nextBangumi);
+				}
+				this.updateStatusBar(nextBangumi);
 			}, timeDifference - aheadTimeM);
 			this.remindTimers.push(timer);
 		}
 	}
 
-  private updateStatusBar(bangumi: WBangumi | undefined) {
-    if (bangumi) {
-      const { title, pub_time: targetTime } = bangumi;
-      const shortTitle = title.length > 7 ? `${title.slice(0, 7)}...` : title;
-      this.statusBar.text = `《${shortTitle}》在 ${targetTime} 更新噢⌛`;
-    } else {
-      this.statusBar.text = "番剧暂时没有了诶"
-    }
-    this.statusBar.show();
-  }
+	private updateStatusBar(bangumi: WBangumi | undefined) {
+		if (bangumi) {
+			const { title, pub_time: targetTime } = bangumi;
+			const shortTitle =
+				title.length > 7 ? `${title.slice(0, 7)}...` : title;
+			this.statusBar.text = `《${shortTitle}》在 ${targetTime} 更新噢⌛`;
+		} else {
+			this.statusBar.text = "番剧暂时没有了诶";
+		}
+		this.statusBar.show();
+	}
 
 	/**
 	 * Destroy reminder
