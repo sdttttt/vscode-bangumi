@@ -99,7 +99,7 @@ export default new (class Reminder {
 			const { title, pub_time: targetTime } = bangumi;
 			const shortTitle =
 				title.length > 7 ? `${title.slice(0, 7)}...` : title;
-			this.statusBar.text = `《${shortTitle}》在 ${targetTime} 更新噢⌛`;
+			this.statusBar.text = `《${shortTitle.trim()}》在 ${targetTime} 更新噢⌛`;
 		} else {
 			this.statusBar.text = "番剧暂时没有了诶";
 		}

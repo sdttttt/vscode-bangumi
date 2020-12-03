@@ -1,15 +1,15 @@
 // eslint-disable-next-line no-unused-vars
 import * as vscode from "vscode";
 
-export const yinglili = "heiheihei.gif";
+export const YING_LILI = "heiheihei.gif";
 
-export const huihui = "loading.gif";
+export const HUIHUI = "loading.gif";
 
-export const enterprise = "enterprise.jpg";
+export const ENTERRPRISE = "enterprise.jpg";
 
-export const WeekBangumiCSS = "css/weekBangumi.css";
-export const BangumiCSS = "css/bangumi.css";
-export const LoadingCSS = "css/loading.css";
+export const WEEK_BANGUMI_CSS = "css/weekBangumi.css";
+export const BANGUMI_CSS = "css/bangumi.css";
+export const LOADING_CSS = "css/loading.css";
 
 let _context: vscode.ExtensionContext;
 

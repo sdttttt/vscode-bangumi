@@ -2,7 +2,7 @@
 
 import { Bangumi } from "../request/structure";
 import AbstractHTMLGenerator from "./generator";
-import { BangumiCSS } from "../constants";
+import { BANGUMI_CSS } from "../constants";
 
 /**
  * Bangumis HTML Generator
@@ -61,7 +61,7 @@ export default new (class BangumisHTMLGenerator extends AbstractHTMLGenerator<
 	 * @author sdttttt
 	 */
 	generateHTML(bangumis: Array<Bangumi>): string {
-		this.makeCssUri(BangumiCSS);
+		this.makeCssUri(BANGUMI_CSS);
 
 		this.html = "";
 		for (const bangumi of bangumis) {

@@ -1,4 +1,4 @@
-import * as vscode from "vscode";
+import { window, commands } from "vscode";
 
 /**
  * show Remind.
@@ -8,11 +8,11 @@ import * as vscode from "vscode";
  * @author sdttttt
  */
 export function showRemind(content: string): void {
-	vscode.window
+	window
 		.showInformationMessage(content, "Open WeekBangumi")
 		.then((result: string | undefined) => {
 			if (result) {
-				vscode.commands.executeCommand("weekBangumi");
+				commands.executeCommand("weekBangumi");
 			}
 		});
 }

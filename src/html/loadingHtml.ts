@@ -3,7 +3,7 @@
 import AbstractHTMLGenerator from "./generator";
 import { Uri } from "vscode";
 import { getResourceFile } from "../utils/file";
-import { huihui, LoadingCSS } from "../constants";
+import { HUIHUI, LOADING_CSS } from "../constants";
 
 /**
  * Loading Html Generator.
@@ -18,8 +18,8 @@ export default new (class LoadingHTMLGenerator extends AbstractHTMLGenerator<und
 
 	generateHTML(): string {
 		if (!this.html) {
-			const loadimg: Uri = getResourceFile(huihui);
-			this.makeCssUri(LoadingCSS);
+			const loadimg: Uri = getResourceFile(HUIHUI);
+			this.makeCssUri(LOADING_CSS);
 			this.html = `<div class="load"><img style="width:120px;height:130px;" src="${loadimg}"><h3>Loading...</h3></div>`;
 			this.html =
 				this.htmlHead +

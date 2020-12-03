@@ -6,7 +6,7 @@ import { toWeekDay, isToday } from "../utils/strings";
 import AbstractHTMLGenerator from "./generator";
 import { getConfig } from "../configuration";
 import { getResourceFile } from "../utils/file";
-import { yinglili, WeekBangumiCSS } from "../constants";
+import { YING_LILI, WEEK_BANGUMI_CSS } from "../constants";
 
 /**
  * Week Bangumis HTML Generator
@@ -28,7 +28,7 @@ export default new (class WeekBangumisHTMLGenerator extends AbstractHTMLGenerato
 	private makeOneDay(day: WeekBangumiData): string {
 		let toDayBadge: vscode.Uri | undefined = undefined;
 		if (isToday(day.date)) {
-			toDayBadge = getResourceFile(yinglili);
+			toDayBadge = getResourceFile(YING_LILI);
 		}
 
 		let daysHtml = `
@@ -106,7 +106,7 @@ export default new (class WeekBangumisHTMLGenerator extends AbstractHTMLGenerato
 
 	generateHTML(data: Array<WeekBangumiData>): string {
 		this.html = "";
-		this.makeCssUri(WeekBangumiCSS);
+		this.makeCssUri(WEEK_BANGUMI_CSS);
 		const isDisplayHistory: unknown = getConfig(
 			"bangumiOpen.DisplayHistory"
 		);
