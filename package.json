@@ -101,6 +101,7 @@
 		"watch": "webpack --mode none --watch",
 		"pretest": "yarn run compile",
 		"test": "node ./out/test/runTest.js",
+		"clean": "gulp clean",
 		"vscode:prepublish": "yarn run webpack:prepublish",
 		"webpack:prepublish": "webpack --mode production",
 		"webpack:compile": "webpack --mode none",
@@ -110,6 +111,7 @@
 		"eslint:fix": "eslint --fix src --ext .ts",
 		"commit": "git add . && npx git-cz",
 		"gulp:imgmin": "gulp optimizeimg",
+		"gulp:cssmin": "gulp optimizecss",
 		"gulp:watch": "gulp watchCompile"
 	},
 	"devDependencies": {
@@ -134,6 +136,8 @@
 		"fork-ts-checker-webpack-plugin": "^6.0.4",
 		"glob": "^7.1.5",
 		"gulp": "^4.0.2",
+		"gulp-clean": "^0.4.0",
+		"gulp-clean-css": "^4.3.0",
 		"gulp-cli": "^2.3.0",
 		"gulp-imagemin": "^7.1.0",
 		"gulp-typescript": "^6.0.0-alpha.1",

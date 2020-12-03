@@ -1,9 +1,13 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { src, dest, watch, series } =  require("gulp");
+const { src, dest, watch } =  require("gulp");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { createProject } =  require( "gulp-typescript");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const imagemin = require("gulp-imagemin");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const cssmin = require("gulp-clean-css");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const clean = require("gulp-clean");
 
 async function optimizeimgTask() {
 	src("resources/*")
@@ -13,6 +17,17 @@ async function optimizeimgTask() {
 	src("Icon.png")
 	.pipe(imagemin())
 	.pipe(dest("."));
+}
+
+async function cleanTask() {
+	src(["resources/mincss","out", "dist"])
+	.pipe(clean())
+}
+
+async function optimizecssTask() {
+	src("resources/css/*.css")
+	.pipe(cssmin())
+	.pipe(dest("resources/mincss"))
 }
 
 async function compileTask() {
@@ -27,5 +42,7 @@ exports.watchCompile = async () => {
 	watch("src/**/*.ts", compileTask);
 };
 
+exports.clean = cleanTask;
 exports.optimizeimg = optimizeimgTask
+exports.optimizecss = optimizecssTask
 exports.compile = compileTask
