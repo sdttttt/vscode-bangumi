@@ -1,13 +1,13 @@
 # Contributing & Maintaining
 
-如果你尝试为BangumiOpen做出贡献, 非常感谢!
+如果你尝试为**BangumiOpen**做出贡献, 非常感谢!
 
-请阅读这份文件, 或许能更好的帮助你了解BangumiOpen.
+请阅读这份文件, 或许能更好的帮助你了解**BangumiOpen**.
 
 ### A brief explanation on the source code structure
 
-所有的主要源代码都在src目录下.
-或许你会觉得我的代码风格非常的..OOP?确实,这是我编写`C#`&`Java`时留下的毛病.每个单独的小模块都是以Class风格编写的.
+所有的主要源代码都在`src`目录下.
+或许你会觉得我的代码风格非常的..`OOP`?确实,这是我编写`C#`&`Java`时留下的毛病.每个单独的小模块都是以`Class`风格编写的.
 
 **目录说明:**
 
