@@ -1,5 +1,3 @@
-"use strict";
-
 /**
  * Detroit: Become Number
  *
@@ -10,7 +8,6 @@
  * @author sdttttt
  */
 export function toNumber(text: string | undefined): number {
-
 	if (text === undefined) {
 		return 0;
 	}

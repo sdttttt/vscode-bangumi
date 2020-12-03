@@ -1,17 +1,28 @@
-import * as vscode from 'vscode';
+import { window, commands } from "vscode";
 
 /**
  * show Remind.
- * 
- * @export
+ *
  * @param {string} bangumiName
  * @author sdttttt
  */
-export function showRemind(content: string): void {
-	vscode.window.showInformationMessage(content,"Open WeekBangumi")
+function showRemind(content: string): void {
+	window
+		.showInformationMessage(content, "Open WeekBangumi")
 		.then((result: string | undefined) => {
 			if (result) {
-				vscode.commands.executeCommand("weekBangumi");
+				commands.executeCommand("weekBangumi");
 			}
 		});
+}
+
+export function showBeforeBangumiUpdateRemind(
+	content: string,
+	minuteTime: string | number
+): void {
+	showRemind(`《${content}》 还有${minuteTime}分钟就更新啦！ 🎉`);
+}
+
+export function showBangumiUpdateRemind(content: string): void {
+	showRemind(`《${content}》 更新啦！🎉`);
 }

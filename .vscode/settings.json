@@ -2,7 +2,8 @@
 {
     "files.exclude": {
         "out": false // set this to true to hide the "out" folder with the compiled JS files
-    },
+	},
+	"editor.fontFamily": "Consolas, 'Courier New', monospace",
     "search.exclude": {
         "out": true // set this to false to include "out" folder in search results
     },
@@ -23,5 +24,7 @@
     "commentTranslate.targetLanguage": "zh-CN",
     "deepscan.enable": true,
     "god.tsconfig": "./tsconfig.json",
-    "compile-hero.disable-compile-files-on-did-save-code": true
+	"compile-hero.disable-compile-files-on-did-save-code": true,
+	"editor.insertSpaces": false,
+	"bangumiOpen.EnableReminder": true
 }

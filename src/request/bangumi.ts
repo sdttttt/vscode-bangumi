@@ -1,6 +1,4 @@
-"use strict";
-
-import * as vscode from "vscode";
+import { window } from "vscode";
 import Axios from "./instance";
 import { AxiosResponse } from "axios";
 import { BangumiUrl, BANGUMI_WEEK } from "./bangumiUrl";
@@ -12,10 +10,8 @@ import {
 	WeekBangumiResponse,
 	BangumisData,
 	isSuccess,
-	isValidBangumisRequest as isValidBangumisRequest
+	isValidBangumisRequest as isValidBangumisRequest,
 } from "./structure";
-
-
 
 /**
  * HTTP Request Gets all bangumi
@@ -24,16 +20,19 @@ import {
  * @async
  * @author sdttttt
  */
-export async function getAllBangumi(burl: BangumiUrl): Promise<BangumisData | undefined> {
-
+export async function getAllBangumi(
+	burl: BangumiUrl
+): Promise<BangumisData | undefined> {
 	const url: string = burl.build().finalUrl;
 
 	const cacheData: BangumisData | undefined = BangumiCache.get(url);
 	let result: BangumisData | undefined = cacheData;
 
 	if (!cacheData) {
-		const res: AxiosResponse<BangumisResponse> =
-			await Axios.get<unknown, AxiosResponse<BangumisResponse>>(url);
+		const res: AxiosResponse<BangumisResponse> = await Axios.get<
+			unknown,
+			AxiosResponse<BangumisResponse>
+		>(url);
 
 		const bangumisResponse: BangumisResponse = res.data;
 
@@ -43,11 +42,8 @@ export async function getAllBangumi(burl: BangumiUrl): Promise<BangumisData | un
 		result = bangumisResponse.data;
 		BangumiCache.set(url, result);
 	}
-
 	return result;
 }
-
-
 
 /**
  * Gets week bangumi
@@ -56,29 +52,33 @@ export async function getAllBangumi(burl: BangumiUrl): Promise<BangumisData | un
  * @async
  * @author sdttttt
  */
-export async function getWeekBangumi(): Promise<Array<WeekBangumiData> | undefined> {
-
-	const cacheData: Array<WeekBangumiData> | undefined =
-		WeekBangumiCache.get(BANGUMI_WEEK);
+export async function getWeekBangumi(): Promise<
+	Array<WeekBangumiData> | undefined
+> {
+	const cacheData: Array<WeekBangumiData> | undefined = WeekBangumiCache.get(
+		BANGUMI_WEEK
+	);
 
 	let result: Array<WeekBangumiData> | undefined = cacheData;
 
 	if (!cacheData) {
-		const res: AxiosResponse<WeekBangumiResponse> =
-			await Axios.get<unknown, AxiosResponse<WeekBangumiResponse>>(BANGUMI_WEEK);
+		const res: AxiosResponse<WeekBangumiResponse> = await Axios.get<
+			unknown,
+			AxiosResponse<WeekBangumiResponse>
+		>(BANGUMI_WEEK);
 
 		const weekBangumiResponse = res.data;
 
-		if (!isSuccess(weekBangumiResponse) || isEmptyArray(weekBangumiResponse.result)) {
-			vscode.window.showInformationMessage(`
-            	诶?!没有找到番剧时间表诶...
-        	`);
+		if (
+			!isSuccess(weekBangumiResponse) ||
+			isEmptyArray(weekBangumiResponse.result)
+		) {
+			window.showInformationMessage(`诶?!没有找到番剧时间表诶...`);
 			return;
 		}
 		result = weekBangumiResponse.result;
 		WeekBangumiCache.set(BANGUMI_WEEK, result);
 	}
-
 
 	return result;
 }

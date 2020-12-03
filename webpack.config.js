@@ -42,6 +42,7 @@ const config = {
 		new webpack.ProgressPlugin(),
 		new TsCheckPlugin(tsCheckConfig)
 	],
+	devtool: "source-map",
 	module: {
 		rules: [
 			{
