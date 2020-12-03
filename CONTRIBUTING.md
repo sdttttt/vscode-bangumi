@@ -2,7 +2,7 @@
 
 如果你尝试为**BangumiOpen**做出贡献, 非常感谢!
 
-请阅读这份文件, 或许能更好的帮助你了解**BangumiOpen**.
+请阅读这份文件, 或许能更好的帮助你了解**BangumiOpen**的工作方式.
 
 ### A brief explanation on the source code structure
 
