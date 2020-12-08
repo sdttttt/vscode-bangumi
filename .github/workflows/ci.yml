@@ -26,10 +26,10 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ~/.npm
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
         restore-keys: |
           ${{ runner.os }}-node-
- 
+
     - name: Get npm cache directory
       if: ${{ runner.os == 'Windows' }}
       id: npm-cache
@@ -41,18 +41,18 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ${{ steps.npm-cache.outputs.dir }}
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
         restore-keys: |
           ${{ runner.os }}-node-
 
-    - name: Initializer ENV
-      run: |
-        npm install -g vsce
-        npm install -g yarn
-        yarn
+    - name: install deps
+      run: npx yarn
+
+    - name: build
+      run: npx yarn run build
     - name: Run tests
       uses: GabrielBB/xvfb-action@v1.2
       with:
-        run: npm test
+        run: npx yarn run test
     - name: Packing
-      run: vsce package
+      run: npx vsce package
