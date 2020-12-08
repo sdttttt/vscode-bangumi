@@ -160,3 +160,9 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 ### Fix
 
 -   修复状态栏提示显示不正确的问题.
+
+## [2.2.2] - 2020-12-8
+
+### Fix
+
+-   锕, 我错了,2.2.1版本发布的压缩后的CSS没有打包到扩展里, 所以看起来很诡异.
