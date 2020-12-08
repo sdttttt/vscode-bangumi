@@ -96,6 +96,7 @@
 		}
 	},
 	"scripts": {
+		"postinstall": "npx husky install",
 		"compile": "tsc -p ./",
 		"format": "prettier --write src/** && yarn run eslint:fix",
 		"watch": "webpack --mode none --watch",
