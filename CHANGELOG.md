@@ -154,3 +154,9 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 -   重新编写 README.
 -   优化插件体积.
 -   重构部分代码.
+
+## [2.2.1] - 2020-12-8
+
+### Fix
+
+-   修复状态栏提示显示不正确的问题.
