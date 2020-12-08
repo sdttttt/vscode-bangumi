@@ -21,7 +21,9 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install -g vsce
-    - run: npm install
+    - run: npm install -g yarn
+    - run: yarn
+    - run: yarn run build
     - run: vsce package
       env:
         CI: true
@@ -31,7 +33,7 @@ jobs:
         args: "publish -p $VSCE_TOKEN"
       env:
         VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }}
-    
+
     - name: Publish to Open-VSX
       run: |
         npx ovsx publish -p ${{ secrets.OVSX_ACCESS_KEY }}
