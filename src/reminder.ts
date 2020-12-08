@@ -21,8 +21,9 @@ export default new (class Reminder {
 	);
 
 	constructor() {
-		this.statusBar.color = "#FFC0CB";
+		// this.statusBar.color = "#FFC0CB";
 		this.statusBar.command = "weekBangumi";
+		this.statusBar.text = "";
 		if (isDisplayStatusBar()) {
 			this.statusBar.show();
 		} else {
@@ -68,7 +69,6 @@ export default new (class Reminder {
 				this.makeReminder(currentTime, aheadTime, bangumi, nextBangumi);
 			}
 		}
-		this.updateStatusBar(bangumisData[todayIndex].seasons[0]);
 	}
 
 	/**
@@ -97,6 +97,11 @@ export default new (class Reminder {
 				}
 				this.updateStatusBar(nextBangumi);
 			}, timeDifference - aheadTimeM);
+
+			// if true: statusBar is not display NextBangumi Information.
+			if (this.statusBar.text.trim().length === 0) {
+				this.updateStatusBar(bangumi);
+			}
 			this.remindTimers.push(timer);
 		}
 	}
@@ -107,7 +112,7 @@ export default new (class Reminder {
 			const shortTitle =
 				title.length > 7 ? `${title.slice(0, 7)}...` : title;
 			this.updateStatusBarContent(
-				`《${shortTitle.trim()}》在 ${targetTime} 更新噢⌛`
+				`《${shortTitle.trim()}》update at ${targetTime} ⏰`
 			);
 		} else {
 			this.updateStatusBarContent("番剧暂时没有了诶");

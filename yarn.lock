@@ -4093,6 +4093,12 @@ https-proxy-agent@^2.2.4:
     agent-base "^4.3.0"
     debug "^3.1.0"
 
+
+husky@^5.0.4:
+  version "5.0.4"
+  resolved "https://registry.npm.taobao.org/husky/download/husky-5.0.4.tgz?cache=0&sync_timestamp=1607327376921&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fhusky%2Fdownload%2Fhusky-5.0.4.tgz#24e666d560f340ce70bf58e7658eb574e3bddcca"
+  integrity sha1-JOZm1WDzQM5wv1jnZY61dOO93Mo=
+
 human-signals@^1.1.1:
   version "1.1.1"
   resolved "https://registry.npm.taobao.org/human-signals/download/human-signals-1.1.1.tgz#c5b1cd14f50aeae09ab6c59fe63ba3395fe4dfa3"
