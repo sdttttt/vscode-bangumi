@@ -145,7 +145,7 @@
 		"gulp-cli": "^2.3.0",
 		"gulp-imagemin": "^7.1.0",
 		"gulp-typescript": "^6.0.0-alpha.1",
-		"mocha": "^7.1.0",
+		"mocha": "^8.2.1",
 		"prettier": "^2.2.1",
 		"ts-loader": "^8.0.1",
 		"tslint": "^6.1.0",
