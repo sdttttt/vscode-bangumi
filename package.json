@@ -126,7 +126,7 @@
 		"@types/axios": "^0.14.0",
 		"@types/chai": "^4.2.8",
 		"@types/glob": "^7.1.1",
-		"@types/mocha": "^7.0.2",
+		"@types/mocha": "^8.2.0",
 		"@types/node": "^14.0.1",
 		"@types/vscode": "^1.41.0",
 		"@typescript-eslint/eslint-plugin": "^3.0.0",
