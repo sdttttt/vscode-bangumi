@@ -2,6 +2,12 @@
 
 All notable changes to the **Bangumi Open** extension will be documented in this file.
 
+## [1.0.0] - 2020-2-10
+
+### Add
+
+-   完成获取番剧页面。
+
 ## [1.0.1] - 2020-2-10
 
 ### Fix
