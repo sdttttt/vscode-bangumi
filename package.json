@@ -131,7 +131,7 @@
 		"@types/vscode": "^1.41.0",
 		"@typescript-eslint/eslint-plugin": "^3.0.0",
 		"@typescript-eslint/parser": "^3.0.2",
-		"axios": "^0.19.2",
+		"axios": "^0.21.0",
 		"babel-loader": "^8.2.2",
 		"chai": "^4.2.0",
 		"eslint": "^7.15.0",
