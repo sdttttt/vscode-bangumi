@@ -56,3 +56,7 @@ jobs:
         run: npx yarn run test
     - name: Packing
       run: npx vsce package
+
+    - uses: actions/upload-artifact@v2
+      with:
+        path: '*.vsix'
