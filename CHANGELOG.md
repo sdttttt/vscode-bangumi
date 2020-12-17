@@ -172,3 +172,10 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 ### Fix
 
 -   锕, 我错了,2.2.1版本发布的压缩后的CSS没有打包到扩展里, 所以看起来很诡异.
+
+
+## [2.2.3] - 2020-12-14
+
+### Fix
+
+- 更新依赖.

@@ -97,7 +97,6 @@
 	},
 	"private": true,
 	"scripts": {
-		"postinstall": "husky install",
 		"compile": "gulp compile",
 		"build": "gulp",
 		"format": "prettier --write src/** && yarn run eslint:fix",
@@ -138,7 +137,6 @@
 		"eslint-plugin-typescript": "^0.14.0",
 		"fork-ts-checker-webpack-plugin": "^6.0.6",
 		"glob": "^7.1.5",
-		"husky": "^5.0.6",
 		"gulp": "^4.0.2",
 		"gulp-clean": "^0.4.0",
 		"gulp-clean-css": "^4.3.0",
