@@ -59,4 +59,5 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
+        name: VSCode-BangumiOpen--for-${{ runner.os }}
         path: '*.vsix'
