@@ -6,7 +6,7 @@
 	"displayName": "Bangumi Open",
 	"description": "Support Browse Bangumi for vscode.",
 	"preview": false,
-	"version": "2.2.2",
+	"version": "2.2.3",
 	"license": "SEE LICENSE IN LICENSE",
 	"icon": "Icon.png",
 	"engines": {
