@@ -24,3 +24,7 @@ azure-pipelines.yml
 tslint.json
 tsconfig.json
 resources/css/**
+TODO.md
+.prettierrc.yml
+.husky/**
+gulpfile.js

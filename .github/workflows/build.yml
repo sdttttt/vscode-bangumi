@@ -51,7 +51,7 @@ jobs:
     - name: build
       run: npx yarn run build
     - name: Run tests
-      uses: GabrielBB/xvfb-action@v1.2
+      uses: GabrielBB/xvfb-action@v1.4
       with:
         run: npx yarn run test
     - name: Packing
@@ -59,4 +59,5 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
+        name: VSCode-BangumiOpen--for-${{ runner.os }}
         path: '*.vsix'
