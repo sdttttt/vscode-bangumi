@@ -145,7 +145,7 @@
 		"gulp-typescript": "^6.0.0-alpha.1",
 		"mocha": "^7.1.0",
 		"prettier": "^2.2.1",
-		"ts-loader": "^8.0.13",
+		"ts-loader": "^8.0.14",
 		"tslint": "^6.1.0",
 		"typescript": "^3.6.4",
 		"typescript-eslint-parser": "^22.0.0",
