@@ -4,9 +4,12 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-const webpack = require("webpack");
 const path = require("path");
 const TsCheckPlugin = require("fork-ts-checker-webpack-plugin");
+const ProgressPlugin = require("progress-bar-webpack-plugin");
+const WebpackNotifierPlugin = require("webpack-notifier");
+// 梁非凡
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const tsCheckConfig = {
 	typescript: {
@@ -39,8 +42,10 @@ const config = {
 		extensions: [".ts", ".js"]
 	},
 	plugins: [
-		new webpack.ProgressPlugin(),
-		new TsCheckPlugin(tsCheckConfig)
+		new ProgressPlugin({width: 1000}),
+		new TsCheckPlugin(tsCheckConfig),
+		new WebpackNotifierPlugin({ title: "Webpacker", emoji: true }),
+		new CleanWebpackPlugin({verbose: true }),
 	],
 	devtool: "source-map",
 	module: {
