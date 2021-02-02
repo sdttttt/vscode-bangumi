@@ -51,11 +51,11 @@ jobs:
       run: npx yarn --emoji
 
     - name: build
-      run: npx yarn run webpack:prepublish --emoji
+      run: npx yarn run webpack:prepublish
     - name: Run tests
       uses: GabrielBB/xvfb-action@v1.4
       with:
-        run: npx yarn run test --emoji
+        run: npx yarn run test
     - name: Packing
       run: npx vsce package
 
