@@ -9,6 +9,7 @@ import {
 } from "./utils/display";
 import {
 	currentTimestamp,
+	getFromIndexSameUpdateBangumi,
 	getTodayIndexInWeekBangumi,
 	toMinuteFromSecode,
 } from "./utils/strings";
@@ -34,9 +35,8 @@ export default new (class Reminder {
 	/**
 	 * Reminders bangumi update
 	 *
-	 * @returns
+	 * @returns {Promise}
 	 * @async
-	 * @author sdttttt
 	 */
 	async enableBangumiUpdateReminder(): Promise<void> {
 		const bangumisData:
@@ -60,13 +60,23 @@ export default new (class Reminder {
 
 		for (let i = todayIndex; i <= todayIndex + 1; i++) {
 			const bangumiSize = bangumisData[i].seasons.length;
+
+			// 制作定时器
 			for (let k = 0; k < bangumiSize; k++) {
 				const bangumi: WBangumi = bangumisData[i].seasons[k];
-				const nextBangumi: WBangumi | undefined =
-					k + 1 < bangumiSize
-						? bangumisData[i].seasons[k + 1]
-						: undefined;
-				this.makeReminder(currentTime, aheadTime, bangumi, nextBangumi);
+				this.makeReminder(currentTime, aheadTime, bangumi);
+			}
+
+			// 制作状态栏
+			for (let k = 0; k < bangumiSize; k++) {
+				const bangumis: WBangumi[] = getFromIndexSameUpdateBangumi(
+					bangumisData[i].seasons,
+					k
+				);
+
+				if (bangumis.length === 0) break;
+				this.makeStatus(currentTime, aheadTime, bangumis);
+				k += bangumis.length;
 			}
 		}
 	}
@@ -75,18 +85,15 @@ export default new (class Reminder {
 	 * Make a Reminder to ReminderGroup.
 	 *
 	 * @private
-	 * @param {WBangumi} bangumi
-	 * @author sdttttt
 	 */
 	private makeReminder(
 		currentTime: number,
 		aheadTime: number,
-		bangumi: WBangumi,
-		nextBangumi: WBangumi | undefined
+		bangumi: WBangumi
 	): void {
 		const bangumiTime: number = bangumi.pub_ts * 1000;
 		if (currentTime < bangumiTime && bangumi.delay !== 1) {
-			const timeDifference: number = bangumiTime - currentTime;
+			const timeDifference = bangumiTime - currentTime;
 			const aheadTimeM = aheadTime * 1000;
 			const timer: NodeJS.Timeout = setTimeout(async () => {
 				if (aheadTime === 0) {
@@ -95,25 +102,54 @@ export default new (class Reminder {
 					const minute = toMinuteFromSecode(aheadTime);
 					showBeforeBangumiUpdateRemind(bangumi.title, minute);
 				}
-				this.updateStatusBar(nextBangumi);
+			}, timeDifference - aheadTimeM);
+
+			this.remindTimers.push(timer);
+		}
+	}
+
+	/**
+	 * Make Status Timer.
+	 *
+	 * @private
+	 */
+	private makeStatus(
+		currentTime: number,
+		aheadTime: number,
+		bangumis: WBangumi[]
+	): void {
+		const bangumiTime: number = bangumis[0].pub_ts * 1000;
+		if (currentTime < bangumiTime) {
+			const timeDifference = bangumiTime - currentTime;
+			const aheadTimeM = aheadTime * 1000;
+			const timer: NodeJS.Timeout = setTimeout(async () => {
+				this.updateStatusBar(bangumis);
 			}, timeDifference - aheadTimeM);
 
 			// if true: statusBar is not display NextBangumi Information.
 			if (this.statusBar.text.trim().length === 0) {
-				this.updateStatusBar(bangumi);
+				this.updateStatusBar(bangumis);
 			}
 			this.remindTimers.push(timer);
 		}
 	}
 
-	private updateStatusBar(bangumi: WBangumi | undefined) {
-		if (bangumi) {
-			const { title, pub_time: targetTime } = bangumi;
-			const shortTitle =
-				title.length > 7 ? `${title.slice(0, 7)}...` : title;
-			this.updateStatusBarContent(
-				`《${shortTitle.trim()}》update at ${targetTime} ⏰`
-			);
+	private updateStatusBar(bangumis: WBangumi[]) {
+		if (bangumis.length !== 0) {
+			if (bangumis.length === 1) {
+				const { title, pub_time: targetTime } = bangumis[0];
+				const shortTitle =
+					title.length > 7 ? `${title.slice(0, 7)}...` : title;
+				this.updateStatusBarContent(
+					`《${shortTitle.trim()}》update at ${targetTime} ⏰`
+				);
+			} else {
+				const { pub_time: targetTime } = bangumis[0];
+				const bangumiCount = bangumis.length;
+				this.updateStatusBarContent(
+					`有${bangumiCount}部番 update at ${targetTime} ⏰`
+				);
+			}
 		} else {
 			this.updateStatusBarContent("番剧暂时没有了诶");
 		}
@@ -125,8 +161,6 @@ export default new (class Reminder {
 
 	/**
 	 * Destroy reminder
-	 *
-	 * @author sdttttt
 	 */
 	destroyReminder(): void {
 		if (!isEmptyArray(this.remindTimers)) {

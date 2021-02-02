@@ -5,13 +5,13 @@
  *--------------------------------------------------------------------------------------------*/
 
 const path = require("path");
-const TsCheckPlugin = require("fork-ts-checker-webpack-plugin");
+const ForkTsCheckerPlugin = require("fork-ts-checker-webpack-plugin");
 const ProgressPlugin = require("progress-bar-webpack-plugin");
 const WebpackNotifierPlugin = require("webpack-notifier");
 // 梁非凡
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
-const tsCheckConfig = {
+const ForkTsCheckerConfig = {
 	typescript: {
 		enabled: true,
 		profile: true
@@ -25,7 +25,7 @@ const tsCheckConfig = {
 /**@type {import('webpack').Configuration}*/
 const config = {
 	target: "node", // vscode插件运行在Node.js环境中 📖 -> https://webpack.js.org/configuration/node/
-
+	
 	entry: "./src/extension.ts", // 插件的入口文件 📖 -> https://webpack.js.org/configuration/entry-context/
 	output: {
 		// 打包好的文件储存在'dist'文件夹中 (请参考package.json), 📖 -> https://webpack.js.org/configuration/output/
@@ -43,7 +43,7 @@ const config = {
 	},
 	plugins: [
 		new ProgressPlugin({width: 1000}),
-		new TsCheckPlugin(tsCheckConfig),
+		new ForkTsCheckerPlugin(ForkTsCheckerConfig),
 		new WebpackNotifierPlugin({ title: "Webpacker", emoji: true }),
 		new CleanWebpackPlugin({verbose: true }),
 	],
