@@ -6,7 +6,7 @@
 	"displayName": "Bangumi Open",
 	"description": "Support Browse Bangumi for vscode.",
 	"preview": false,
-	"version": "2.2.3",
+	"version": "2.3.0",
 	"license": "SEE LICENSE IN LICENSE",
 	"icon": "Icon.png",
 	"engines": {
@@ -104,7 +104,7 @@
 		"pretest": "yarn run compile",
 		"test": "node ./out/test/runTest.js",
 		"clean": "gulp clean",
-		"vscode:prepublish": "yarn run webpack:prepublish",
+		"vscode:prepublish": "yarn run build && yarn run webpack:prepublish",
 		"webpack:prepublish": "webpack --mode production",
 		"webpack:compile": "webpack --mode none",
 		"lint": "tslint ./src/**/*.ts -t verbose",
