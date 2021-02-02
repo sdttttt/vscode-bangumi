@@ -155,8 +155,8 @@ export default new (class Reminder {
 	/**
 	 * @param bangumis - this Bangumi Array update time same.
 	 */
-	private updateStatusBar(bangumis: WBangumi[]) {
-		if (bangumis.length !== 0) {
+	private updateStatusBar(bangumis: WBangumi[] | undefined) {
+		if (bangumis && bangumis.length !== 0) {
 			if (bangumis.length === 1) {
 				const { title, pub_time: targetTime } = bangumis[0];
 				const shortTitle =
