@@ -48,14 +48,14 @@ jobs:
           ${{ runner.os }}-node-
 
     - name: install deps
-      run: npx yarn
+      run: npx yarn --emoji
 
     - name: build
-      run: npx yarn run webpack:prepublish
+      run: npx yarn run webpack:prepublish --emoji
     - name: Run tests
       uses: GabrielBB/xvfb-action@v1.4
       with:
-        run: npx yarn run test
+        run: npx yarn run test --emoji
     - name: Packing
       run: npx vsce package
 
