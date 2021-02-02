@@ -51,7 +51,7 @@ jobs:
       run: npx yarn
 
     - name: build
-      run: npx yarn run build
+      run: npx yarn run webpack:prepublish
     - name: Run tests
       uses: GabrielBB/xvfb-action@v1.4
       with:
