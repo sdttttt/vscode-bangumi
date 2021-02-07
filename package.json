@@ -121,7 +121,7 @@
 		"@babel/plugin-proposal-class-properties": "^7.12.1",
 		"@babel/plugin-proposal-object-rest-spread": "^7.12.1",
 		"@babel/preset-env": "^7.12.11",
-		"@babel/preset-typescript": "^7.12.7",
+		"@babel/preset-typescript": "^7.12.13",
 		"@types/axios": "^0.14.0",
 		"@types/chai": "^4.2.8",
 		"@types/glob": "^7.1.1",
