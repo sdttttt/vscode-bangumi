@@ -152,7 +152,7 @@
 		"typescript": "^3.6.4",
 		"typescript-eslint-parser": "^22.0.0",
 		"vscode-test": "^1.2.2",
-		"webpack": "^5.11.0",
+		"webpack": "^5.21.1",
 		"webpack-cli": "^4.2.0",
 		"webpack-notifier": "^1.12.0"
 	}
