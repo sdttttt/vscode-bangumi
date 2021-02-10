@@ -9,6 +9,7 @@ import {
 } from "./utils/display";
 import {
 	currentTimestamp,
+	getFromIndexSameUpdateBangumi,
 	getTodayIndexInWeekBangumi,
 	toMinuteFromSecode,
 } from "./utils/strings";
@@ -34,9 +35,8 @@ export default new (class Reminder {
 	/**
 	 * Reminders bangumi update
 	 *
-	 * @returns
+	 * @returns {Promise}
 	 * @async
-	 * @author sdttttt
 	 */
 	async enableBangumiUpdateReminder(): Promise<void> {
 		const bangumisData:
@@ -56,37 +56,48 @@ export default new (class Reminder {
 		}
 
 		const currentTime: number = currentTimestamp();
+		// 提前时间
 		const aheadTime: number = getReminderAheadTime();
+
+		// 内部结构其实就是相同更新时间的番剧一组, 分多组.
+		const bangumiTimeGroups: Array<WBangumi[]> = [];
 
 		for (let i = todayIndex; i <= todayIndex + 1; i++) {
 			const bangumiSize = bangumisData[i].seasons.length;
+
+			// 制作定时器
 			for (let k = 0; k < bangumiSize; k++) {
 				const bangumi: WBangumi = bangumisData[i].seasons[k];
-				const nextBangumi: WBangumi | undefined =
-					k + 1 < bangumiSize
-						? bangumisData[i].seasons[k + 1]
-						: undefined;
-				this.makeReminder(currentTime, aheadTime, bangumi, nextBangumi);
+				this.makeReminder(currentTime, aheadTime, bangumi);
+			}
+
+			// 根据更新时间将番剧分组
+			for (let k = 0; k < bangumiSize; ) {
+				const bangumis: WBangumi[] = getFromIndexSameUpdateBangumi(
+					bangumisData[i].seasons,
+					k
+				);
+				bangumiTimeGroups.push(bangumis);
+				k += bangumis.length;
 			}
 		}
+
+		this.statusHandle(currentTime, aheadTime, bangumiTimeGroups);
 	}
 
 	/**
 	 * Make a Reminder to ReminderGroup.
 	 *
 	 * @private
-	 * @param {WBangumi} bangumi
-	 * @author sdttttt
 	 */
 	private makeReminder(
 		currentTime: number,
 		aheadTime: number,
-		bangumi: WBangumi,
-		nextBangumi: WBangumi | undefined
+		bangumi: WBangumi
 	): void {
 		const bangumiTime: number = bangumi.pub_ts * 1000;
 		if (currentTime < bangumiTime && bangumi.delay !== 1) {
-			const timeDifference: number = bangumiTime - currentTime;
+			const timeDifference = bangumiTime - currentTime;
 			const aheadTimeM = aheadTime * 1000;
 			const timer: NodeJS.Timeout = setTimeout(async () => {
 				if (aheadTime === 0) {
@@ -95,27 +106,73 @@ export default new (class Reminder {
 					const minute = toMinuteFromSecode(aheadTime);
 					showBeforeBangumiUpdateRemind(bangumi.title, minute);
 				}
-				this.updateStatusBar(nextBangumi);
 			}, timeDifference - aheadTimeM);
 
-			// if true: statusBar is not display NextBangumi Information.
-			if (this.statusBar.text.trim().length === 0) {
-				this.updateStatusBar(bangumi);
-			}
 			this.remindTimers.push(timer);
 		}
 	}
 
-	private updateStatusBar(bangumi: WBangumi | undefined) {
-		if (bangumi) {
-			const { title, pub_time: targetTime } = bangumi;
-			const shortTitle =
-				title.length > 7 ? `${title.slice(0, 7)}...` : title;
-			this.updateStatusBarContent(
-				`《${shortTitle.trim()}》update at ${targetTime} ⏰`
-			);
+	/**
+	 * Status handler.
+	 */
+	private statusHandle(
+		currentTime: number,
+		aheadTime: number,
+		bangumisTimeGroup: WBangumi[][]
+	): void {
+		for (let i = 0; i < bangumisTimeGroup.length; i++) {
+			const bangumiTime: number = bangumisTimeGroup[i][0].pub_ts * 1000;
+
+			if (currentTime < bangumiTime) {
+				const timeDifference = bangumiTime - currentTime;
+				const aheadTimeM = aheadTime * 1000;
+
+				// if true: statusBar is not display NextBangumi Information.
+				if (this.statusBar.text.trim().length === 0) {
+					this.updateStatusBar(bangumisTimeGroup[i]);
+				}
+
+				const timer: NodeJS.Timeout = setTimeout(
+					/**
+					 * 为什么这里的 i 要加 1 呢:
+					 * 状态栏的显示的永远是下一部番剧的更新时间
+					 *
+					 * 所以下一个定时器里在还没触发的时候,
+					 * 里面存放的是下下部番剧的更新时间.
+					 * 触发的时间是下部番剧更新的时间.
+					 * 								听懂了🐎?
+					 * 						什么?!你没听懂? 多看几遍?
+					 */
+					async () => this.updateStatusBar(bangumisTimeGroup[i + 1]),
+					timeDifference - aheadTimeM
+				);
+
+				this.remindTimers.push(timer);
+			}
+		}
+	}
+
+	/**
+	 * @param bangumis - this Bangumi Array update time same.
+	 */
+	private updateStatusBar(bangumis: WBangumi[] | undefined) {
+		if (bangumis && bangumis.length !== 0) {
+			if (bangumis.length === 1) {
+				const { title, pub_time: targetTime } = bangumis[0];
+				const shortTitle =
+					title.length > 7 ? `${title.slice(0, 7)}...` : title;
+				this.updateStatusBarContent(
+					`《${shortTitle.trim()}》update at ${targetTime} ⏰`
+				);
+			} else {
+				const { pub_time: targetTime } = bangumis[0];
+				const bangumiCount = bangumis.length;
+				this.updateStatusBarContent(
+					`很神秘, 有${bangumiCount}部番 update at ${targetTime} ⏰`
+				);
+			}
 		} else {
-			this.updateStatusBarContent("番剧暂时没有了诶");
+			this.updateStatusBarContent("番剧暂时没有了诶, 蛮怪的.");
 		}
 	}
 
@@ -125,8 +182,6 @@ export default new (class Reminder {
 
 	/**
 	 * Destroy reminder
-	 *
-	 * @author sdttttt
 	 */
 	destroyReminder(): void {
 		if (!isEmptyArray(this.remindTimers)) {

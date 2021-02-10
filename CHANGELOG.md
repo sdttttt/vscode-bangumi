@@ -179,3 +179,10 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 ### Fix
 
 - 更新依赖.
+
+## [2.2.4] - 2021-2-10
+
+### Feat
+
+- 加强状态栏显示.
+- 更新依赖.

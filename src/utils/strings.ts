@@ -1,4 +1,4 @@
-import { WeekBangumiData } from "../request/structure";
+import { WBangumi, WeekBangumiData } from "../request/structure";
 import { toNumber } from "./type";
 
 /**
@@ -69,6 +69,29 @@ export function getTodayIndexInWeekBangumi(
 			return i;
 		}
 	}
+}
+
+/**
+ * Gets Form Index start Same time update Bangumi.
+ *
+ * @param bangumis 
+ * @param index 
+ * @returns
+ */
+export function getFromIndexSameUpdateBangumi(
+	bangumis: WBangumi[],
+	index: number
+): WBangumi[] {
+	const currentDate = bangumis[index].pub_time;
+	const result: WBangumi[] = [];
+
+	for (let i = index; i < bangumis.length; i++) {
+		if (bangumis[i].pub_time === currentDate) result.push(bangumis[i]);
+		else break;
+	}
+
+	// 最后过滤拖更的番剧
+	return result.filter(v => v.delay !== 1);
 }
 
 /**

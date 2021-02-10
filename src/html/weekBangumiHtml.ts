@@ -11,7 +11,7 @@ import { YING_LILI, WEEK_BANGUMI_CSS } from "../constants";
 /**
  * Week Bangumis HTML Generator
  *
- * @class WeekBangumisHTMLGenerator
+ * @class {WeekBangumisHTMLGenerator}
  * @author sdttttt
  */
 export default new (class WeekBangumisHTMLGenerator extends AbstractHTMLGenerator<
