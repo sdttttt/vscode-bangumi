@@ -1,12 +1,3 @@
-# [2.3.0](https://github.com/sdttttt/vscode-Bangumi/compare/v2.2.3...v2.3.0) (2021-02-02)
-
-
-### Features
-
-* **remind:** enh statusbar display. ([6cc82e1](https://github.com/sdttttt/vscode-Bangumi/commit/6cc82e1558e4083c6662626631696a5f49262583))
-
-
-
 # Change Log
 
 All notable changes to the **Bangumi Open** extension will be documented in this file.
