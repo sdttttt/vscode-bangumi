@@ -189,7 +189,7 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 
 - 更新依赖.
 
-## [2.3.0] - 2021-2-2
+## [2.2.4] - 2021-2-10
 
 ### Feat
 
