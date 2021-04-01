@@ -186,3 +186,13 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 
 - 加强状态栏显示.
 - 更新依赖.
+
+## [2.2.5] - 2021-4-1
+
+### Feat
+
+- 更新依赖.
+
+### Fix
+
+- vscode启动时出现扩展主机去世.

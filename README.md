@@ -1,8 +1,6 @@
 # Bangumi Open
 
 [![vsmarketplacebadge](https://vsmarketplacebadge.apphb.com/version/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)
-![CI](https://github.com/sdttttt/vscode-bangumi/workflows/CI/badge.svg)
-![VSCE Publish](https://github.com/sdttttt/vscode-bangumi/workflows/VSCE%20Publish/badge.svg)
 
 > 一款基于 **Vscode** 的番剧插件, 该扩展请配合`Bilibili`食用( ゜- ゜)つロ
 

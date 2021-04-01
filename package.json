@@ -6,7 +6,7 @@
 	"displayName": "Bangumi Open",
 	"description": "Support Browse Bangumi for vscode.",
 	"preview": false,
-	"version": "2.2.4",
+	"version": "2.2.5",
 	"license": "SEE LICENSE IN LICENSE",
 	"icon": "Icon.png",
 	"engines": {
@@ -97,7 +97,7 @@
 	},
 	"private": true,
 	"scripts": {
-		"compile": "gulp compile",
+		"compile": "webpack --mode none",
 		"build": "gulp",
 		"format": "prettier --write src/** && yarn run eslint:fix",
 		"watch": "webpack --mode none --watch",
@@ -136,7 +136,7 @@
 		"clean-webpack-plugin": "^3.0.0",
 		"eslint": "^7.15.0",
 		"eslint-plugin-typescript": "^0.14.0",
-		"fork-ts-checker-webpack-plugin": "^6.1.0",
+		"fork-ts-checker-webpack-plugin": "^6.2.0",
 		"glob": "^7.1.5",
 		"gulp": "^4.0.2",
 		"gulp-clean": "^0.4.0",
@@ -147,12 +147,12 @@
 		"mocha": "^7.1.0",
 		"prettier": "^2.2.1",
 		"progress-bar-webpack-plugin": "^2.1.0",
-		"ts-loader": "^8.0.16",
+		"ts-loader": "^8.0.18",
 		"tslint": "^6.1.0",
 		"typescript": "^3.6.4",
 		"typescript-eslint-parser": "^22.0.0",
-		"vscode-test": "^1.5.0",
-		"webpack": "^5.21.2",
+		"vscode-test": "^1.5.1",
+		"webpack": "^5.24.2",
 		"webpack-cli": "^4.2.0",
 		"webpack-notifier": "^1.13.0"
 	}
