@@ -81,35 +81,35 @@ suite("TEST API", function () {
 
 					const seasons: Array<WBangumi> = data.seasons;
 
-					// tslint:disable-next-line: no-unused-expression
-					expect(seasons).to.not.empty;
-					expect(seasons.length).to.be.above(0);
-
-					for (const bangumi of seasons) {
-						// tslint:disable-next-line: no-unused-expression
-						expect(bangumi.cover).to.be.exist;
-						// tslint:disable-next-line: no-unused-expression
-						expect(bangumi.favorites).to.be.exist;
-						// tslint:disable-next-line: no-unused-expression
-						expect(bangumi.is_published)
-							.to.be.least(0)
-							.that.most(1);
-						expect(bangumi.delay).to.be.least(0).that.most(1);
-
-						if (bangumi.delay === 0) {
+					expect(seasons.length).to.be.least(0);
+					
+					if (seasons) {
+						for (const bangumi of seasons) {
 							// tslint:disable-next-line: no-unused-expression
-							expect(bangumi.pub_index).to.be.exist;
+							expect(bangumi.cover).to.be.exist;
+							// tslint:disable-next-line: no-unused-expression
+							expect(bangumi.favorites).to.be.exist;
+							// tslint:disable-next-line: no-unused-expression
+							expect(bangumi.is_published)
+								.to.be.least(0)
+								.that.most(1);
+							expect(bangumi.delay).to.be.least(0).that.most(1);
+	
+							if (bangumi.delay === 0) {
+								// tslint:disable-next-line: no-unused-expression
+								expect(bangumi.pub_index).to.be.exist;
+							}
+							// tslint:disable-next-line: no-unused-expression
+							expect(bangumi.pub_time).to.be.exist;
+							// tslint:disable-next-line: no-unused-expression
+							expect(bangumi.pub_ts).to.be.exist;
+							// tslint:disable-next-line: no-unused-expression
+							expect(bangumi.square_cover).to.be.exist;
+							// tslint:disable-next-line: no-unused-expression
+							expect(bangumi.title).to.be.exist;
+							// tslint:disable-next-line: no-unused-expression
+							expect(bangumi.url).to.be.exist;
 						}
-						// tslint:disable-next-line: no-unused-expression
-						expect(bangumi.pub_time).to.be.exist;
-						// tslint:disable-next-line: no-unused-expression
-						expect(bangumi.pub_ts).to.be.exist;
-						// tslint:disable-next-line: no-unused-expression
-						expect(bangumi.square_cover).to.be.exist;
-						// tslint:disable-next-line: no-unused-expression
-						expect(bangumi.title).to.be.exist;
-						// tslint:disable-next-line: no-unused-expression
-						expect(bangumi.url).to.be.exist;
 					}
 				}
 			} else {

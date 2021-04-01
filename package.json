@@ -97,7 +97,7 @@
 	},
 	"private": true,
 	"scripts": {
-		"compile": "gulp compile",
+		"compile": "webpack --mode none",
 		"build": "gulp",
 		"format": "prettier --write src/** && yarn run eslint:fix",
 		"watch": "webpack --mode none --watch",
