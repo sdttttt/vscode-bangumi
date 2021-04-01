@@ -77,7 +77,7 @@ export default new (class Reminder {
 					bangumisData[i].seasons,
 					k
 				);
-				bangumiTimeGroups.push(bangumis);
+				bangumiTimeGroups.push(bangumis.filter(v => v.delay !== 1));
 				k += bangumis.length;
 			}
 		}
@@ -164,6 +164,7 @@ export default new (class Reminder {
 				this.updateStatusBarContent(
 					`《${shortTitle.trim()}》update at ${targetTime} ⏰`
 				);
+				
 			} else {
 				const { pub_time: targetTime } = bangumis[0];
 				const bangumiCount = bangumis.length;
@@ -171,6 +172,7 @@ export default new (class Reminder {
 					`很神秘, 有${bangumiCount}部番 update at ${targetTime} ⏰`
 				);
 			}
+			
 		} else {
 			this.updateStatusBarContent("番剧暂时没有了诶, 蛮怪的.");
 		}

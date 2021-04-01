@@ -91,7 +91,7 @@ export function getFromIndexSameUpdateBangumi(
 	}
 
 	// 最后过滤拖更的番剧
-	return result.filter(v => v.delay !== 1);
+	return result
 }
 
 /**
