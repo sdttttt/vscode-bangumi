@@ -83,7 +83,7 @@ suite("TEST API", function () {
 
 					expect(seasons.length).to.be.least(0);
 					
-					if (seasons) {
+					if (seasons && seasons.length > 0) {
 						for (const bangumi of seasons) {
 							// tslint:disable-next-line: no-unused-expression
 							expect(bangumi.cover).to.be.exist;
