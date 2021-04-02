@@ -1,65 +1,66 @@
 name: build
 
 on:
-  push:
-    branches: [master]
-  pull_request: 
-    branches: [master, SDTTTTT]
-  schedule:
-    # * is a special character in YAML so you have to quote this string
-    - cron:  0 */1 * * *
+    push:
+        branches: [master]
+    pull_request:
+        branches: [master, SDTTTTT]
+    schedule:
+        # * is a special character in YAML so you have to quote this string
+        - cron: 0 */1 * * *
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Install Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: 13.x
+    build:
+        strategy:
+            matrix:
+                os: [macos-latest, ubuntu-latest, windows-latest]
+        runs-on: ${{ matrix.os }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: Install Node.js
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 13.x
 
-    - name: Cache Depend on UNIX
-      if: ${{ runner.os != 'Windows' }}
-      uses: actions/cache@v2
-      with:
-        path: ~/.npm
-        key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
+            - name: Cache Depend on UNIX
+              if: ${{ runner.os != 'Windows' }}
+              uses: actions/cache@v2
+              with:
+                  path: ~/.npm
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-
 
-    - name: Get npm cache directory
-      if: ${{ runner.os == 'Windows' }}
-      id: npm-cache
-      run: |
-        echo "::set-output name=dir::$(npm config get cache)"
-    
-    - name: Cache Depend on Windows
-      if: ${{ runner.os == 'Windows' }}
-      uses: actions/cache@v2
-      with:
-        path: ${{ steps.npm-cache.outputs.dir }}
-        key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
+            - name: Get npm cache directory
+              if: ${{ runner.os == 'Windows' }}
+              id: npm-cache
+              run: |
+                  echo "::set-output name=dir::$(npm config get cache)"
 
-    - name: install deps
-      run: npx yarn --emoji
+            - name: Cache Depend on Windows
+              if: ${{ runner.os == 'Windows' }}
+              uses: actions/cache@v2
+              with:
+                  path: ${{ steps.npm-cache.outputs.dir }}
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-
 
-    - name: build
-      run: npx yarn run webpack:prepublish
-    - name: Run tests
-      uses: GabrielBB/xvfb-action@v1.4
-      with:
-        run: npx yarn run test
-    - name: Packing
-      run: npx vsce package
+            - run: npm install -g vsce
+            - run: npm install -g yarn
+            - run: yarn
 
-    - uses: actions/upload-artifact@v2
-      with:
-        name: VSCode-BangumiOpen--for-${{ runner.os }}
-        path: '*.vsix'
+            - name: build
+              run: yarn webpack:prepublish
+            - name: Run tests
+              uses: GabrielBB/xvfb-action@v1.4
+              with:
+                  run: yarn run test
+            - name: Packing
+              run: vsce package
+
+            - uses: actions/upload-artifact@v2
+              with:
+                  name: VSCode-BangumiOpen--for-${{ runner.os }}
+                  path: "*.vsix"
