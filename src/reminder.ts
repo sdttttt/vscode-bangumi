@@ -121,7 +121,8 @@ export default new (class Reminder {
 		bangumisTimeGroup: WBangumi[][]
 	): void {
 		for (let i = 0; i < bangumisTimeGroup.length; i++) {
-			const bangumiTime: number = bangumisTimeGroup[i][0].pub_ts * 1000;
+
+			const bangumiTime: number = bangumisTimeGroup[i].length !== 0 ? bangumisTimeGroup[i][0].pub_ts * 1000 : 0;
 
 			if (currentTime < bangumiTime) {
 				const timeDifference = bangumiTime - currentTime;

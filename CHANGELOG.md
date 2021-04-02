@@ -196,3 +196,13 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 ### Fix
 
 - vscode启动时出现扩展主机去世.
+
+## [2.2.6] - 2021-4-2
+
+### Feat
+
+- 更新依赖.
+
+### Fix
+
+- 修复遇到空时间段番剧不显示提醒状态栏的问题. (Fix #187)
