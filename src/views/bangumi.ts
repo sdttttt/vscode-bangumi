@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { getAllBangumi } from "../request/bangumi";
 import BangumisHTMLGenerator from "../html/bangumiHtml";
 import { BangumiUrl } from "../request/bangumiUrl";
+import { useBangumiNoticeHuck } from "../request/huck"
 import { Bangumi, BangumisData } from "../request/structure";
 import { toNumber } from "../utils/type";
 import AbstractView from "./view";
@@ -84,6 +85,8 @@ export default new (class BangumisView extends AbstractView {
 		).then((data: BangumisData | undefined) =>
 			this.createBangumiView(data)
 		);
+
+		useBangumiNoticeHuck();
 	}
 
 	/**

@@ -206,3 +206,10 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 ### Fix
 
 - 修复遇到空时间段番剧不显示提醒状态栏的问题. (Fix #187)
+
+## [2.2.7] - 2021-4-7
+
+### Feat
+
+- 更新依赖.
+- 增加了一个计数通知请求, 现在BangumiOpen会统计大🔥的使用每个功能的次数. 这个数据是公开的我会定时发布.
