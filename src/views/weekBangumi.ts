@@ -2,6 +2,7 @@ import { getWeekBangumi } from "../request/bangumi";
 import * as vscode from "vscode";
 import WeekBangumisHTMLGenerator from "../html/weekBangumiHtml";
 import { WeekBangumiData } from "../request/structure";
+import { useWeekBangumiNoticeHuck } from "../request/huck";
 import AbstractView from "./view";
 
 /**
@@ -46,5 +47,7 @@ export default new (class WeekBangumisView extends AbstractView {
 				this.createWeekBangumiView(result);
 			}
 		});
+
+		useWeekBangumiNoticeHuck();
 	}
 })();
