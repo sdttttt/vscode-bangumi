@@ -16,6 +16,8 @@
 
 ![b2](https://raw.githubusercontent.com/sdttttt/vscode-bangumi/master/resources/b2.png)
 
+> 以上提供的截图是早期版本的，请以实物为准🐶
+
 ### Reminder
 
 > 该功能在配置文件中可以被关闭.
