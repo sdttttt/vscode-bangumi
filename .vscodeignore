@@ -29,3 +29,4 @@ TODO.md
 .prettierrc.yml
 .husky/**
 gulpfile.js
+.chglog/**
