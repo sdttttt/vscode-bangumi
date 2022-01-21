@@ -6,9 +6,6 @@
 
 ### A brief explanation on the source code structure
 
-所有的主要源代码都在`src`目录下.
-或许你会觉得我的代码风格非常的..`OOP`?确实,这是我编写`C#`&`Java`时留下的毛病.每个单独的小模块都是以`Class`风格编写的.
-
 **目录说明:**
 
 - html: 用来存放页面的生成器.
