@@ -5,7 +5,7 @@
 	},
 	"editor.fontFamily": "Cascadia Code, Consolas, 'Courier New', monospace",
 	"editor.fontWeight": "350",
-	"editor.fontSize": 16,
+	"editor.fontSize": 13,
     "search.exclude": {
 		"out": true // set this to false to include "out" folder in search results
     },
