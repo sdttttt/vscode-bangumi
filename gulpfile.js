@@ -13,6 +13,8 @@ const cssmin = require("gulp-clean-css");
 const clean = require("gulp-clean");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const gulpWebpack = require("webpack-stream");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const notify = require("gulp-notify");
 
 async function optimizeimgTask() {
 	src("resources/*")
@@ -53,6 +55,7 @@ async function packingTask() {
 		devtool: "inline-source-map",
 		}
 		, Webpack))
+	.pipe(notify("Packing done!"))
 	.pipe(dest("./dist"));
 }
 

@@ -3,6 +3,7 @@ node_modules
 .vscode-test/
 .history
 *.vsix
+.yarn/
 dist/
 *.log
 resources/mincss/**

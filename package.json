@@ -142,6 +142,7 @@
 		"gulp-clean-css": "^4.3.0",
 		"gulp-cli": "^2.3.0",
 		"gulp-imagemin": "^7.1.0",
+		"gulp-notify": "^4.0.0",
 		"gulp-typescript": "^6.0.0-alpha.1",
 		"mocha": "^7.1.0",
 		"prettier": "^2.2.1",
@@ -155,5 +156,6 @@
 		"webpack-cli": "^4.9.1",
 		"webpack-notifier": "^1.15.0",
 		"webpack-stream": "^7.0.0"
-	}
+	},
+	"packageManager": "yarn@3.1.1"
 }
