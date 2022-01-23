@@ -14,7 +14,7 @@ import {
 	toMinuteFromSecode,
 } from "./utils/strings";
 
-export default new (class Reminder {
+export default new class Reminder {
 	private remindTimers: Array<NodeJS.Timeout> = [];
 
 	private statusBar: StatusBarItem = window.createStatusBarItem(
@@ -38,7 +38,7 @@ export default new (class Reminder {
 	 * @returns {Promise}
 	 * @async
 	 */
-	async enableBangumiUpdateReminder(): Promise<void> {
+	public async enableBangumiUpdateReminder(): Promise<void> {
 		const bangumisData:
 			| Array<WeekBangumiData>
 			| undefined = await getWeekBangumi();
@@ -186,7 +186,7 @@ export default new (class Reminder {
 	/**
 	 * Destroy reminder
 	 */
-	destroyReminder(): void {
+	public destroyReminder(): void {
 		if (!isEmptyArray(this.remindTimers)) {
 			this.remindTimers.forEach((timer: NodeJS.Timeout) => {
 				clearTimeout(timer);
@@ -194,4 +194,4 @@ export default new (class Reminder {
 			this.remindTimers = [];
 		}
 	}
-})();
+}

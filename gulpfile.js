@@ -1,5 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { src, dest, watch, series } =  require("gulp");
+const Webpack = require("webpack");
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { src, dest, watch, series, parallel } =  require("gulp");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { createProject } =  require( "gulp-typescript");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -8,6 +11,8 @@ const imagemin = require("gulp-imagemin");
 const cssmin = require("gulp-clean-css");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const clean = require("gulp-clean");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const gulpWebpack = require("webpack-stream");
 
 async function optimizeimgTask() {
 	src("resources/*")
@@ -38,12 +43,43 @@ async function compileTask() {
 	return tsresult.js.pipe(dest("out"));
 }
 
+async function packingTask() {
+	return src("./src/extension.ts")
+	// eslint-disable-next-line @typescript-eslint/no-var-requires
+	.pipe(gulpWebpack( 
+		{
+		...require("./webpack.config.js"),
+		mode: "development",
+		devtool: "inline-source-map",
+		}
+		, Webpack))
+	.pipe(dest("./dist"));
+}
+
+async function packageTask() {
+	return src("./src/extension.ts")
+	.pipe(gulpWebpack( 
+		{
+		...require("./webpack.config.js"),
+		mode: "production"
+		}
+		, Webpack))
+	.pipe(dest("./dist"));
+}
+
+
 exports.watchCompile = async () => {
 	watch("src/**/*.ts", compileTask);
 };
+
+exports.watchPacking = async () => {
+	watch("src/**/*.ts", packingTask);
+}
 
 exports.clean = cleanTask;
 exports.optimizeimg = optimizeimgTask
 exports.optimizecss = optimizecssTask
 exports.compile = compileTask
+exports.watch = parallel(packingTask, compileTask)
 exports.default = series(optimizeimgTask, optimizecssTask, compileTask)
+exports.publish = series(optimizeimgTask, optimizecssTask, compileTask, packageTask);

@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 import BangumiView from "./views/bangumi";
 import WeekBangumiView from "./views/weekBangumi";
-import { useReminderNoticeHuck } from "./request/huck"
 import { setContext } from "./constants";
 import { getConfig } from "./configuration";
 import MainIndexList from "./match/";
@@ -36,7 +35,6 @@ export function activate(context: vscode.ExtensionContext): void {
 
 	if (useReminder as boolean) {
 		Reminder.enableBangumiUpdateReminder();
-		useReminderNoticeHuck();
 	}
 
 	// The command has been defined in the package.json file

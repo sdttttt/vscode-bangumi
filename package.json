@@ -100,11 +100,11 @@
 		"compile": "gulp compile",
 		"build": "gulp",
 		"format": "prettier --write src/** && yarn run eslint:fix",
-		"watch": "webpack --mode none --watch",
+		"watch": "gulp watch",
 		"pretest": "yarn run compile",
 		"test": "node ./out/test/runTest.js",
 		"clean": "gulp clean",
-		"vscode:prepublish": "yarn run build && yarn run webpack:prepublish",
+		"vscode:prepublish": "gulp publish",
 		"webpack:prepublish": "webpack --mode production",
 		"webpack:compile": "webpack --mode none",
 		"lint": "tslint ./src/**/*.ts -t verbose",
@@ -113,8 +113,7 @@
 		"eslint:fix": "eslint --fix src --ext .ts",
 		"commit": "git add . && npx git-cz",
 		"gulp:imgmin": "gulp optimizeimg",
-		"gulp:cssmin": "gulp optimizecss",
-		"gulp:watch": "gulp watchCompile"
+		"gulp:cssmin": "gulp optimizecss"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.12.10",
@@ -154,6 +153,7 @@
 		"vscode-test": "^1.5.2",
 		"webpack": "^5.66.0",
 		"webpack-cli": "^4.9.1",
-		"webpack-notifier": "^1.15.0"
+		"webpack-notifier": "^1.15.0",
+		"webpack-stream": "^7.0.0"
 	}
 }

@@ -3,7 +3,7 @@
     "files.exclude": {
         "out": false // set this to true to hide the "out" folder with the compiled JS files
 	},
-	"editor.fontFamily": "SF Mono,Cascadia Code, Consolas, 'Courier New', monospace",
+	"editor.fontFamily": "SF Mono, Monaco, Cascadia Code, Consolas, 'Courier New', monospace",
 	"editor.fontWeight": "350",
 	"editor.fontSize": 13,
     "search.exclude": {
