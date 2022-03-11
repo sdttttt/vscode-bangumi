@@ -53,6 +53,10 @@ jobs:
 
             - name: build
               run: yarn rollup:build
+          
+            - name: pretest
+              run: yarn pretest
+              
             - name: Run tests
               uses: GabrielBB/xvfb-action@v1.4
               with:
