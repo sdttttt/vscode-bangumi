@@ -102,7 +102,7 @@
 		"build": "gulp",
 		"format": "prettier --write src/** && yarn run eslint:fix",
 		"watch": "gulp watch",
-		"pretest": "yarn run compile",
+		"pretest": "yarn compile",
 		"test": "node ./out/test/runTest.js",
 		"clean": "gulp clean",
 		"vscode:prepublish": "gulp publish",
