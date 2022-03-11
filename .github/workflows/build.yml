@@ -62,7 +62,8 @@ jobs:
               with:
                   run: yarn run test
             - name: Packing
-              run: vsce package
+                # yarn2之后好像不支持list这个指令了
+              run: vsce package --no-yarn
 
             - uses: actions/upload-artifact@v2
               with:
