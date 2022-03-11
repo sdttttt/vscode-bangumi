@@ -3,7 +3,7 @@ import BangumiView from "./views/bangumi";
 import WeekBangumiView from "./views/weekBangumi";
 import { setContext } from "./constants";
 import { getConfig } from "./configuration";
-import MainIndexList from "./match/";
+import MainIndexList from "./match/index";
 import Reminder from "./reminder";
 
 let isInit = false;

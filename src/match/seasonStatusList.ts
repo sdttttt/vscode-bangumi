@@ -1,4 +1,4 @@
-import { SimpleFinalIndexList } from "./indexList";
+import { SimpleFinalIndexList } from "./finalIndexList";
 import { BangumiUrl } from "../request/bangumiUrl";
 
 export default new (class SeasonStatusList extends SimpleFinalIndexList {

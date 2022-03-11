@@ -11,6 +11,7 @@ export const WEEK_BANGUMI_CSS = "mincss/weekBangumi.css";
 export const BANGUMI_CSS = "mincss/bangumi.css";
 export const LOADING_CSS = "mincss/loading.css";
 
+
 let _context: vscode.ExtensionContext;
 
 /**

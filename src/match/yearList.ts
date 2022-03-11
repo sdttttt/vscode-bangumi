@@ -1,6 +1,6 @@
 import BangumisView from "../views/bangumi";
 import { numberOfStringPlus } from "../utils/strings";
-import { FinalIndexList } from "./indexList";
+import { FinalIndexList } from "./finalIndexList";
 
 export default new (class YearList extends FinalIndexList {
 	protected readonly tag: string = "Year";

@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
-		"module": "commonjs",
-		"target": "es6",
+		"module": "ESNext",
+		"target": "ES6",
 		"experimentalDecorators": true,
 		"outDir": "out",
 		"lib": [
@@ -10,7 +10,9 @@
 		//"declaration": true,
 		//"declarationDir": "typing",
 		"sourceMap": true,
-		"rootDir": "src",
+		"rootDir": "./",
+		"allowJs": true,
+		"moduleResolution": "node",
 		"strict": true   /* enable all strict type-checking options */
 		/* Additional Checks */
 		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */

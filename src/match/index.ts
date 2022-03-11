@@ -1,10 +1,10 @@
+import * as vscode from "vscode";
 import { AbstractIndexList, Hooks } from "./indexList";
 import YearList from "./yearList";
 import SeasonVersionList from "./seasonVersionList";
 import AreaList from "./areaList";
 import FinishList from "./finishList";
 import CopyRightList from "./copyRightList";
-import * as vscode from "vscode";
 import SeasonStatusList from "./seasonStatusList";
 import SeasonMonthList from "./seasonMonthList";
 import BangumisView from "../views/bangumi";
@@ -15,7 +15,7 @@ import StyleList from "./styleList";
  *
  *	@author sdttttt
  */
-export default new (class MainIndexList extends AbstractIndexList {
+export default new class MainIndexList extends AbstractIndexList {
 	protected readonly openIndexListAfter: Hooks = [];
 
 	protected readonly openIndexListBefore: Hooks = [];
@@ -81,4 +81,4 @@ export default new (class MainIndexList extends AbstractIndexList {
 				vscode.window.showInformationMessage("果咩,还在施工中");
 		}
 	}
-})();
+};

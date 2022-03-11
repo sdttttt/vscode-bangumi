@@ -1,6 +1,5 @@
-"use strict";
+import Axios, { AxiosRequestConfig, AxiosInstance } from "axios";
 
-import Axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 
 const config: AxiosRequestConfig = {
 	timeout: 8888,
