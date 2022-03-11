@@ -21,7 +21,7 @@ jobs:
             - name: Install Node.js
               uses: actions/setup-node@v1
               with:
-                  node-version: 13.x
+                  node-version: 14.x
 
             - name: Cache Depend on UNIX
               if: ${{ runner.os != 'Windows' }}
