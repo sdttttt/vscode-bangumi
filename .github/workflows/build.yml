@@ -21,7 +21,7 @@ jobs:
             - name: Install Node.js
               uses: actions/setup-node@v1
               with:
-                  node-version: 13.x
+                  node-version: 14.x
 
             - name: Cache Depend on UNIX
               if: ${{ runner.os != 'Windows' }}
@@ -52,13 +52,18 @@ jobs:
             - run: yarn
 
             - name: build
-              run: yarn webpack:prepublish
+              run: yarn rollup:build
+          
+            - name: pretest
+              run: yarn pretest
+              
             - name: Run tests
               uses: GabrielBB/xvfb-action@v1.4
               with:
                   run: yarn run test
             - name: Packing
-              run: vsce package
+                # yarn2之后好像不支持list这个指令了
+              run: vsce package --no-yarn
 
             - uses: actions/upload-artifact@v2
               with:
