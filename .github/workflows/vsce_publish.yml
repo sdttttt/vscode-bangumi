@@ -21,11 +21,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm install -g vsce
       - run: npm install -g yarn
+      
       - name: Publish to Visual Studio Marketplace
-        uses: HaaLeo/publish-vscode-extension@v1
-        with:
-          pat: ${{ secrets.VSCE_TOKEN  }}
-          registryUrl: https://marketplace.visualstudio.com
+        run: vsce publish --no-yarn -p ${{ secrets.VSCE_TOKEN }}
 
       - name: Publish to Open-VSX
         run: |

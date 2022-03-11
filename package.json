@@ -110,6 +110,7 @@
 		"webpack:compile": "webpack --mode none",
 		"lint": "tslint ./src/**/*.ts -t verbose",
 		"package": "vsce package --no-yarn",
+		"publish": "vsce publish --no-yarn",
 		"eslint": "eslint src --ext .ts",
 		"eslint:fix": "eslint --fix src --ext .ts",
 		"commit": "git add . && npx git-cz",
