@@ -22,18 +22,13 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm install -g vsce
     - run: npm install -g yarn
-    - run: yarn
-    - run: yarn build
-    - run: vsce package --no-yarn
-      env:
-        CI: true
-    - name: Publish to VSCode Marketplace
-      uses: lannonbr/vsce-action@master
+    - name: Publish extension
+      id: publisher
+      uses: sigma/vsce-publish-action@v0.0.2
       with:
-        args: "publish -p $VSCE_TOKEN --no-yarn"
-      env:
-        VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }}
-
+        vsce_token: ${{ secrets.VSCE_TOKEN }}
+        build_pkg: yes
+        
     - name: Publish to Open-VSX
       run: |
         npx ovsx publish -p ${{ secrets.OVSX_ACCESS_KEY }} --no-yarn
