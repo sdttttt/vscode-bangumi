@@ -30,10 +30,10 @@ jobs:
     - name: Publish to VSCode Marketplace
       uses: lannonbr/vsce-action@master
       with:
-        args: "publish -p $VSCE_TOKEN"
+        args: "publish -p $VSCE_TOKEN --no-yarn"
       env:
         VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }}
 
     - name: Publish to Open-VSX
       run: |
-        npx ovsx publish -p ${{ secrets.OVSX_ACCESS_KEY }}
+        npx ovsx publish -p ${{ secrets.OVSX_ACCESS_KEY }} --no-yarn
