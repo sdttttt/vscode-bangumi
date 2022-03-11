@@ -23,8 +23,8 @@ jobs:
     - run: npm install -g vsce
     - run: npm install -g yarn
     - run: yarn
-    - run: yarn run build
-    - run: vsce package
+    - run: yarn build
+    - run: vsce package --no-yarn
       env:
         CI: true
     - name: Publish to VSCode Marketplace
