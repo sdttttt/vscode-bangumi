@@ -2,12 +2,11 @@ name: VSCE Publish
 
 on:
   push:
-    tags: 
-      - 'v**'
+    tags:
+      - "v**"
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -15,20 +14,19 @@ jobs:
         node-version: [14.x]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm install -g vsce
-    - run: npm install -g yarn
-    - name: Publish extension
-      id: publisher
-      uses: sigma/vsce-publish-action@v0.0.2
-      with:
-        vsce_token: ${{ secrets.VSCE_TOKEN }}
-        build_pkg: yes
-        
-    - name: Publish to Open-VSX
-      run: |
-        npx ovsx publish -p ${{ secrets.OVSX_ACCESS_KEY }} --no-yarn
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install -g vsce
+      - run: npm install -g yarn
+      - name: Publish to Visual Studio Marketplace
+        uses: HaaLeo/publish-vscode-extension@v1
+        with:
+          pat: ${{ secrets.VSCE_TOKEN  }}
+          registryUrl: https://marketplace.visualstudio.com
+
+      - name: Publish to Open-VSX
+        run: |
+          npx ovsx publish -p ${{ secrets.OVSX_ACCESS_KEY }} --no-yarn
