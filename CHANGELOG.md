@@ -213,3 +213,14 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 
 - 更新依赖.
 - 增加了一个计数通知请求, 现在BangumiOpen会统计大🔥的使用每个功能的次数. 这个数据是公开的我会定时发布.
+
+## [2.2.8] - 2022-3-11
+
+### Feat
+
+- 优化插件激活触发事件, 从任意事件激活改为空闲激活. 对VSCode启动速度优化.
+- 构建工具从Webpack迁移到Rollup.
+
+### Fix
+
+- 修复Match模块循环依赖问题.
