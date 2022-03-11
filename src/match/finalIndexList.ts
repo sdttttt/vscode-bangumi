@@ -1,6 +1,6 @@
 import { isDisplayIndexTags } from "../configuration";
 import { AbstractIndexList, Hook, Hooks } from "./indexList";
-import MainIndexList from "./index"
+import Tagger from "./tagger";
 import * as vscode from "vscode";
 import { BangumiUrl } from "../request/bangumiUrl";
 import BangumisView from "../views/bangumi";
@@ -36,9 +36,9 @@ import BangumisView from "../views/bangumi";
 	protected pushTagHook: Hook = (index?: string): void => {
 		if (isDisplayIndexTags()) {
 			if (index) {
-				const tags: Map<string, string> = MainIndexList.tags;
+				const tags: Map<string, string> = Tagger.tags;
 				tags.set(this.tag, index);
-				MainIndexList.tags = tags;
+				Tagger.tags = tags;
 			}
 		}
 	};
@@ -50,7 +50,7 @@ import BangumisView from "../views/bangumi";
 	 */
 	private showTagHook(): void {
 		if (isDisplayIndexTags()) {
-			const tags: Map<string, string> = MainIndexList.tags;
+			const tags: Map<string, string> = Tagger.tags;
 			if (tags.size > 0) {
 				let message = "";
 				message += "Tags: | ";

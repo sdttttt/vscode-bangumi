@@ -94,12 +94,11 @@ async function packageTask() {
 	});
 }
 
-
-exports.watchCompile = async () => {
+const watchCompile = async () => {
 	watch("src/**/*.ts", compileTask);
 };
 
-exports.watchPacking = async () => {
+const watchPacking = async () => {
 	watch("src/**/*.ts", packingTask);
 }
 
@@ -107,6 +106,6 @@ exports.clean = cleanTask;
 exports.optimizeimg = optimizeimgTask
 exports.optimizecss = optimizecssTask
 exports.compile = compileTask
-exports.watch = parallel(packingTask, compileTask)
+exports.watch = parallel(watchCompile)
 exports.default = series(optimizeimgTask, optimizecssTask, compileTask)
 exports.publish = series(optimizeimgTask, optimizecssTask, compileTask, packageTask);

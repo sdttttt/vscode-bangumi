@@ -8,6 +8,7 @@ import Reminder from "./reminder";
 
 let isInit = false;
 
+
 /**
  * init work
  *

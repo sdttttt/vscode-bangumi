@@ -31,3 +31,4 @@ TODO.md
 gulpfile.js
 .chglog/**
 .yarn/**
+rollup.config.js

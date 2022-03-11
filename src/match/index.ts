@@ -9,6 +9,7 @@ import SeasonStatusList from "./seasonStatusList";
 import SeasonMonthList from "./seasonMonthList";
 import BangumisView from "../views/bangumi";
 import StyleList from "./styleList";
+import Tagger from "./tagger";
 
 /**
  *	Main List
@@ -31,21 +32,6 @@ export default new class MainIndexList extends AbstractIndexList {
 		"风格",
 		"(恢复默认)",
 	];
-
-	/**
-	 * Hit Tag
-	 *
-	 * @author sdttttt
-	 */
-	private _tags: Map<string, string> = new Map();
-
-	set tags(value: Map<string, string>) {
-		this._tags = value;
-	}
-
-	get tags(): Map<string, string> {
-		return this._tags;
-	}
 
 	protected conditionHandler(index: string): void {
 		switch (index) {
@@ -75,7 +61,7 @@ export default new class MainIndexList extends AbstractIndexList {
 				break;
 			case "(恢复默认)":
 				BangumisView.bangumiUrl.restoreDefault();
-				this._tags.clear();
+				Tagger.clear();
 				break;
 			default:
 				vscode.window.showInformationMessage("果咩,还在施工中");

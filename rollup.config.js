@@ -4,12 +4,17 @@ const commonjs = require('@rollup/plugin-commonjs');
 const json = require('@rollup/plugin-json');
 const { terser } = require("rollup-plugin-terser");
 const progressbar = require('rollup-plugin-progress');
+
+/**
+ * @type {import("rollup").RollupOptions}
+ */
 module.exports = {
 	input: './src/extension.ts',
 	output: {
 		file: './dist/extension.js',
 		format: 'cjs',
-		sourcemap: false
+		sourcemap: false,
+		banner: `/* 很感谢你使用BangumiOpen, 祝你工作愉快!  */`
 	},
 
 	external: [
@@ -17,10 +22,10 @@ module.exports = {
 	],
 
 	plugins: [
+		commonjs(),
 		nodeResolve({
 			preferBuiltins: true
 		}),
-		commonjs(),
 		json(),
 		ts(),
 		terser(),
