@@ -61,21 +61,7 @@
 
 `Back Page` 可用 `Ctrl+alt+k` 代替
 
-## About i18n 🌍
-
-**At present, not intended to provide i18n. The reasons are as follows:**
-
--   Bilibili does not seem to provide an i18n interface.
--   Bilibili's Bangumi seems to be available only in Chinese.
-
-If you are a **non-Chinese user**.
-I'm Sorry.(´；ω；‘)
-
-> _If you have any ideas about i18n, you can **issue** me._ 👋
-
 ## Contribution ☕
-
-**欢迎 PR！ ( ´･∀･｀)**
 
 | contributer | cover                                                                  |
 | ----------- | ---------------------------------------------------------------------- |
