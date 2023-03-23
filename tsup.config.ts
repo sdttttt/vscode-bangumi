@@ -1,8 +1,10 @@
-import { defineConfig } from "tsup";
+import {
+    defineConfig
+} from "tsup";
 
 export default defineConfig({
-    entry: ["src/extension.ts"],
+    entry   : ["src/extension.ts"],
     external: ["vscode"],
-    format: ["cjs"],
-    shims: false,
+    format  : ["cjs"],
+    shims   : false,
 });

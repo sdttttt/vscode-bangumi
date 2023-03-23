@@ -18,7 +18,8 @@ let isInit = false;
  * @param {vscode.ExtensionContext} context
  * @author sdttttt
  */
-function initializer(context: vscode.ExtensionContext): void{
+function initializer(context: vscode.ExtensionContext): void
+{
     if (isInit)
     {
         return;

@@ -11,15 +11,15 @@ import {
     randomInteger,
 } from "../../utils/strings";
 import {
-    expect
-} from "chai";
+    describe, test, expect
+} from "vitest";
 
 /**
  * Utils TEST
  *
  * @author sdttttt
  */
-suite("Utils TEST", () =>
+describe("Utils TEST", () =>
 {
     test("toNumber", () =>
     {

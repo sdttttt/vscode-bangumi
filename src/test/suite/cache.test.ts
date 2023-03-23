@@ -2,11 +2,12 @@
 
 import {
     Cache
-} from "../../request/cache";
+} from "@/request/cache";
+
 import {
-    expect
-} from "chai";
-suite("Cache Test", () =>
+    describe, test, expect
+} from "vitest";
+describe("Cache Test", () =>
 {
     test("Running TEST", () =>
     {

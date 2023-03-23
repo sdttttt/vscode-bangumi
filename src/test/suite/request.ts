@@ -1,8 +1,6 @@
-"use strict";
-
 import {
-    expect
-} from "chai";
+    describe, test, expect
+} from "vitest";
 import {
     getAllBangumi, getWeekBangumi
 } from "../../request/bangumi";
@@ -25,7 +23,7 @@ import {
  *
  * @author sdttttt
  */
-suite("TEST API", () =>
+describe("TEST API", () =>
 {
     test("BILIBILI BANGUMI API TEST", async () =>
     {
