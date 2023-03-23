@@ -8,12 +8,6 @@
 
 提供的`番剧索引`. 以及`新番时间表` 的功能.
 
-### Search
-
-![b1](https://raw.githubusercontent.com/sdttttt/vscode-bangumi/master/resources/b1.gif)
-
-### WeekBangumi
-
 ![b2](https://raw.githubusercontent.com/sdttttt/vscode-bangumi/master/resources/b2.png)
 
 ### Reminder
