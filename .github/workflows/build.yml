@@ -7,7 +7,7 @@ on:
         branches: [master, SDTTTTT]
 
 jobs:
-  cache-and-install:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -40,9 +40,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: version
+        run: pnpm -v
+
       - name: Install dependencies
         run: pnpm install
-        
+       
       - name: test
         run: pnpm test -- run
     
