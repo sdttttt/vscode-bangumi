@@ -5,68 +5,49 @@ on:
         branches: [master]
     pull_request:
         branches: [master, SDTTTTT]
-    schedule:
-        # * is a special character in YAML so you have to quote this string
-        - cron: 0 */1 * * *
 
 jobs:
-    build:
-        strategy:
-            matrix:
-                os: [macos-latest, ubuntu-latest, windows-latest]
-        runs-on: ${{ matrix.os }}
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v2
-            - name: Install Node.js
-              uses: actions/setup-node@v1
-              with:
-                  node-version: 14.x
+  build:
+    runs-on: ubuntu-latest
 
-            - name: Cache Depend on UNIX
-              if: ${{ runner.os != 'Windows' }}
-              uses: actions/cache@v2
-              with:
-                  path: ~/.npm
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: |
-                      ${{ runner.os }}-node-
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-            - name: Get npm cache directory
-              if: ${{ runner.os == 'Windows' }}
-              id: npm-cache
-              run: |
-                  echo "::set-output name=dir::$(npm config get cache)"
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
 
-            - name: Cache Depend on Windows
-              if: ${{ runner.os == 'Windows' }}
-              uses: actions/cache@v2
-              with:
-                  path: ${{ steps.npm-cache.outputs.dir }}
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: |
-                      ${{ runner.os }}-node-
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
 
-            - run: npm install -g vsce
-            - run: npm install -g yarn
-            - run: yarn
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-            - name: build
-              run: yarn rollup:build
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
-            - name: pretest
-              run: yarn pretest
+      - name: version
+        run: pnpm -v
 
-            - name: Run tests
-              uses: GabrielBB/xvfb-action@v1.4
-              with:
-                  run: yarn run test
-            - name:
-                  Packing
-                  # yarn2之后好像不支持list这个指令了
-              run: vsce package --no-yarn
-
-            - uses: actions/upload-artifact@v2
-              with:
-                  name: VSCode-BangumiOpen--for-${{ runner.os }}
-                  path: "*.vsix"
+      - name: Install dependencies
+        run: pnpm install
+       
+      - name: test
+        run: pnpm test -- run
+    
+      - name: build
+        run: pnpm build 
