@@ -6,7 +6,7 @@
 
 ## Features
 
-提供的`番剧索引`. 以及`新番时间表`🕰 的功能.
+提供的`番剧索引`. 以及`新番时间表` 的功能.
 
 ### Search
 
@@ -15,8 +15,6 @@
 ### WeekBangumi
 
 ![b2](https://raw.githubusercontent.com/sdttttt/vscode-bangumi/master/resources/b2.png)
-
-> 以上提供的截图是早期版本的.
 
 ### Reminder
 
@@ -29,31 +27,20 @@
 ## Configuration 🛠
 
 ```json
-    //Default Config
-
-    // 是否显示前六天的番剧更新
-    "bangumiOpen.DisplayHistory": false,
-
-    // 是否开启番更新剧提醒
-    "bangumiOpen.EnableReminder": true,
-
-    // 更新提醒时间提前 (单位：秒)
-    "bangumiOpen.ReminderAheadTime": 0,
-
-    // 使用索引时是否显示已经选中的Tag
-    "bangumiOpen.DisplayIndexTags": true,
-
-    // 是否显示状态栏提示
-    "bangumiOpen.DisplayStatusBar": true
+"bangumiOpen.DisplayHistory": false,  // 是否显示前六天的番剧更新
+"bangumiOpen.EnableReminder": true,   // 是否开启番更新剧提醒
+"bangumiOpen.ReminderAheadTime": 0,   // 更新提醒时间提前 (单位：秒)
+"bangumiOpen.DisplayIndexTags": true, // 使用索引时是否显示已经选中的Tag
+"bangumiOpen.DisplayStatusBar": true  // 是否显示状态栏提示
 ```
 
-## Quick Usage 🚀
+## Quick Usage
 
-`Ctrl+Shift+P` 调出命令栏后,输入`Open Bangumi`或 `Bangumi Open: Week Bangumi` 即可打开视图. 🕵️‍♂️
+`Ctrl+Shift+P` 调出命令栏后,输入`Open Bangumi`或 `Bangumi Open: Week Bangumi` 即可打开视图.
 
 使用 `Bangumi Open: Index` 可打开索引. 选中索引后自动触发`Open Bangumi`命令.
 
-> 在一级索引中选中`(恢复默认)`可清除所有已经选中的 Tag. 📑
+> 在一级索引中选中`(恢复默认)`可清除所有已经选中的 Tag.
 
 `Next Page` 和 `Back Page` 提供翻页功能.
 
@@ -61,7 +48,7 @@
 
 `Back Page` 可用 `Ctrl+alt+k` 代替
 
-## Contribution ☕
+## Contribution
 
 | contributer | cover                                                                  |
 | ----------- | ---------------------------------------------------------------------- |
