@@ -14,8 +14,9 @@ const DISPLAY_STATUSBAR = "bangumiOpen.DisplayStatusBar";
  *
  * @author sdttttt
  */
-export function getConfig(key: string): unknown {
-	return vscode.workspace.getConfiguration().get(key);
+export function getConfig(key: string): unknown
+{
+    return vscode.workspace.getConfiguration().get(key);
 }
 
 /**
@@ -24,13 +25,15 @@ export function getConfig(key: string): unknown {
  * @returns reminder ahead time
  * @author sdttttt
  */
-export function getReminderAheadTime(): number {
-	const aheadTime: unknown = getConfig(REMINDER_AHEAD_TIME);
-	const result: number = aheadTime as number;
-	if (isNaN(result) || result < 0) {
-		return 0;
-	}
-	return result;
+export function getReminderAheadTime(): number
+{
+    const aheadTime: unknown = getConfig(REMINDER_AHEAD_TIME);
+    const result: number = aheadTime as number;
+    if (isNaN(result) || 0 > result)
+    {
+        return 0;
+    }
+    return result;
 }
 
 /**
@@ -39,9 +42,10 @@ export function getReminderAheadTime(): number {
  * @returns true if display index tags
  * @author sdttttt
  */
-export function isDisplayIndexTags(): boolean {
-	const displayStatus: unknown = getConfig(DISPLAY_INDEX_TAGS);
-	return displayStatus as boolean;
+export function isDisplayIndexTags(): boolean
+{
+    const displayStatus: unknown = getConfig(DISPLAY_INDEX_TAGS);
+    return displayStatus as boolean;
 }
 
 /**
@@ -50,9 +54,10 @@ export function isDisplayIndexTags(): boolean {
  * @returns true if display status bar
  * @author sdttttt
  */
-export function isDisplayStatusBar(): boolean {
-	const displayStatus: unknown = getConfig(DISPLAY_STATUSBAR);
-	return displayStatus as boolean;
+export function isDisplayStatusBar(): boolean
+{
+    const displayStatus: unknown = getConfig(DISPLAY_STATUSBAR);
+    return displayStatus as boolean;
 }
 
 /**
@@ -61,7 +66,8 @@ export function isDisplayStatusBar(): boolean {
  * @returns true if display history
  * @author sdttttt
  */
-export function isDisplayHistory(): boolean {
-	const displayStatus: unknown = getConfig(DISPLAY_HISTORY);
-	return displayStatus as boolean;
+export function isDisplayHistory(): boolean
+{
+    const displayStatus: unknown = getConfig(DISPLAY_HISTORY);
+    return displayStatus as boolean;
 }

@@ -11,7 +11,6 @@ export const WEEK_BANGUMI_CSS = "mincss/weekBangumi.css";
 export const BANGUMI_CSS = "mincss/bangumi.css";
 export const LOADING_CSS = "mincss/loading.css";
 
-
 let _context: vscode.ExtensionContext;
 
 /**
@@ -20,8 +19,9 @@ let _context: vscode.ExtensionContext;
  * @param {vscode.ExtensionContext}
  * @author sdttttt
  */
-export function setContext(ctx: vscode.ExtensionContext): void {
-	_context = ctx;
+export function setContext(ctx: vscode.ExtensionContext): void
+{
+    _context = ctx;
 }
 
 /**
@@ -30,6 +30,7 @@ export function setContext(ctx: vscode.ExtensionContext): void {
  * @returns {vscode.ExtensionContext}
  * @author sdttttt
  */
-export function getContext(): vscode.ExtensionContext {
-	return _context;
+export function getContext(): vscode.ExtensionContext
+{
+    return _context;
 }

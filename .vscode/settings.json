@@ -1,43 +1,43 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-	"files.exclude": {
-		"out": false // set this to true to hide the "out" folder with the compiled JS files
-	},
-	"editor.fontFamily": " Monaco,SF Mono, Cascadia Code, Consolas, 'Courier New', monospace",
-	"editor.fontWeight": "350",
-	"editor.fontSize": 11.5,
-	"search.exclude": {
-		"out": true // set this to false to include "out" folder in search results
-	},
-	// Turn off tsc task auto detection since we have the necessary tasks as npm scripts
-	"typescript.tsc.autoDetect": "off",
-	"cSpell.words": [
-		"Bangumi",
-		"Bili",
-		"Xvfb",
-		"bangumiopen",
-		"bangumis",
-		"bilibili",
-		"sdttttt",
-		"vsce",
-		"vsix",
-		"yinglili"
-	],
-	"commentTranslate.targetLanguage": "zh-CN",
-	"deepscan.enable": true,
-	"god.tsconfig": "./tsconfig.json",
-	"compile-hero.disable-compile-files-on-did-save-code": true,
-	"editor.insertSpaces": false,
-	"bangumiOpen.EnableReminder": true,
-	"editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
-	"editor.formatOnPaste": false, // required 
-	"editor.formatOnType": false, // required
-	"editor.formatOnSave": true, // optional 
-	"editor.formatOnSaveMode": "file", // required to format on save
-	"files.autoSave": "onFocusChange", // optional but recommended
-	"vitest.commandLine": "pnpm test --",
-	"vs-code-prettier-eslint.prettierLast": false, // set as "true" to run 'prettier' last not first
-	"[typescript]": {
-		"editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
-	}
+    "files.exclude": {
+        "out": false // set this to true to hide the "out" folder with the compiled JS files
+    },
+    "editor.fontFamily": " Monaco,SF Mono, Cascadia Code, Consolas, 'Courier New', monospace",
+    "editor.fontWeight": "350",
+    "editor.fontSize": 11.5,
+    "search.exclude": {
+        "out": true // set this to false to include "out" folder in search results
+    },
+    // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
+    "typescript.tsc.autoDetect": "off",
+    "cSpell.words": [
+        "Bangumi",
+        "Bili",
+        "Xvfb",
+        "bangumiopen",
+        "bangumis",
+        "bilibili",
+        "sdttttt",
+        "vsce",
+        "vsix",
+        "yinglili"
+    ],
+    "commentTranslate.targetLanguage": "zh-CN",
+    "deepscan.enable": true,
+    "god.tsconfig": "./tsconfig.json",
+    "compile-hero.disable-compile-files-on-did-save-code": true,
+    "editor.insertSpaces": false,
+    "bangumiOpen.EnableReminder": true,
+    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
+    "editor.formatOnPaste": false, // required
+    "editor.formatOnType": false, // required
+    "editor.formatOnSave": true, // optional
+    "editor.formatOnSaveMode": "file", // required to format on save
+    "files.autoSave": "onFocusChange", // optional but recommended
+    "vitest.commandLine": "pnpm test --",
+    "vs-code-prettier-eslint.prettierLast": false, // set as "true" to run 'prettier' last not first
+    "[typescript]": {
+        "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+    }
 }

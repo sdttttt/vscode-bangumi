@@ -1,5 +1,9 @@
-import { WBangumi, WeekBangumiData } from "../request/structure";
-import { toNumber } from "./type";
+import {
+    WBangumi, WeekBangumiData
+} from "../request/structure";
+import {
+    toNumber
+} from "./type";
 
 /**
  * To week day
@@ -8,25 +12,27 @@ import { toNumber } from "./type";
  * @returns week day
  * @author sdttttt
  */
-export function toWeekDay(day: number): string {
-	switch (day) {
-		case 1:
-			return "星期一";
-		case 2:
-			return "星期二";
-		case 3:
-			return "星期三";
-		case 4:
-			return "星期四";
-		case 5:
-			return "星期五";
-		case 6:
-			return "星期六";
-		case 7:
-			return "星期日";
-		default:
-			return "";
-	}
+export function toWeekDay(day: number): string
+{
+    switch (day)
+    {
+    case 1:
+        return "星期一";
+    case 2:
+        return "星期二";
+    case 3:
+        return "星期三";
+    case 4:
+        return "星期四";
+    case 5:
+        return "星期五";
+    case 6:
+        return "星期六";
+    case 7:
+        return "星期日";
+    default:
+        return "";
+    }
 }
 
 /**
@@ -36,10 +42,11 @@ export function toWeekDay(day: number): string {
  * @export
  * @author sdttttt
  */
-export function isToday(day: string): boolean {
-	const currentTime: Date = new Date();
-	const today = currentTime.getMonth() + 1 + "-" + currentTime.getDate();
-	return today === day;
+export function isToday(day: string): boolean
+{
+    const currentTime: Date = new Date();
+    const today = `${currentTime.getMonth() + 1}-${currentTime.getDate()}`;
+    return today === day;
 }
 
 /**
@@ -49,8 +56,9 @@ export function isToday(day: string): boolean {
  * @export
  * @author sdttttt
  */
-export function currentTimestamp(): number {
-	return Number(new Date());
+export function currentTimestamp(): number
+{
+    return Number(new Date());
 }
 
 /**
@@ -62,36 +70,47 @@ export function currentTimestamp(): number {
  * @author sdttttt
  */
 export function getTodayIndexInWeekBangumi(
-	bangumis: Array<WeekBangumiData>
-): number | undefined {
-	for (let i = 0; i < bangumis.length; i++) {
-		if (isToday(bangumis[i].date)) {
-			return i;
-		}
-	}
+    bangumis: Array<WeekBangumiData>
+): number | undefined
+{
+    for (let i = 0; i < bangumis.length; i++)
+    {
+        if (isToday(bangumis[i].date))
+        {
+            return i;
+        }
+    }
 }
 
 /**
  * Gets Form Index start Same time update Bangumi.
  *
- * @param bangumis 
- * @param index 
+ * @param bangumis
+ * @param index
  * @returns
  */
 export function getFromIndexSameUpdateBangumi(
-	bangumis: WBangumi[],
-	index: number
-): WBangumi[] {
-	const currentDate = bangumis[index].pub_time;
-	const result: WBangumi[] = [];
+    bangumis: WBangumi[],
+    index: number
+): WBangumi[]
+{
+    const currentDate = bangumis[index].pub_time;
+    const result: WBangumi[] = [];
 
-	for (let i = index; i < bangumis.length; i++) {
-		if (bangumis[i].pub_time === currentDate) result.push(bangumis[i]);
-		else break;
-	}
+    for (let i = index; i < bangumis.length; i++)
+    {
+        if (bangumis[i].pub_time === currentDate)
+        {
+            result.push(bangumis[i]);
+        }
+        else
+        {
+            break;
+        }
+    }
 
-	// 最后过滤拖更的番剧
-	return result
+    // 最后过滤拖更的番剧
+    return result;
 }
 
 /**
@@ -101,8 +120,9 @@ export function getFromIndexSameUpdateBangumi(
  * @returns {number} minute from secode
  * @author sdttttt
  */
-export function toMinuteFromSecode(time: number): number {
-	return Math.ceil(time / 60);
+export function toMinuteFromSecode(time: number): number
+{
+    return Math.ceil(time / 60);
 }
 
 /**
@@ -113,8 +133,9 @@ export function toMinuteFromSecode(time: number): number {
  * @returns of string plus
  * @author sdttttt
  */
-export function numberOfStringPlus(str: string, num: number): string {
-	return (toNumber(str) + num).toString();
+export function numberOfStringPlus(str: string, num: number): string
+{
+    return (toNumber(str) + num).toString();
 }
 
 /**
@@ -126,6 +147,7 @@ export function numberOfStringPlus(str: string, num: number): string {
  * @returns {number}
  * @author sdttttt
  */
-export function randomInteger(min: number, max: number): number {
-	return Math.floor(Math.random() * (max - min)) + min;
+export function randomInteger(min: number, max: number): number
+{
+    return Math.floor(Math.random() * (max - min)) + min;
 }

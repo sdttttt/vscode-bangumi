@@ -1,6 +1,8 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import { getContext } from "../constants";
+import {
+    getContext
+} from "../constants";
 
 /**
  * Gets resource file
@@ -9,9 +11,12 @@ import { getContext } from "../constants";
  * @returns resource file
  * @author sdttttt
  */
-export function getResourceFile(filename: string): vscode.Uri {
-	const onDiskPath = vscode.Uri.file(
-		path.join(getContext().extensionPath, "resources", filename)
-	);
-	return onDiskPath.with({ scheme: "vscode-resource" });
+export function getResourceFile(filename: string): vscode.Uri
+{
+    const onDiskPath = vscode.Uri.file(
+        path.join(getContext().extensionPath, "resources", filename)
+    );
+    return onDiskPath.with({
+        scheme: "vscode-resource",
+    });
 }

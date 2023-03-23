@@ -2,9 +2,9 @@
 
 [![vsmarketplacebadge](https://vsmarketplacebadge.apphb.com/version/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)
 
-> 一款基于 **Vscode** 的番剧插件, 该扩展请配合`Bilibili`食用( ゜- ゜)つロ
+> 一款基于 **Vscode** 的番剧插件, 数据来自 B 站.
 
-## Features 🌈
+## Features
 
 提供的`番剧索引`. 以及`新番时间表`🕰 的功能.
 
@@ -16,7 +16,7 @@
 
 ![b2](https://raw.githubusercontent.com/sdttttt/vscode-bangumi/master/resources/b2.png)
 
-> 以上提供的截图是早期版本的，请以实物为准🐶
+> 以上提供的截图是早期版本的.
 
 ### Reminder
 
@@ -24,7 +24,7 @@
 
 **BangumiOpen**会在下面的状态栏处显示下一部即将更新的番剧 _（该状态栏可被关闭）_.
 插件有自带提醒的功能. 在番剧更新时会以提示窗的形式提醒你. 🎉
-如果你喜欢在评论区里快人一步(🛋️)🏁, **BangumiOpen**也提供了能**提前**提醒时间的配置选项`ReminderAheadTime`.
+如果你喜欢在评论区里快人一步, **BangumiOpen**也提供了能**提前**提醒时间的配置选项`ReminderAheadTime`.
 
 ## Configuration 🛠
 

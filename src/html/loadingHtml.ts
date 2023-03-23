@@ -1,9 +1,15 @@
 "use strict";
 
 import AbstractHTMLGenerator from "./generator";
-import { Uri } from "vscode";
-import { getResourceFile } from "../utils/file";
-import { HUIHUI, LOADING_CSS } from "../constants";
+import {
+    Uri
+} from "vscode";
+import {
+    getResourceFile
+} from "../utils/file";
+import {
+    HUIHUI, LOADING_CSS
+} from "../constants";
 
 /**
  * Loading Html Generator.
@@ -11,23 +17,26 @@ import { HUIHUI, LOADING_CSS } from "../constants";
  * @class LoadingHTMLGenerator
  * @author sdttttt
  */
-export default new (class LoadingHTMLGenerator extends AbstractHTMLGenerator<undefined> {
-	protected style?: string;
+export default new (class LoadingHTMLGenerator extends AbstractHTMLGenerator<undefined>
+{
+    protected style?: string;
 
-	protected html?: string;
+    protected html?: string;
 
-	generateHTML(): string {
-		if (!this.html) {
-			const loadimg: Uri = getResourceFile(HUIHUI);
-			this.makeCssUri(LOADING_CSS);
-			this.html = `<div class="load"><img style="width:120px;height:130px;" src="${loadimg}"><h3>Loading...</h3></div>`;
-			this.html =
-				this.htmlHead +
-				this.style +
-				this.htmlBody +
-				this.html +
-				this.htmlFloor;
-		}
-		return this.html;
-	}
+    generateHTML(): string
+    {
+        if (!this.html)
+        {
+            const loadimg: Uri = getResourceFile(HUIHUI);
+            this.makeCssUri(LOADING_CSS);
+            this.html = `<div class="load"><img style="width:120px;height:130px;" src="${loadimg}"><h3>Loading...</h3></div>`;
+            this.html =
+                this.htmlHead +
+                this.style +
+                this.htmlBody +
+                this.html +
+                this.htmlFloor;
+        }
+        return this.html;
+    }
 })();

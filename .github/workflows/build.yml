@@ -53,16 +53,17 @@ jobs:
 
             - name: build
               run: yarn rollup:build
-          
+
             - name: pretest
               run: yarn pretest
-              
+
             - name: Run tests
               uses: GabrielBB/xvfb-action@v1.4
               with:
                   run: yarn run test
-            - name: Packing
-                # yarn2之后好像不支持list这个指令了
+            - name:
+                  Packing
+                  # yarn2之后好像不支持list这个指令了
               run: vsce package --no-yarn
 
             - uses: actions/upload-artifact@v2

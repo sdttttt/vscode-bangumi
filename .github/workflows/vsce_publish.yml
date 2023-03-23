@@ -1,32 +1,32 @@
 name: VSCE Publish
 
 on:
-  push:
-    tags:
-      - "v**"
+    push:
+        tags:
+            - "v**"
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+    build:
+        runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [14.x]
+        strategy:
+            matrix:
+                node-version: [14.x]
 
-    steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - run: npm install -g vsce
-      - run: npm install -g yarn
+        steps:
+            - uses: actions/checkout@v2
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+            - run: npm install -g vsce
+            - run: npm install -g yarn
 
-      - run: yarn
+            - run: yarn
 
-      - name: Publish to Visual Studio Marketplace
-        run: vsce publish --no-yarn -p ${{ secrets.VSCE_TOKEN }}
+            - name: Publish to Visual Studio Marketplace
+              run: vsce publish --no-yarn -p ${{ secrets.VSCE_TOKEN }}
 
-      - name: Publish to Open-VSX
-        run: |
-          npx ovsx publish -p ${{ secrets.OVSX_ACCESS_KEY }} --no-yarn
+            - name: Publish to Open-VSX
+              run: |
+                  npx ovsx publish -p ${{ secrets.OVSX_ACCESS_KEY }} --no-yarn

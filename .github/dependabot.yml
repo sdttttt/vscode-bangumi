@@ -5,12 +5,12 @@
 
 version: 2
 updates:
-  - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/" # Location of package manifests
-    target-branch: "SDTTTTT"
-    assignees:
-      - "sdttttt"
-    schedule:
-      interval: "weekly"
-      # Check for npm updates on Sundays
-      day: "sunday"
+    - package-ecosystem: "npm" # See documentation for possible values
+      directory: "/" # Location of package manifests
+      target-branch: "SDTTTTT"
+      assignees:
+          - "sdttttt"
+      schedule:
+          interval: "weekly"
+          # Check for npm updates on Sundays
+          day: "sunday"
