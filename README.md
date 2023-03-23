@@ -18,16 +18,6 @@
 插件有自带提醒的功能. 在番剧更新时会以提示窗的形式提醒你. 🎉
 如果你喜欢在评论区里快人一步, **BangumiOpen**也提供了能**提前**提醒时间的配置选项`ReminderAheadTime`.
 
-## Configuration 🛠
-
-```json
-"bangumiOpen.DisplayHistory": false,  // 是否显示前六天的番剧更新
-"bangumiOpen.EnableReminder": true,   // 是否开启番更新剧提醒
-"bangumiOpen.ReminderAheadTime": 0,   // 更新提醒时间提前 (单位：秒)
-"bangumiOpen.DisplayIndexTags": true, // 使用索引时是否显示已经选中的Tag
-"bangumiOpen.DisplayStatusBar": true  // 是否显示状态栏提示
-```
-
 ## Quick Usage
 
 `Ctrl+Shift+P` 调出命令栏后,输入`Open Bangumi`或 `Bangumi Open: Week Bangumi` 即可打开视图.
@@ -41,6 +31,17 @@
 `Next Page` 可用 `Ctrl+alt+l` 代替
 
 `Back Page` 可用 `Ctrl+alt+k` 代替
+
+
+## Configuration 🛠
+
+```json
+"bangumiOpen.DisplayHistory": false,  // 是否显示前六天的番剧更新
+"bangumiOpen.EnableReminder": true,   // 是否开启番更新剧提醒
+"bangumiOpen.ReminderAheadTime": 0,   // 更新提醒时间提前 (单位：秒)
+"bangumiOpen.DisplayIndexTags": true, // 使用索引时是否显示已经选中的Tag
+"bangumiOpen.DisplayStatusBar": true  // 是否显示状态栏提示
+```
 
 ## Contribution
 
