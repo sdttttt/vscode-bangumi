@@ -7,4 +7,6 @@ export default defineConfig({
     external: ["vscode"],
     format  : ["cjs"],
     shims   : false,
+    clean   : true,
+    target  : "esnext",
 });

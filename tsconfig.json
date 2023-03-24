@@ -8,8 +8,6 @@
 			"es6"
 		],
 		"esModuleInterop": true,
-		// "declaration": true,
-		// "declarationDir": "typing",
 		"sourceMap": true,
 		"rootDir": ".",
 		"allowJs": true,
