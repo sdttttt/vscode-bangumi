@@ -50,4 +50,8 @@ jobs:
         run: pnpm test -- run
     
       - name: build
-        run: pnpm build 
+        run: pnpm build
+    
+      - uses: actions/upload-artifact@v3
+        with:
+            path: dist/extension.js
