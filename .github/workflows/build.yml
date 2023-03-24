@@ -49,9 +49,9 @@ jobs:
       - name: test
         run: pnpm test -- run
     
-      - name: build
-        run: pnpm build
-    
+      - name: package
+        run: npx vsce package --no-dependencies
+
       - uses: actions/upload-artifact@v3
         with:
-            path: dist/extension.js
+            path: ./**/*.vsix
