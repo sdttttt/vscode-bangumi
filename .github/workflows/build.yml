@@ -53,7 +53,7 @@ jobs:
         run: pnpm build
         
       - name: package
-        run: npx vsce package --yarn
+        run: npx vsce package --no-dependencies
 
       - uses: actions/upload-artifact@v3
         with:
