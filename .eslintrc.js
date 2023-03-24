@@ -30,6 +30,7 @@ module.exports = {
         "object-curly-newline"            : ["error", "always"],
         "nonblock-statement-body-position": ["error", "any"],
         "no-trailing-spaces"              : "error",
+        "linebreak-style"                 : [1, "windows"],
         "max-statements-per-line"         : [
             "error",
             {
@@ -58,7 +59,6 @@ module.exports = {
         "switch-colon-spacing"   : "error",
         quotes                   : ["error", "double"],
         "object-property-newline": "error",
-        "linebreak-style"        : ["error", "windows"],
         "no-var"                 : "error",
     },
 };
