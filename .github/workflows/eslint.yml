@@ -5,5 +5,42 @@ jobs:
   eslint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: bradennapier/eslint-plus-action@v3.4.2
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+            echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+              ${{ runner.os }}-pnpm-store-
+      - name: version
+        run: pnpm -v
+
+      - name: Install dependencies
+        run: pnpm install
+        
+      - uses: CatChen/eslint-suggestion-action@v2
+        with:
+          request-changes: true # optional
+          fail-check: false # optional
+          github-token: ${{ secrets.GITHUB_TOKEN }} # optional
+          directory: './src/' #optional
+          targets: '.' #optional
+          eslint-lib-path: './node_modules/eslint/lib/api.js' #optional
+          eslint-bin-path: 'node_modules/.bin/eslint' # optional
