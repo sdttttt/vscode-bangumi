@@ -51,7 +51,10 @@ jobs:
     
       - name: build
         run: pnpm build
-    
+        
+      - name: package
+        run: npx vsce package
+
       - uses: actions/upload-artifact@v3
         with:
             path: dist/extension.js
