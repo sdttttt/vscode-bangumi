@@ -8,5 +8,5 @@ export default defineConfig({
     format  : ["cjs"],
     shims   : false,
     clean   : true,
-    target  : "esnext",
+    target  : "es2022",
 });
