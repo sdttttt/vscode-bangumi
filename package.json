@@ -100,7 +100,7 @@
         "build": "tsup --minify",
         "test-compile": "tsc -p ./",
         "format": "prettier-eslint \"./**/*.{ts}\" --write  --log-level info --list-different",
-        "watch": "tsup --sourcemap inline --dts --watch src",
+        "watch": "tsup --sourcemap inline --watch src",
         "pretest": "pnpm test-compile",
         "test": "vitest",
         "package": "vsce package --no-yarn",
