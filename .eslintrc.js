@@ -30,7 +30,7 @@ module.exports = {
         "object-curly-newline"            : ["error", "always"],
         "nonblock-statement-body-position": ["error", "any"],
         "no-trailing-spaces"              : "error",
-        "linebreak-style"                 : [1, "windows"],
+        "linebreak-style"                 : [1, "unix"],
         "max-statements-per-line"         : [
             "error",
             {

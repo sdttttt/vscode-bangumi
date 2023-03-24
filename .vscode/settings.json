@@ -37,6 +37,7 @@
 	"files.autoSave": "onFocusChange", // optional but recommended
 	"vitest.commandLine": "pnpm test --",
 	"vs-code-prettier-eslint.prettierLast": false, // set as "true" to run 'prettier' last not first
+	"files.eol": "\n",
 	"[typescript]": {
 		"editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
 	},
