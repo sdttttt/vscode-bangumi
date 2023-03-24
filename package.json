@@ -4,9 +4,9 @@
     "author": "SDTTTTT",
     "repository": "https://github.com/sdttttt/vscode-Bangumi",
     "displayName": "Bangumi Open",
-    "description": "Support Browse Bangumi for vscode.",
+    "description": "Support bilibili bangumi for vscode.",
     "preview": false,
-    "version": "2.2.8",
+    "version": "2.2.9",
     "license": "SEE LICENSE IN LICENSE",
     "icon": "Icon.png",
     "engines": {
