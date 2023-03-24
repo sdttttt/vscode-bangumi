@@ -98,14 +98,14 @@
     "private": true,
     "scripts": {
         "build": "tsup",
-		"vscode:prepublish": "tsup --minify",
+        "vscode:prepublish": "tsup --minify",
         "test-compile": "tsc -p ./",
-        "format": "prettier-eslint  --list-different --write \"./**/*.{js,ts}\"",
+        "format": "prettier-eslint  --list-different --write \"./**/*.{js,ts,json}\"",
         "watch": "tsup --sourcemap inline --watch src",
         "pretest": "pnpm test-compile",
         "test": "vitest",
-		"eslint": "eslint src --ext .ts",
-        "eslint:fix": "eslint --fix src --ext .ts"
+        "eslint": "eslint  --format stylish --ext .ts,.js,.json \"./**/*.{js,ts,json}\"",
+        "eslint:fix": "eslint  --fix --format stylish \"./**/*.{js,ts,json}\""
     },
     "devDependencies": {
         "@types/node": "^14.14.14",
@@ -114,6 +114,7 @@
         "@typescript-eslint/parser": "^5.56.0",
         "axios": "^1.3.4",
         "eslint": "^8.36.0",
+        "eslint-plugin-json": "^3.1.0",
         "prettier": "^2.8.5",
         "prettier-eslint-cli": "^7.1.0",
         "tsup": "^6.6.3",
