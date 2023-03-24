@@ -1,4 +1,4 @@
-name: build
+name: eslint
 
 on:
     push:
@@ -49,7 +49,7 @@ jobs:
                 request-changes: true # optional
                 fail-check: false # optional
                 github-token: ${{ secrets.GITHUB_TOKEN }} # optional
-                directory: './src/' #optional
+                directory: './' #optional
                 targets: '.' #optional
                 eslint-lib-path: './node_modules/eslint/lib/api.js' #optional
                 eslint-bin-path: 'node_modules/.bin/eslint' # optional
