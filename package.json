@@ -100,10 +100,11 @@
         "build": "tsup",
 		"vscode:prepublish": "tsup --minify",
         "test-compile": "tsc -p ./",
-        "format": "prettier-eslint \"./**/*.{ts}\" --write  --log-level info --list-different",
+        "format": "prettier-eslint  --list-different --write \"./**/*.{js,ts}\"",
         "watch": "tsup --sourcemap inline --watch src",
         "pretest": "pnpm test-compile",
         "test": "vitest",
+		"eslint": "eslint src --ext .ts",
         "eslint:fix": "eslint --fix src --ext .ts"
     },
     "devDependencies": {
