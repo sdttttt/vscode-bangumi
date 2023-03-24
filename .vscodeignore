@@ -13,7 +13,6 @@ vsc-extension-quickstart.md
 **/webpack.config.js
 yarn.lock
 resources/*.png
-resources/b1.gif
 .github/**
 package.json
 azure-pipelines.yml
@@ -32,3 +31,4 @@ gulpfile.js
 .chglog/**
 .yarn/**
 rollup.config.js
+pnpm-lock.yaml
