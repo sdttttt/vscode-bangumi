@@ -1,9 +1,12 @@
 import * as vscode from "vscode";
 
-const REMINDER_AHEAD_TIME = "bangumiOpen.ReminderAheadTime";
-const DISPLAY_INDEX_TAGS = "bangumiOpen.DisplayIndexTags";
-const DISPLAY_HISTORY = "bangumiOpen.DisplayHistory";
-const DISPLAY_STATUSBAR = "bangumiOpen.DisplayStatusBar";
+export enum ConfigKey {
+    EnableReminder = "bangumiOpen.EnableReminder",
+    ReminderAheadTime = "bangumiOpen.ReminderAheadTime",
+    DisplayIndexTags = "bangumiOpen.DisplayIndexTags",
+    DisplayHistory = "bangumiOpen.DisplayHistory",
+    DisplayStatusBar = "bangumiOpen.DisplayStatusBar",
+}
 
 /**
  * Quick Gets config
@@ -14,7 +17,7 @@ const DISPLAY_STATUSBAR = "bangumiOpen.DisplayStatusBar";
  *
  * @author sdttttt
  */
-export function getConfig(key: string): unknown
+export function getConfig(key: ConfigKey): unknown
 {
     return vscode.workspace.getConfiguration().get(key);
 }
@@ -27,7 +30,7 @@ export function getConfig(key: string): unknown
  */
 export function getReminderAheadTime(): number
 {
-    const aheadTime: unknown = getConfig(REMINDER_AHEAD_TIME);
+    const aheadTime: unknown = getConfig(ConfigKey.ReminderAheadTime);
     const result: number = aheadTime as number;
     if (isNaN(result) || 0 > result)
     {
@@ -44,7 +47,7 @@ export function getReminderAheadTime(): number
  */
 export function isDisplayIndexTags(): boolean
 {
-    const displayStatus: unknown = getConfig(DISPLAY_INDEX_TAGS);
+    const displayStatus: unknown = getConfig(ConfigKey.DisplayIndexTags);
     return displayStatus as boolean;
 }
 
@@ -56,7 +59,7 @@ export function isDisplayIndexTags(): boolean
  */
 export function isDisplayStatusBar(): boolean
 {
-    const displayStatus: unknown = getConfig(DISPLAY_STATUSBAR);
+    const displayStatus: unknown = getConfig(ConfigKey.DisplayStatusBar);
     return displayStatus as boolean;
 }
 
@@ -68,6 +71,6 @@ export function isDisplayStatusBar(): boolean
  */
 export function isDisplayHistory(): boolean
 {
-    const displayStatus: unknown = getConfig(DISPLAY_HISTORY);
+    const displayStatus: unknown = getConfig(ConfigKey.DisplayHistory);
     return displayStatus as boolean;
 }

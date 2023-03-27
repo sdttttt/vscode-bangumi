@@ -5,7 +5,7 @@ import {
     setContext
 } from "./constants";
 import {
-    getConfig
+    ConfigKey, getConfig
 } from "./configuration";
 import MainIndexList from "./match/index";
 import Reminder from "./reminder";
@@ -38,7 +38,7 @@ export function activate(context: vscode.ExtensionContext): void
 {
     initializer(context);
 
-    const useReminder: unknown = getConfig("bangumiOpen.EnableReminder");
+    const useReminder: unknown = getConfig(ConfigKey.EnableReminder);
 
     if (useReminder as boolean)
     {

@@ -16,9 +16,12 @@
     "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
     "editor.formatOnPaste": false, // required
     "editor.formatOnType": false, // required
-    "editor.formatOnSave": true, // optional
+    "editor.formatOnSave": false, // optional
     "editor.formatOnSaveMode": "file", // required to format on save
     "files.autoSave": "onFocusChange", // optional but recommended
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true,
+    },
     "vitest.commandLine": "pnpm test --",
     "vs-code-prettier-eslint.prettierLast": false, // set as "true" to run 'prettier' last not first
     "files.eol": "\n",
