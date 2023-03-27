@@ -46,8 +46,8 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
-            - name: eslint
-              run: pnpm eslint
+            - name: format
+              run: pnpm format
 
             - name: test
               run: pnpm test -- run

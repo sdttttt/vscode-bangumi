@@ -101,7 +101,7 @@
         "vscode:prepublish": "tsup --minify",
         "test-compile": "tsc -p ./",
         "format": "pnpm prettie && pnpm eslint:fix",
-		"prettie": "prettier \"./**/*.{js,ts}\" --write",
+        "prettie": "prettier \"./**/*.{js,ts}\" --write",
         "watch": "tsup --sourcemap inline --watch src",
         "pretest": "pnpm test-compile",
         "test": "vitest",
