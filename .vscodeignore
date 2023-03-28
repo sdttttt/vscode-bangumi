@@ -12,7 +12,6 @@ vsc-extension-quickstart.md
 **/*.ts
 **/webpack.config.js
 yarn.lock
-resources/*.png
 .github/**
 package.json
 azure-pipelines.yml
@@ -23,7 +22,6 @@ azure-pipelines.yml
 .babelrc
 tslint.json
 tsconfig.json
-resources/css/**
 TODO.md
 .prettierrc.yml
 .husky/**
