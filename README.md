@@ -45,6 +45,4 @@
 
 ## Contribution
 
-| contributer | cover                                                                  |
-| ----------- | ---------------------------------------------------------------------- |
-| sdttttt     | ![sdttttt](https://avatars1.githubusercontent.com/u/42728902?s=96&v=4) |
+![](https://contributors.nn.ci/api?repo=sdttttt/vscode-bangumi)
