@@ -90,7 +90,7 @@ export default new (class Reminder
             }
 
             // 根据更新时间将番剧分组
-            for (let k = 0; k < bangumiSize; )
+            for (let k = 0; k < bangumiSize;)
             {
                 const bangumis: WBangumi[] = getFromIndexSameUpdateBangumi(
                     bangumisData[i].seasons,

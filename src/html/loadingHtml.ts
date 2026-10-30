@@ -1,9 +1,7 @@
 "use strict";
 
 import AbstractHTMLGenerator from "./generator";
-import {
-    Uri
-} from "vscode";
+import * as vscode from "vscode";
 import {
     getResourceFile
 } from "../utils/file";
@@ -23,20 +21,19 @@ export default new (class LoadingHTMLGenerator extends AbstractHTMLGenerator<und
 
     protected html?: string;
 
-    generateHTML(): string
+    generateHTML(data: undefined, webview: vscode.Webview): string
     {
-        if (!this.html)
-        {
-            const loadimg: Uri = getResourceFile(HUIHUI);
-            this.makeCssUri(LOADING_CSS);
-            this.html = `<div class="load"><img style="width:120px;height:130px;" src="${loadimg}"><h3>Loading...</h3></div>`;
-            this.html =
-                this.htmlHead +
-                this.style +
-                this.htmlBody +
-                this.html +
-                this.htmlFloor;
-        }
-        return this.html;
+        const loadimg: vscode.Uri = getResourceFile(webview, HUIHUI);
+        this.makeCssUri(webview, LOADING_CSS);
+        /* 资源 URI 与 Webview 绑定，不能跨面板复用，因此每次重新生成 */
+        this.html = `<div class="load"><img style="width:120px;height:130px;" src="${loadimg}"><h3>Loading...</h3></div>`;
+
+        return (
+            this.htmlHead +
+            this.style +
+            this.htmlBody +
+            this.html +
+            this.htmlFloor
+        );
     }
 })();

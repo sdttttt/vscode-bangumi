@@ -54,7 +54,10 @@ export default new (class BangumisView extends AbstractView
 
         this.openWebViewPanel((pv: vscode.WebviewPanel) =>
         {
-            pv.webview.html = BangumisHTMLGenerator.generateHTML(bangumis);
+            pv.webview.html = BangumisHTMLGenerator.generateHTML(
+                bangumis,
+                pv.webview
+            );
         });
     }
 

@@ -3,6 +3,7 @@
 import {
     Bangumi
 } from "../request/structure";
+import * as vscode from "vscode";
 import AbstractHTMLGenerator from "./generator";
 import {
     BANGUMI_CSS
@@ -62,9 +63,9 @@ export default new (class BangumisHTMLGenerator extends AbstractHTMLGenerator<
      * @returns string
      * @author sdttttt
      */
-    generateHTML(bangumis: Array<Bangumi>): string
+    generateHTML(bangumis: Array<Bangumi>, webview: vscode.Webview): string
     {
-        this.makeCssUri(BANGUMI_CSS);
+        this.makeCssUri(webview, BANGUMI_CSS);
 
         this.html = "";
         for (const bangumi of bangumis)

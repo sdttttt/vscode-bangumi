@@ -37,7 +37,10 @@ export default new (class WeekBangumisView extends AbstractView
     {
         this.openWebViewPanel((pv: vscode.WebviewPanel) =>
         {
-            pv.webview.html = WeekBangumisHTMLGenerator.generateHTML(data);
+            pv.webview.html = WeekBangumisHTMLGenerator.generateHTML(
+                data,
+                pv.webview
+            );
         });
     }
 

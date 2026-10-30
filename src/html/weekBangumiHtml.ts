@@ -37,12 +37,12 @@ export default new (class WeekBangumisHTMLGenerator extends AbstractHTMLGenerato
         super();
     }
 
-    private makeOneDay(day: WeekBangumiData): string
+    private makeOneDay(day: WeekBangumiData, webview: vscode.Webview): string
     {
         let toDayBadge: vscode.Uri | undefined;
         if (isToday(day.date))
         {
-            toDayBadge = getResourceFile(YING_LILI);
+            toDayBadge = getResourceFile(webview, YING_LILI);
         }
 
         let daysHtml = `
@@ -122,16 +122,19 @@ export default new (class WeekBangumisHTMLGenerator extends AbstractHTMLGenerato
             `;
     }
 
-    generateHTML(data: Array<WeekBangumiData>): string
+    generateHTML(
+        data: Array<WeekBangumiData>,
+        webview: vscode.Webview
+    ): string
     {
         this.html = "";
-        this.makeCssUri(WEEK_BANGUMI_CSS);
+        this.makeCssUri(webview, WEEK_BANGUMI_CSS);
 
         if (isDisplayHistory())
         {
             for (const day of data)
             {
-                this.html += this.makeOneDay(day);
+                this.html += this.makeOneDay(day, webview);
             }
         }
         else
@@ -141,7 +144,7 @@ export default new (class WeekBangumisHTMLGenerator extends AbstractHTMLGenerato
             {
                 if (5 <= index)
                 {
-                    this.html += this.makeOneDay(item);
+                    this.html += this.makeOneDay(item, webview);
                 }
                 index++;
             }

@@ -4,6 +4,7 @@ import {
     getResourceFile
 } from "../utils/file";
 import * as vscode from "vscode";
+
 /**
  * Html Generator
  *
@@ -21,11 +22,11 @@ export default abstract class AbstractHTMLGenerator<T = unknown | undefined>
 
     protected abstract html?: string;
 
-    abstract generateHTML(data: T): string;
+    abstract generateHTML(data: T, webview: vscode.Webview): string;
 
-    protected makeCssUri(path: string): void
+    protected makeCssUri(webview: vscode.Webview, path: string): void
     {
-        const cssPath: vscode.Uri = getResourceFile(path);
+        const cssPath: vscode.Uri = getResourceFile(webview, path);
         this.style = `<link rel="stylesheet" href="${cssPath}">`;
     }
 }

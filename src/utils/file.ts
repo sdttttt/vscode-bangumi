@@ -5,18 +5,23 @@ import {
 } from "../constants";
 
 /**
- * Gets resource file
+ * Gets resource Uri usable inside a Webview.
  *
- * @param filename
+ * The old `vscode-resource` scheme is deprecated, `asWebviewUri` is the
+ * supported way to reference extension files from Webview HTML.
+ *
+ * @param webview the Webview that will load the resource
+ * @param filename resource file name, relative to `resources/`
  * @returns resource file
  * @author sdttttt
  */
-export function getResourceFile(filename: string): vscode.Uri
+export function getResourceFile(
+    webview: vscode.Webview,
+    filename: string
+): vscode.Uri
 {
     const onDiskPath = vscode.Uri.file(
         path.join(getContext().extensionPath, "resources", filename)
     );
-    return onDiskPath.with({
-        scheme: "vscode-resource",
-    });
+    return webview.asWebviewUri(onDiskPath);
 }

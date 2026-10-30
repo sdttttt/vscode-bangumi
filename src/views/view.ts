@@ -103,7 +103,10 @@ export default abstract class AbstractView
     {
         this.openWebViewPanel((pv: vscode.WebviewPanel) =>
         {
-            pv.webview.html = LoadingHTMLGenerator.generateHTML();
+            pv.webview.html = LoadingHTMLGenerator.generateHTML(
+                undefined,
+                pv.webview
+            );
         });
     }
 
@@ -118,7 +121,10 @@ export default abstract class AbstractView
     {
         this.openWebViewPanel((pv: vscode.WebviewPanel) =>
         {
-            pv.webview.html = NotFoundHTMLGenerator.generateHTML();
+            pv.webview.html = NotFoundHTMLGenerator.generateHTML(
+                undefined,
+                pv.webview
+            );
         });
     }
 }

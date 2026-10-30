@@ -7,9 +7,7 @@ import {
 import {
     LOADING_CSS, ENTERRPRISE
 } from "../constants";
-import {
-    Uri
-} from "vscode";
+import * as vscode from "vscode";
 
 /**
  * Not Found Html Generator.
@@ -22,20 +20,19 @@ export default new (class NotFoundHTMLGenerator extends AbstractHTMLGenerator<un
     protected style?: string;
     protected html?: string;
 
-    generateHTML(): string
+    generateHTML(data: undefined, webview: vscode.Webview): string
     {
-        if (!this.html)
-        {
-            const loadImg: Uri = getResourceFile(ENTERRPRISE);
-            this.makeCssUri(LOADING_CSS);
-            this.html = `<div class="load"><img src="${loadImg}"><h3>没有数据!</h3></div>`;
-            this.html =
-                this.htmlHead +
-                this.style +
-                this.htmlBody +
-                this.html +
-                this.htmlFloor;
-        }
-        return this.html;
+        const loadImg: vscode.Uri = getResourceFile(webview, ENTERRPRISE);
+        this.makeCssUri(webview, LOADING_CSS);
+        /* 资源 URI 与 Webview 绑定，不能跨面板复用，因此每次重新生成 */
+        this.html = `<div class="load"><img src="${loadImg}"><h3>没有数据!</h3></div>`;
+
+        return (
+            this.htmlHead +
+            this.style +
+            this.htmlBody +
+            this.html +
+            this.htmlFloor
+        );
     }
 })();
