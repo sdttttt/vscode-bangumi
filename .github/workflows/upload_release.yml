@@ -12,21 +12,24 @@ jobs:
     build:
         runs-on: ubuntu-latest
 
-        strategy:
-            matrix:
-                node-version: [14.x]
-
         steps:
-            - uses: actions/checkout@v2
-            - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v1
+            - uses: actions/checkout@v4
+
+            - name: Install pnpm
+              uses: pnpm/action-setup@v4
+
+            - name: Use Node.js 22
+              uses: actions/setup-node@v4
               with:
-                  node-version: ${{ matrix.node-version }}
-            - run: npm install -g vsce
-            - run: npm install
-            - run: vsce package --no-yarn
+                  node-version: 22
+                  cache: pnpm
+
+            - run: pnpm install --frozen-lockfile
+
+            - run: pnpm dlx @vscode/vsce package --no-dependencies
               env:
                   CI: true
+
             - name: Upload To Github Release
               uses: xresloader/upload-to-github-release@v1.1.1
               env:

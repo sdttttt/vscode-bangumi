@@ -6,11 +6,11 @@
     "displayName": "Bangumi Open",
     "description": "Support bilibili bangumi for vscode.",
     "preview": false,
-    "version": "2.2.9",
+    "version": "2.3.0",
     "license": "SEE LICENSE IN LICENSE",
     "icon": "Icon.png",
     "engines": {
-        "vscode": "^1.41.0"
+        "vscode": "^1.100.0"
     },
     "categories": [
         "Other"
@@ -96,29 +96,31 @@
         }
     },
     "private": true,
+    "packageManager": "pnpm@10.34.9",
     "scripts": {
-        "build": "tsup",
-        "vscode:prepublish": "tsup --minify",
-        "test-compile": "tsc -p ./",
-        "format": "pnpm prettie && pnpm eslint:fix",
-        "prettie": "prettier \"./**/*.{js,ts}\" --write",
-        "watch": "tsup --sourcemap inline --watch src",
+        "build": "vite build",
+        "vscode:prepublish": "vite build --minify",
+        "watch": "vite build --sourcemap inline --watch",
+        "test-compile": "tsc -p ./ --noEmit",
         "pretest": "pnpm test-compile",
-        "test": "vitest",
-        "eslint": "eslint  --format stylish --ext .ts,.js,.json \"./**/*.{js,ts,json}\"",
-        "eslint:fix": "eslint  --fix --format stylish \"./**/*.{js,ts,json}\""
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "eslint": "eslint --format stylish \"./**/*.{js,mjs,ts,mts,json}\"",
+        "eslint:fix": "eslint --fix --format stylish \"./**/*.{js,mjs,ts,mts,json}\"",
+        "prettie": "prettier \"./**/*.{js,ts,mjs,mts}\" --write",
+        "format": "pnpm prettie && pnpm eslint:fix"
     },
     "devDependencies": {
-        "@types/node": "^14.14.14",
-        "@types/vscode": "^1.41.0",
-        "@typescript-eslint/eslint-plugin": "^5.56.0",
-        "@typescript-eslint/parser": "^5.56.0",
-        "axios": "^1.3.4",
-        "eslint": "^8.36.0",
-        "eslint-plugin-json": "^3.1.0",
-        "prettier": "^2.8.5",
-        "tsup": "^6.6.3",
-        "typescript": "^4.4.4",
-        "vitest": "^0.29.7"
+        "@eslint/js": "^10.0.1",
+        "@types/node": "^22.20.5",
+        "@types/vscode": "~1.100.0",
+        "axios": "^1.21.0",
+        "eslint": "^10.14.0",
+        "eslint-plugin-json": "^5.0.0",
+        "prettier": "^3.9.10",
+        "typescript": "^6.0.3",
+        "typescript-eslint": "^8.72.1",
+        "vite": "^8.3.5",
+        "vitest": "^5.0.5"
     }
 }

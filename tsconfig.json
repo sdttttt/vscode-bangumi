@@ -1,20 +1,21 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
-        "target": "ES6",
-        "experimentalDecorators": true,
+        "module": "preserve",
+        "moduleResolution": "bundler",
+        "target": "ES2022",
+        "lib": ["ES2022"],
         "outDir": "out",
-        "lib": ["es6"],
+        "rootDir": ".",
         "esModuleInterop": true,
         "sourceMap": true,
-        "rootDir": ".",
         "allowJs": true,
-        "moduleResolution": "node",
         "strict": true,
+        "skipLibCheck": true,
+        "experimentalDecorators": true,
         "paths": {
             "~/*": ["./*"],
             "@/*": ["./src/*"]
         }
     },
-    "exclude": ["node_modules", ".vscode-test"]
+    "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }

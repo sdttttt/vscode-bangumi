@@ -1,9 +1,0 @@
-node_modules
-dist
-public
-package.json
-*.png
-*.jpg
-*.css
-*.gif
-*.md

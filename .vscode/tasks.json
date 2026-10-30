@@ -6,7 +6,16 @@
         {
             "type": "npm",
             "script": "watch",
-            "problemMatcher": "$tsc-watch",
+            "label": "npm: watch",
+            "problemMatcher": {
+                "owner": "vite",
+                "pattern": [],
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "build started",
+                    "endsPattern": "built in"
+                }
+            },
             "isBackground": true,
             "presentation": {
                 "reveal": "never"
@@ -15,6 +24,13 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "type": "npm",
+            "script": "test",
+            "label": "npm: test",
+            "problemMatcher": [],
+            "group": "test"
         }
     ]
 }

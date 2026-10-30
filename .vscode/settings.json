@@ -7,31 +7,33 @@
     "editor.fontWeight": "350",
     "editor.fontSize": 11.5,
     "search.exclude": {
-        "out": true // set this to false to include "out" folder in search results
+        "out": true,
+        "dist": true
     },
     // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
     "typescript.tsc.autoDetect": "off",
+    "typescript.tsdk": "node_modules/typescript/lib",
     "editor.insertSpaces": true,
     "bangumiOpen.EnableReminder": true,
-    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
-    "editor.formatOnPaste": false, // required
-    "editor.formatOnType": false, // required
-    "editor.formatOnSave": false, // optional
-    "editor.formatOnSaveMode": "file", // required to format on save
-    "files.autoSave": "onFocusChange", // optional but recommended
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.formatOnPaste": false,
+    "editor.formatOnType": false,
+    "editor.formatOnSave": false,
+    "editor.formatOnSaveMode": "file",
+    "files.autoSave": "onFocusChange",
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true,
+        "source.fixAll.eslint": "explicit"
     },
+    "eslint.useFlatConfig": true,
     "vitest.commandLine": "pnpm test --",
-    "vs-code-prettier-eslint.prettierLast": false, // set as "true" to run 'prettier' last not first
     "files.eol": "\n",
     "[typescript]": {
-        "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
     },
     "[json]": {
-        "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
     },
     "[jsonc]": {
-        "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
     }
 }
