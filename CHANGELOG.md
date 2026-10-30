@@ -223,3 +223,18 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 ### Fix
 
 -   修复 Match 模块循环依赖问题.
+
+## [2.3.0] - 2026-10-31
+
+### Feat
+
+-   构建工具链迁移到 Vite 8（Rolldown），移除 tsup 与 Babel 配置.
+-   依赖全面升级: TypeScript 6, ESLint 10（Flat Config）, Vitest 5, Prettier 3, axios 1.21.
+-   包管理器升级到 pnpm 10, CI 使用 Node.js 22.
+-   最低 VS Code 版本提升到 1.100, 构建目标对齐扩展宿主自带的 Node.js 20.
+-   Webview 资源改用 `webview.asWebviewUri`, 移除已废弃的 `vscode-resource` scheme.
+-   新增 `pnpm test:watch` 监听模式, `pnpm test` 改为单次运行.
+
+### Fix
+
+-   修复加载页面与未找到页面的 HTML 缓存导致跨面板复用旧资源 URI 的问题.

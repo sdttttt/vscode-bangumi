@@ -1,6 +1,6 @@
 # Bangumi Open
 
-[![vsmarketplacebadge](https://vsmarketplacebadge.apphb.com/version/sdttttt.bangumiopen.svg)](https://github.com/sdttttt/vscode-bangumi)
+[![vsmarketplacebadge](https://img.shields.io/visual-studio-marketplace/v/sdttttt.bangumiopen.png)](https://marketplace.visualstudio.com/items?itemName=SDTTTTT.bangumiopen)
 
 > 一款基于 **Vscode** 的番剧插件, 数据来自 B 站.
 
