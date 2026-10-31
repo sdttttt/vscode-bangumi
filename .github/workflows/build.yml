@@ -5,26 +5,38 @@ on:
         branches: [master]
     pull_request:
         branches: [master, SDTTTTT]
+    # Called by `release.yml` so a tag can never ship an unverified build.
+    workflow_call:
+        inputs:
+            artifact:
+                description: Name of the VSIX artifact to upload, empty to skip
+                type: string
+                default: ""
+        outputs:
+            artifact:
+                description: Name of the uploaded VSIX artifact, empty when skipped
+                value: ${{ jobs.package.outputs.artifact }}
+
+# A newer push to the same ref makes the previous run pointless, but a release
+# must never be cancelled half way through.
+concurrency:
+    group: build-${{ github.ref }}
+    cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+permissions:
+    contents: read
+
+env:
+    CI: true
 
 jobs:
-    build:
+    quality:
+        name: Format, lint, types
         runs-on: ubuntu-latest
-
+        timeout-minutes: 10
         steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-
-            - name: Install pnpm
-              uses: pnpm/action-setup@v4
-
-            - name: Install Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 22
-                  cache: pnpm
-
-            - name: Install dependencies
-              run: pnpm install --frozen-lockfile
+            - uses: actions/checkout@v7
+            - uses: ./.github/actions/setup
 
             - name: format check
               run: pnpm format:check
@@ -32,16 +44,63 @@ jobs:
             - name: lint
               run: pnpm lint
 
-            # `pretest` runs `pnpm typecheck` first, so no separate step is needed
-            - name: test
-              run: pnpm test
+            - name: typecheck
+              run: pnpm typecheck
 
-            - name: coverage
+    test:
+        name: Test and coverage
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - uses: actions/checkout@v7
+            - uses: ./.github/actions/setup
+
+            # `pnpm test:coverage` runs the whole suite, so a separate
+            # `pnpm test` would only repeat the same work.
+            - name: test
               run: pnpm test:coverage
 
-            - name: package
-              run: pnpm dlx @vscode/vsce@4.1.0 package --no-dependencies
-
-            - uses: actions/upload-artifact@v4
+            - name: upload coverage report
+              if: always()
+              uses: actions/upload-artifact@v7
               with:
-                  path: ./**/*.vsix
+                  name: coverage
+                  path: coverage/lcov.info
+                  if-no-files-found: ignore
+                  retention-days: 7
+
+    package:
+        name: Package VSIX
+        needs: [quality, test]
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        outputs:
+            artifact: ${{ steps.name.outputs.artifact }}
+        steps:
+            - uses: actions/checkout@v7
+            - uses: ./.github/actions/setup
+
+            # A tag run reuses the VSIX built here, so the marketplaces and the
+            # GitHub release always ship the artifact the checks ran against.
+            - name: resolve artifact name
+              id: name
+              run: |
+                  set -eu
+                  name="${{ inputs.artifact }}"
+                  if [ -z "$name" ]; then
+                      name="vsix-${{ github.ref_name }}"
+                  fi
+                  echo "artifact=$name" >> "$GITHUB_OUTPUT"
+
+            # `vsce` runs the `vscode:prepublish` script (which is `pnpm build`)
+            # itself, so there is no separate build step here.
+            - name: package
+              run: pnpm package --out bangumiopen.vsix
+
+            - name: upload VSIX
+              uses: actions/upload-artifact@v7
+              with:
+                  name: ${{ steps.name.outputs.artifact }}
+                  path: bangumiopen.vsix
+                  if-no-files-found: error
+                  retention-days: 14

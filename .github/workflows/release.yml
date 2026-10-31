@@ -1,0 +1,99 @@
+name: release
+
+# Triggered by a tag such as `v2.3.0`.
+on:
+    push:
+        tags: ["v*"]
+
+# `contents: write` is for the GitHub release, `actions: read` for downloading
+# the VSIX that `build.yml` produced in this same run.
+permissions:
+    contents: write
+    actions: read
+
+env:
+    CI: true
+
+jobs:
+    verify:
+        # Runs the full suite and uploads the VSIX under a fixed name, so the
+        # published artifact is exactly the one the checks ran against.
+        uses: ./.github/workflows/build.yml
+        with:
+            artifact: bangumiopen
+
+    publish:
+        name: Publish ${{ github.ref_name }}
+        needs: verify
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - uses: actions/checkout@v7
+            - uses: ./.github/actions/setup
+
+            - name: download the verified VSIX
+              uses: actions/download-artifact@v8
+              with:
+                  name: bangumiopen
+                  path: artifacts
+
+            # `package.json` is the source of truth for the version, and the
+            # marketplaces reject a version that is not newer than the
+            # published one. A tag may only add a suffix to it, so `v2.2.8` and
+            # `v2.2.8.patch3` both belong to version `2.2.8`.
+            #
+            # The same step decides the release channel.
+            - name: read version and release channel
+              id: version
+              run: |
+                  set -eu
+                  version="$(node -p "require('./package.json').version")"
+                  tag="${GITHUB_REF_NAME#v}"
+                  case "$tag" in
+                      "$version" | "$version".* ) ;;
+                      *)
+                          echo "::error::tag v$tag does not belong to package.json version $version"
+                          exit 1
+                          ;;
+                  esac
+                  echo "version=$version" >> "$GITHUB_OUTPUT"
+
+                  # A tag that merely repeats the version is a stable release;
+                  # anything else (`v2.3.0.beta.1`, `2.4.0-rc.2`) is a preview.
+                  if [ "$tag" = "$version" ] &&
+                      printf '%s' "$version" | grep -Eqx '[0-9]+\.[0-9]+\.[0-9]+'; then
+                      echo "prerelease=false" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "prerelease=true" >> "$GITHUB_OUTPUT"
+                  fi
+
+            # The tokens travel through the environment: `vsce` and `ovsx` both
+            # read them from there, which keeps them out of the process list.
+            - name: publish to the Visual Studio Marketplace
+              run: |
+                  set -eu
+                  args="--packagePath artifacts/bangumiopen.vsix"
+                  if [ "${{ steps.version.outputs.prerelease }}" = "true" ]; then
+                      args="$args --pre-release"
+                  fi
+                  pnpm publish:vsce $args
+              env:
+                  VSCE_PAT: ${{ secrets.VSCE_TOKEN }}
+
+            - name: publish to Open VSX
+              run: |
+                  set -eu
+                  args="-i artifacts/bangumiopen.vsix"
+                  if [ "${{ steps.version.outputs.prerelease }}" = "true" ]; then
+                      args="$args --pre-release"
+                  fi
+                  pnpm publish:ovsx $args
+              env:
+                  OVSX_PAT: ${{ secrets.OVSX_ACCESS_KEY }}
+
+            - name: publish the GitHub release
+              uses: softprops/action-gh-release@v3
+              with:
+                  files: artifacts/bangumiopen.vsix
+                  prerelease: ${{ steps.version.outputs.prerelease }}
+                  fail_on_unmatched_files: true

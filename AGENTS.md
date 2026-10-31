@@ -16,9 +16,25 @@
 | 代码检查  | `pnpm lint`（oxlint），自动修复用 `pnpm lint:fix`                |
 | 格式化    | `pnpm format`（oxfmt 原地写入），只检查用 `pnpm format:check`    |
 | 生产打包  | `pnpm vscode:prepublish`（等价 `pnpm build`）                    |
-| 生成 VSIX | `pnpm dlx @vscode/vsce@4.1.0 package --no-dependencies`          |
+| 生成 VSIX | `pnpm package`（本地 `vsce`，附加参数写在 `--` 之后）            |
 
-提交改动前至少跑通 `pnpm typecheck`、`pnpm lint`、`pnpm format:check`、`pnpm test`。CI（`.github/workflows/build.yml`）会执行 `pnpm format:check` → `pnpm lint` → `pnpm test`（内含 `pretest` 的类型检查）→ `pnpm test:coverage` → 打包，所以请在本地先跑一次，避免提交的代码与格式化结果不一致。
+提交改动前至少跑通 `pnpm typecheck`、`pnpm lint`、`pnpm format:check`、`pnpm test`。
+
+## GitHub Actions
+
+`.github/workflows/build.yml` 是唯一的校验入口，`push`、`pull_request` 与 `workflow_call` 三种触发方式共用同一份定义：
+
+- `quality` —— `format:check`、`lint`、`typecheck` 三个独立步骤，失败时能一眼看出问题类别。
+- `test` —— 只跑 `pnpm test:coverage`。覆盖率命令本身就会执行全部用例，再跑一次 `pnpm test` 纯属浪费。
+- `package` —— 依赖前两个 job，构建并上传 `bangumiopen.vsix`。
+
+发布由 `.github/workflows/release.yml` 在推送 `v*` 标签时触发：先以 `workflow_call` 复用 `build.yml`（完整校验 + 产出 VSIX），再下载**同一份**产物推送到 VS Code Marketplace、Open VSX 与 GitHub Release。三处发布共用一份 VSIX，产物不会互相漂移。
+
+- 依赖安装统一走 `.github/actions/setup` 复合 action，`pnpm` 版本取自 `package.json#packageManager`，Node 版本取自 `.nvmrc`。
+- 版本以 `package.json` 为准：标签去掉 `v` 后必须等于版本号、或以其为前缀（`v2.2.8` 与 `v2.2.8.patch3` 都算 `2.2.8`），否则发布 job 直接失败。
+- 只有 `x.y.z` 形式的版本视为正式版，`v2.3.0.beta.1` 这类会带上 `--pre-release`。
+- 令牌通过环境变量传入（`VSCE_PAT`、`OVSX_PAT`），不要写成命令行参数，否则会出现在进程列表里。
+- `vsce` / `ovsx` 已装为 devDependency（`pnpm package` / `pnpm publish:vsce` / `pnpm publish:ovsx`），不要再在 CI 里 `dlx`，这样可以锁版本。
 
 ## 目录结构与职责
 

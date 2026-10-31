@@ -5,12 +5,28 @@
 
 version: 2
 updates:
-    - package-ecosystem: "npm" # See documentation for possible values
-      directory: "/" # Location of package manifests
-      target-branch: "SDTTTTT"
+    - package-ecosystem: "npm"
+      directory: "/"
       assignees:
           - "sdttttt"
       schedule:
           interval: "weekly"
           # Check for npm updates on Sundays
           day: "sunday"
+      # One pull request per week instead of one per package.
+      groups:
+          npm:
+              patterns: ["*"]
+
+    # Keep the workflow actions themselves up to date too; Dependabot bumps the
+    # pinned tags and the composite action in the same pull request.
+    - package-ecosystem: "github-actions"
+      directory: "/"
+      assignees:
+          - "sdttttt"
+      schedule:
+          interval: "weekly"
+          day: "sunday"
+      groups:
+          actions:
+              patterns: ["*"]

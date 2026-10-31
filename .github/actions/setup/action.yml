@@ -1,0 +1,22 @@
+name: Setup
+description: Install pnpm, Node.js and the project dependencies with caching
+
+runs:
+    using: composite
+    steps:
+        # Reads the exact version from `packageManager` in package.json, so
+        # the local and CI toolchains cannot drift.
+        - name: Install pnpm
+          uses: pnpm/action-setup@v6
+
+        - name: Install Node.js
+          uses: actions/setup-node@v7
+          with:
+              node-version-file: .nvmrc
+              # pnpm store caching; `cache-dependency-path` keys it on the lockfile.
+              cache: pnpm
+              cache-dependency-path: pnpm-lock.yaml
+
+        - name: Install dependencies
+          shell: bash
+          run: pnpm install --frozen-lockfile --prefer-offline

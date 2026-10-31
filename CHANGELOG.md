@@ -251,6 +251,16 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 
 ## [Unreleased]
 
+### CI
+
+- `.github/workflows/build.yml` 拆成 `quality` / `test` / `package` 三个 job，不再重复跑 `pnpm test` 与 `pnpm test:coverage`。
+- 合并 `upload_release.yml` 与 `vsce_publish.yml` 为 `release.yml`：标签触发时先复用 `build.yml` 做完整校验并产出 VSIX，再下载同一份产物发布到 VS Code Marketplace、Open VSX 与 GitHub Release，三处不再各自打包。
+- 新增 `.github/actions/setup` 复合 action 与 `.nvmrc`，`pnpm` 版本取自 `packageManager`，Node 版本取自 `.nvmrc`。
+- 新增标签与 `package.json` 版本的一致性校验，以及 `--pre-release` 的自动判定。
+- 工作流升级到 `actions/checkout@v7`、`actions/setup-node@v7`、`pnpm/action-setup@v6`、`actions/upload-artifact@v7`、`actions/download-artifact@v8`、`softprops/action-gh-release@v3`，并补上 `permissions`、`concurrency`、`timeout-minutes`。
+- `vsce` 与 `ovsx` 改为 devDependency，新增 `pnpm package` / `pnpm publish:vsce` / `pnpm publish:ovsx`。
+- 覆盖率报告（`coverage/lcov.info`）作为 artifact 上传；Dependabot 增加 `github-actions` 生态并按周分组。
+
 ### Changed
 
 - Webview 渲染从宿主侧字符串拼接迁移到独立的前端工程（Preact + TypeScript，`webview/` 目录），由 `vite.webview.mts` 单独构建到 `webview-dist/`。
