@@ -6,18 +6,19 @@
 
 包管理器固定为 pnpm 10（见 `package.json` 的 `packageManager` 字段），**不要**使用 npm 或 yarn。Node.js 需要 22 及以上（Vite 8、Vitest 5 与 oxlint 的要求）。
 
-| 用途      | 命令                                                                   |
-| --------- | ---------------------------------------------------------------------- |
-| 构建      | `pnpm build`（`vite build`）                                           |
-| 监听构建  | `pnpm watch`（`vite build --sourcemap inline --watch`）                |
-| 类型检查  | `pnpm test-compile`（`tsc -p ./ --noEmit`，strict 模式，TypeScript 7） |
-| 单元测试  | `pnpm test`（Vitest 单次运行，监听模式用 `pnpm test:watch`）           |
-| 代码检查  | `pnpm lint`（oxlint），自动修复用 `pnpm lint:fix`                      |
-| 格式化    | `pnpm format`（oxfmt 原地写入），只检查用 `pnpm format:check`          |
-| 生产打包  | `pnpm vscode:prepublish`（`vite build --minify`）                      |
-| 生成 VSIX | `pnpm dlx @vscode/vsce@4.1.0 package --no-dependencies`                |
+| 用途      | 命令                                                                |
+| --------- | ------------------------------------------------------------------- |
+| 构建      | `pnpm build`（`vite build`）                                        |
+| 监听构建  | `pnpm watch`（`vite build --sourcemap inline --watch`）             |
+| 类型检查  | `pnpm typecheck`（`tsc -p ./ --noEmit`，strict 模式，TypeScript 7） |
+| 单元测试  | `pnpm test`（Vitest 单次运行，监听模式用 `pnpm test:watch`）        |
+| 覆盖率    | `pnpm test:coverage`（v8，阈值 90% 行/函数、85% 分支）              |
+| 代码检查  | `pnpm lint`（oxlint），自动修复用 `pnpm lint:fix`                   |
+| 格式化    | `pnpm format`（oxfmt 原地写入），只检查用 `pnpm format:check`       |
+| 生产打包  | `pnpm vscode:prepublish`（`vite build --minify`）                   |
+| 生成 VSIX | `pnpm dlx @vscode/vsce@4.1.0 package --no-dependencies`             |
 
-提交改动前至少跑通 `pnpm test-compile`、`pnpm lint`、`pnpm format:check`、`pnpm test`。CI（`.github/workflows/build.yml`）会执行 `pnpm format` → `pnpm format:check` → `pnpm lint` → `pnpm test` → 打包，所以请在本地先跑一次，避免提交的代码与格式化结果不一致。
+提交改动前至少跑通 `pnpm typecheck`、`pnpm lint`、`pnpm format:check`、`pnpm test`。CI（`.github/workflows/build.yml`）会执行 `pnpm format:check` → `pnpm lint` → `pnpm test`（内含 `pretest` 的类型检查）→ `pnpm test:coverage` → 打包，所以请在本地先跑一次，避免提交的代码与格式化结果不一致。
 
 ## 目录结构与职责
 
@@ -28,7 +29,7 @@
 - `src/match/` —— 索引视图（年份 / 季度 / 标签 / 地区筛选），由若干静态列表模块组合而成。
 - `src/reminder.ts` —— 状态栏条目，以及基于周番数据的更新提醒。
 - `src/utils/` —— 纯函数工具（`strings`、`type`、`file`、`display`）。
-- `src/test/suite/` —— Vitest 用例，目前只覆盖纯函数与请求模块。
+- `src/test/` —— 单元测试目录，布局见下方「测试约定」。
 - `resources/` —— CSS 与图片，通过 `context.extensionPath` 引用，不参与打包。
 
 ## 打包约束
@@ -56,17 +57,31 @@
 
 项目直接使用 TypeScript 7（`typescript@^7.0.2`）。它是 Go 原生实现，**不提供 JS 编译器 API**：
 
-- `npx tsc` / `pnpm test-compile` 正常工作
+- `npx tsc` / `pnpm typecheck` 正常工作
 - 任何依赖 TypeScript 旧版 API 的工具（如 typescript-eslint）都无法使用，因此本项目不再引入这类工具
 
 如果将来需要 oxlint 的类型感知规则（`--type-aware`），要额外安装 `oxlint-tsgolint` 包。
+
+## 测试约定
+
+全部用例都是可在纯 Node.js 里运行的单元测试，不启动 VS Code，也不打真实网络。
+
+- `src/test/unit/` —— Vitest 用例，按被测目录镜像分层（`utils/`、`request/`、`html/`、`match/`、`views/`）。
+- `src/test/setup.ts` —— 全局 `setupFiles`，负责把 `vscode` 模块替换成桩，测试文件里不要再写 `vi.mock("vscode")`。
+- `src/test/mocks/vscode.ts` —— `vscode` 桩工厂。新增用到的 API 时在这里补，不要在各用例里就地 mock。
+- `src/test/mocks/fixtures/` —— 响应夹具（`bangumi.ts`、`weekBangumi.ts`），用带 `overrides` 的工厂函数构造，不要在用例里手写完整对象。
+- 模块级单例（视图、`Reminder`、`Tagger`）状态会跨用例泄漏，用例里用 `vi.resetModules()` 后重新 `import()`；重新导入后需要重新 `setContext()`，因为 `@/constants` 也是新实例。
+- 断言统一用 Vitest 原生 matcher（`toBe`/`toEqual`/`toBeUndefined`/`toBeGreaterThanOrEqual`），**不要**用 chai 风格（`to.be.equal`、`to.be.exist`）——后者是裸表达式，会迫使 oxlint 关掉 `no-unused-expressions`。
+- 涉及时间、定时器、随机数的用例必须用假时钟（`vi.useFakeTimers()` + `vi.setSystemTime`）或 `vi.spyOn(Math, "random")`，不要依赖真实时钟。
+- 请求层测试 `vi.mock("@/request/instance")`，用夹具构造响应；`Cache` 每例前调用 `clear()` 重置。
+- `src/test/unit/manifest.test.ts` 校验 `package.json` 的 commands 与 `src/commands.ts` 的 `COMMAND_IDS` 一致、`@types/vscode` 不高于 `engines.vscode`。新增命令时先改 `src/commands.ts`，TypeScript 会强制 `extension.ts` 补上处理函数。
 
 ## 编码约定
 
 - 4 空格缩进、双引号、行尾分号、K&R 花括号（`{` 与控制语句同行）。这些由 [.oxfmtrc.json](.oxfmtrc.json) 与 oxfmt 保证，不要手动写成相反风格。
 - 跨目录引用使用 `@/*` 别名指向 `src/*`，该别名在 `vite.config.mts` 与 `vitest.config.mts` 中均已配置。
 - 视图类与提醒模块沿用 `export default new (class ...)` 的模块级单例写法，状态放在实例上，不要新增游离的模块级变量。
-- 新增命令需同时修改 `contributes.commands`、`src/extension.ts` 中的注册，并 push 进 `context.subscriptions`。
+- 新增命令需同时修改 `contributes.commands`、`src/commands.ts` 的 `COMMAND_IDS` 与 `src/extension.ts` 的 `handlers`。`handlers` 是 `Record<CommandId, …>`，漏写会编译失败；注册时统一 push 进 `context.subscriptions`。
 - 用户配置统一通过 `src/configuration.ts` 的 `ConfigKey` 读取，不要直接调用 `workspace.getConfiguration`。
 - Webview 引用 `resources/` 下的文件必须走 `getResourceFile(webview, name)`（内部调用 `webview.asWebviewUri`），不要再用已废弃的 `vscode-resource` scheme。
-- `src/test/suite/request.ts` 不是测试用例（文件名缺少 `.test.ts` 后缀），Vitest 只收集 `src/**/*.{test,spec}.ts`。
+- Vitest 只收集 `src/test/unit/**/*.test.ts`。放在别处的 `.test.ts` 不会被执行。

@@ -248,3 +248,21 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 
 - 修复加载页面与未找到页面的 HTML 缓存导致跨面板复用旧资源 URI 的问题.
 - 移除 `isValidBangumisRequest as isValidBangumisRequest` 这类无意义的重命名导入.
+
+## [Unreleased]
+
+### Test
+
+- 测试目录重组为 `src/test/unit/`，按被测模块镜像分层（`utils`、`request`、`html`、`match`、`views`），替代原先含义模糊的 `test/suite/`。
+- 新增 `src/test/setup.ts` 与 `src/test/mocks/vscode.ts`，把 `vscode` 模块桩集中到一处并由 `setupFiles` 全局注入，测试文件不再逐个 `vi.mock`。
+- 新增 `src/test/mocks/fixtures/` 响应夹具，替换原先直接请求 B 站线上 API 的测试。
+- 断言统一为 Vitest 原生 matcher，移除 chai 风格（`to.be.equal`、`to.be.exist`）与随之而来的 `no-unused-expressions` 全局豁免。
+- 时间、定时器与随机数相关用例改用假时钟与 `Math.random` 桩，消除跨零点、跨时区的偶发失败。
+- 新增 `pnpm test:coverage` 与 v8 覆盖率阈值（行/函数 90%、分支 85%），覆盖率从 0 提升到约 98%。
+- 新增 `src/commands.ts` 与 `src/test/unit/manifest.test.ts`，校验 `package.json` 的命令声明、`activationEvents`、`@types/vscode` 与 `engines.vscode` 的一致性。
+- 删除从未被 Vitest 收集的 `src/test/suite/request.ts`（线上 API 测试），请求层改为 mock axios 的确定性用例。
+
+### Fix
+
+- 修复 `Cache.set` 覆盖同一 key 时旧计时器未取消，导致新值被提前清除的问题；新增 `Cache.clear()`。
+- 修复 `Reminder` 在今日索引为 0 时误判为"没有找到今日的索引"而跳过提醒的问题。

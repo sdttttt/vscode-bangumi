@@ -16,6 +16,7 @@
         "node_modules/",
         "dist/",
         "out/",
+        "coverage/",
         "public/",
         "pnpm-lock.yaml",
         "resources/"

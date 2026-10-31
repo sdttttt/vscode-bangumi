@@ -8,7 +8,8 @@
     "editor.fontSize": 11.5,
     "search.exclude": {
         "out": true,
-        "dist": true
+        "dist": true,
+        "coverage": true
     },
     // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
     "typescript.tsc.autoDetect": "off",

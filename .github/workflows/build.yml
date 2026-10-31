@@ -26,17 +26,18 @@ jobs:
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
 
-            - name: format
-              run: pnpm format
-
             - name: format check
               run: pnpm format:check
 
             - name: lint
               run: pnpm lint
 
+            # `pretest` runs `pnpm typecheck` first, so no separate step is needed
             - name: test
               run: pnpm test
+
+            - name: coverage
+              run: pnpm test:coverage
 
             - name: package
               run: pnpm dlx @vscode/vsce@4.1.0 package --no-dependencies

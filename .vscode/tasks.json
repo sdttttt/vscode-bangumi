@@ -31,6 +31,13 @@
             "label": "npm: test",
             "problemMatcher": [],
             "group": "test"
+        },
+        {
+            "type": "npm",
+            "script": "test:coverage",
+            "label": "npm: test:coverage",
+            "problemMatcher": [],
+            "group": "test"
         }
     ]
 }

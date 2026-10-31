@@ -8,7 +8,22 @@ export default defineConfig({
         },
     },
     test: {
-        include: ["src/**/*.{test,spec}.ts"],
+        include: ["src/test/unit/**/*.test.ts"],
         exclude: ["node_modules", "dist", "out"],
+        setupFiles: ["src/test/setup.ts"],
+        restoreMocks: true,
+        clearMocks: true,
+        coverage: {
+            provider: "v8",
+            reporter: ["text", "lcov"],
+            include: ["src/**/*.ts"],
+            exclude: ["src/test/**"],
+            thresholds: {
+                lines: 90,
+                functions: 90,
+                branches: 85,
+                statements: 90,
+            },
+        },
     },
 });

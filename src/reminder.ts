@@ -48,7 +48,8 @@ export default new (class Reminder {
 
         const todayIndex: number | undefined =
             getTodayIndexInWeekBangumi(bangumisData);
-        if (!todayIndex) {
+        /* index 0 is a valid day, so only undefined means "not found" */
+        if (todayIndex === undefined) {
             window.showInformationMessage("没有找到今日的索引 ??");
             return;
         }

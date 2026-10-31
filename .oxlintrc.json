@@ -33,13 +33,5 @@
         "curly": "error",
         "yoda": ["error", "always"],
         "typescript/dot-notation": "error"
-    },
-    "overrides": [
-        {
-            "files": ["src/test/**/*.ts"],
-            "rules": {
-                "no-unused-expressions": "off"
-            }
-        }
-    ]
+    }
 }

@@ -6,3 +6,4 @@ node_modules
 dist/
 *.log
 resources/mincss/**
+coverage

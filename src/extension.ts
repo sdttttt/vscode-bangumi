@@ -5,6 +5,7 @@ import { setContext } from "./constants";
 import { ConfigKey, getConfig } from "./configuration";
 import MainIndexList from "./match/index";
 import Reminder from "./reminder";
+import { CommandId } from "./commands";
 
 let isInit = false;
 
@@ -21,6 +22,23 @@ function initializer(context: vscode.ExtensionContext): void {
     setContext(context);
     isInit = !isInit;
 }
+
+/**
+ * Handlers keyed by command id.
+ *
+ * Typed as a total record so adding an id to `COMMAND_IDS` fails to compile
+ * until the matching handler exists.
+ *
+ * @author sdttttt
+ */
+const handlers: Record<CommandId, () => unknown> = {
+    openBangumi: () => BangumiView.openBangumi(),
+    nextPage: () => BangumiView.nextPage(),
+    backPage: () => BangumiView.backPage(),
+    jumpPage: () => BangumiView.jumpPage(),
+    weekBangumi: () => WeekBangumiView.openWeekBangumi(),
+    index: () => MainIndexList.openIndexList(),
+};
 
 /**
  *  Main Function
@@ -42,25 +60,9 @@ export function activate(context: vscode.ExtensionContext): void {
      * Now provide the implementation of the command with registerCommand
      * The commandId parameter must match the command field in package.json
      */
-
     context.subscriptions.push(
-        vscode.commands.registerCommand("openBangumi", () =>
-            BangumiView.openBangumi()
-        ),
-        vscode.commands.registerCommand("nextPage", () =>
-            BangumiView.nextPage()
-        ),
-        vscode.commands.registerCommand("backPage", () =>
-            BangumiView.backPage()
-        ),
-        vscode.commands.registerCommand("jumpPage", () =>
-            BangumiView.jumpPage()
-        ),
-        vscode.commands.registerCommand("weekBangumi", () =>
-            WeekBangumiView.openWeekBangumi()
-        ),
-        vscode.commands.registerCommand("index", () =>
-            MainIndexList.openIndexList()
+        ...Object.entries(handlers).map(([id, handler]) =>
+            vscode.commands.registerCommand(id, handler)
         )
     );
 }
