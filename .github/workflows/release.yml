@@ -76,6 +76,8 @@ jobs:
             # exchanges it for a Marketplace credential, which is what the
             # publisher's trusted publishing configuration allows.
             - name: publish to the Visual Studio Marketplace
+              id: vsce
+              continue-on-error: true
               run: |
                   set -eu
                   args="--oidc --packagePath artifacts/bangumiopen.vsix"
@@ -85,8 +87,13 @@ jobs:
                   pnpm publish:vsce $args
 
             # `ovsx` enables trusted publishing on its own once a CI system
-            # hands it an OIDC token and no access token is present.
+            # hands it an OIDC token and no access token is present. A
+            # Marketplace failure must not block this one, and vice versa: the
+            # two registries are independent, so neither step stops the run
+            # before the GitHub release is created.
             - name: publish to Open VSX
+              id: ovsx
+              continue-on-error: true
               run: |
                   set -eu
                   args="-i artifacts/bangumiopen.vsix"
@@ -101,3 +108,18 @@ jobs:
                   files: artifacts/bangumiopen.vsix
                   prerelease: ${{ steps.version.outputs.prerelease }}
                   fail_on_unmatched_files: true
+
+            # The release itself did happen, so the job only fails once the
+            # GitHub release exists; the annotation names the channel that
+            # needs attention.
+            - name: report the channels that failed
+              if: steps.vsce.outcome == 'failure' || steps.ovsx.outcome == 'failure'
+              run: |
+                  set -eu
+                  if [ "${{ steps.vsce.outcome }}" = "failure" ]; then
+                      echo "::error::the Visual Studio Marketplace rejected the publish"
+                  fi
+                  if [ "${{ steps.ovsx.outcome }}" = "failure" ]; then
+                      echo "::error::Open VSX rejected the publish"
+                  fi
+                  exit 1
