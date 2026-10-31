@@ -1,51 +1,51 @@
 # Bangumi Open
 
-[![vsmarketplacebadge](https://img.shields.io/visual-studio-marketplace/v/sdttttt.bangumiopen.png)](https://marketplace.visualstudio.com/items?itemName=SDTTTTT.bangumiopen)
+[![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/sdttttt.bangumiopen.png)](https://marketplace.visualstudio.com/items?itemName=SDTTTTT.bangumiopen)
+[![Open VSX](https://img.shields.io/badge/Open%20VSX-SDTTTTT-blue)](https://open-vsx.org/extension/SDTTTTT/bangumiopen)
 
-> 一款基于 **Vscode** 的番剧插件, 数据来自 B 站.
+在 VS Code 里查看 B 站番剧时间表与番剧索引，并在番剧更新时提醒你。
 
 ## 功能
 
-提供的`番剧索引`. 以及`新番时间表` 的功能.
+- **周番表** —— 按星期排布的更新时间表，「今天」那一列标出当前时刻与距下一场更新的倒计时
+- **番剧索引** —— 可按类型、地区、状态、版权、付费、季度、时间、风格多级筛选
+- **更新提醒** —— 状态栏显示下一场更新，更新时弹通知，支持提前提醒
 
-![b2](https://raw.githubusercontent.com/sdttttt/vscode-bangumi/master/resources/b2.png)
+![周番表](https://raw.githubusercontent.com/sdttttt/vscode-bangumi/master/resources/b2.png)
 
-### 更新提醒
+## 使用
 
-> 该功能在配置文件中可以被关闭.
+`Ctrl+Shift+P` 调出命令栏，输入：
 
-**BangumiOpen**会在下面的状态栏处显示下一部即将更新的番剧 _（该状态栏可被关闭）_, 形如 `17:00 2部番` 或 `明日 09:00 财神窦占龙`. 鼠标悬停可以看到后续几部番剧的完整名称, 点击可直接打开周番表.
-插件有自带提醒的功能. 在番剧更新时会以提示窗的形式提醒你. 同一时间更新的多部番剧会合并为一条提醒.
-如果你喜欢在评论区里快人一步, **BangumiOpen**也提供了能**提前**提醒时间的配置选项`ReminderAheadTime`.
-
-提醒只在整个周番表上维持一个定时器, 并会在每天零点后自动刷新时间表, 因此长期开着的窗口不会停留在昨天的信息上. 修改相关配置后立即生效, 无需重载窗口.
-
-## 快速上手
-
-`Ctrl+Shift+P` 调出命令栏后, 输入`番剧时间表：打开番剧列表`或 `番剧时间表：打开周番表` 即可打开视图.
-
-周番表会在「今天」那一列标出当前时间, 形如金色的 `▶ 你在这里~ 还有 38 分钟`, 插在已经开播与还没开播的时间组之间, 随时间自动下移. 后面的时间是**距下一场更新的倒计时**: 不足一小时按分钟显示, 更长则显示小时与分钟; 当天全部播完显示`今日已播完`, 没有更新显示`今日没有更新`.
-
-使用 `番剧时间表：打开筛选索引` 可打开索引. 选中索引后自动触发`番剧时间表：打开番剧列表`命令.
-
-> 在一级索引中选中`(恢复默认)`可清除所有已经选中的标签.
-
-`番剧时间表：下一页` 和 `番剧时间表：上一页` 提供翻页功能.
-
-`番剧时间表：下一页` 可用 `Ctrl+alt+l` 代替
-
-`番剧时间表：上一页` 可用 `Ctrl+alt+k` 代替
+| 命令                     | 快捷键（Windows / macOS）  |
+| ------------------------ | -------------------------- |
+| 番剧时间表：打开周番表   |                            |
+| 番剧时间表：打开番剧列表 |                            |
+| 番剧时间表：打开筛选索引 |                            |
+| 番剧时间表：下一页       | `Ctrl+Alt+L` / `Cmd+Alt+L` |
+| 番剧时间表：上一页       | `Ctrl+Alt+K` / `Cmd+Alt+K` |
+| 番剧时间表：跳转到指定页 |                            |
 
 ## 配置
 
-```json
-"bangumiOpen.DisplayHistory": false,  // 是否显示前六天的番剧更新
-"bangumiOpen.EnableReminder": true,   // 是否开启番更新剧提醒
-"bangumiOpen.ReminderAheadTime": 0,   // 更新提醒时间提前 (单位：秒)
-"bangumiOpen.DisplayIndexTags": true, // 使用索引时是否显示已经选中的标签
-"bangumiOpen.DisplayStatusBar": true  // 是否显示状态栏提示
-```
+| 配置项                          | 默认值  | 说明               |
+| ------------------------------- | ------- | ------------------ |
+| `bangumiOpen.DisplayHistory`    | `false` | 显示过去几天的更新 |
+| `bangumiOpen.EnableReminder`    | `true`  | 开启更新提醒       |
+| `bangumiOpen.ReminderAheadTime` | `0`     | 提前提醒的秒数     |
+| `bangumiOpen.DisplayIndexTags`  | `true`  | 显示已选标签       |
+| `bangumiOpen.DisplayStatusBar`  | `true`  | 显示状态栏提示     |
 
 ## 贡献
 
+欢迎提交 Issue 与 Pull Request。
+
 ![](https://contributors.nn.ci/api?repo=sdttttt/vscode-bangumi)
+
+## 许可证
+
+代码以 **Zero-Clause BSD (0BSD)** 发布，见 [LICENSE](LICENSE)。第三方声明见 [THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt)。
+
+图标与界面插图为《日常》的同人素材，版权归原作者所有，不在本项目授权范围内（`Icon.png`、`resources/` 下的图片、`resources/b2.png`）。
+
+数据来自 B 站公开接口，本项目与 B 站无隶属关系。

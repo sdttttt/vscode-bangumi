@@ -251,6 +251,15 @@
 
 ## [Unreleased]
 
+### Changed
+
+- 许可证由 Unlicense 改为 **Zero-Clause BSD (0BSD)**，`package.json` 的 `license` 字段同步改为 SPDX 短标识 `0BSD`。两者都允许任意使用与分发，0BSD 额外是 OSI 认可的许可证，Marketplace 的许可证识别也更准确。
+
+### Added
+
+- 新增 `THIRD-PARTY-NOTICES.txt`，声明随扩展分发的第三方代码（当前仅 preact，MIT）并附上其完整版权声明。该文件会打进 VSIX——Webview 打包后的 `webview-dist/main.js` 含 preact 的完整代码，但构建过程会剥离依赖自带的 license header，需要在本文件里补齐。
+- README 新增「许可证」与「素材来源」两节：前者说明 0BSD 的条款，后者说明扩展图标与界面插图是《日常》的同人素材、版权归原作者所有，不在本项目授权范围内。
+
 ### CI
 
 - `.github/workflows/build.yml` 拆成 `quality` / `test` / `package` 三个 job，不再重复跑 `pnpm test` 与 `pnpm test:coverage`。
