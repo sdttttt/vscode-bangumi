@@ -2,7 +2,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { BangumiApi } from "@/request/bangumi";
 import { createSettingsStub, type SettingsStub } from "@/test/mocks/settings";
-import { weekBangumi } from "@/test/mocks/fixtures/weekBangumi";
+import {
+    weekBangumi,
+    weekBangumiData,
+} from "@/test/mocks/fixtures/weekBangumi";
 import { createPanelStub, PanelStub } from "@/test/mocks/panel";
 import { useWebviewHost } from "@/webview/host";
 import { usePanel } from "@/views/panel";
@@ -70,7 +73,11 @@ describe("Week bangumi view", () => {
 
     it("hides the past days when history is disabled", async () => {
         settings.values["bangumiOpen.DisplayHistory"] = false;
-        vi.mocked(api.getWeekBangumi).mockResolvedValue(weekBangumi());
+        vi.mocked(api.getWeekBangumi).mockResolvedValue([
+            weekBangumiData({ date: "10-30", day_of_week: 5, is_today: 0 }),
+            weekBangumiData({ date: "10-31", day_of_week: 6, is_today: 1 }),
+            weekBangumiData({ date: "11-1", day_of_week: 7, is_today: 0 }),
+        ]);
 
         view.openWeekBangumi();
 
@@ -78,6 +85,18 @@ describe("Week bangumi view", () => {
             const days = stub.posted().at(-1)?.days ?? [];
             expect(days).toHaveLength(2);
             expect(days[0].dayOfWeek).toBe(6);
+            expect(days[0].isToday).toBe(true);
+        });
+    });
+
+    it("keeps the whole schedule when today is missing", async () => {
+        settings.values["bangumiOpen.DisplayHistory"] = false;
+        vi.mocked(api.getWeekBangumi).mockResolvedValue(weekBangumi());
+
+        view.openWeekBangumi();
+
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.days).toHaveLength(7);
         });
     });
 

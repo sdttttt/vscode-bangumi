@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-    HIDDEN_DAYS,
     toBangumiPayloads,
     toSeasonPayload,
     toWeekDayPayloads,
@@ -57,11 +56,43 @@ describe("toWeekDayPayloads", () => {
         expect(days[0].dayOfWeek).toBe(1);
     });
 
-    it("drops the past days when history is disabled", () => {
-        const days = toWeekDayPayloads(weekBangumi(), false);
+    it("drops the days before today when history is disabled", () => {
+        const schedule = [
+            weekBangumiData({ date: "10-29", day_of_week: 4, is_today: 0 }),
+            weekBangumiData({ date: "10-30", day_of_week: 5, is_today: 0 }),
+            weekBangumiData({ date: "10-31", day_of_week: 6, is_today: 1 }),
+            weekBangumiData({ date: "11-1", day_of_week: 7, is_today: 0 }),
+            weekBangumiData({ date: "11-2", day_of_week: 1, is_today: 0 }),
+        ];
 
-        expect(days).toHaveLength(7 - HIDDEN_DAYS);
-        expect(days[0].dayOfWeek).toBe(HIDDEN_DAYS + 1);
+        const days = toWeekDayPayloads(schedule, false);
+
+        expect(days).toHaveLength(3);
+        expect(days[0].isToday).toBe(true);
+        expect(days.map(day => day.date)).toEqual(["10-31", "11-1", "11-2"]);
+    });
+
+    it("does not depend on how many past days the api returns", () => {
+        const past = Array.from({ length: 6 }, (_, index) =>
+            weekBangumiData({
+                date: `10-${25 + index}`,
+                is_today: 0,
+                date_ts: 0,
+            })
+        );
+        const today = weekBangumiData({ date: "10-31", is_today: 1 });
+        const future = weekBangumiData({ date: "11-1", is_today: 0 });
+
+        const days = toWeekDayPayloads([...past, today, future], false);
+
+        expect(days).toHaveLength(2);
+        expect(days[0].isToday).toBe(true);
+    });
+
+    it("keeps every day when today is missing from the response", () => {
+        const schedule = weekBangumi();
+
+        expect(toWeekDayPayloads(schedule, false)).toHaveLength(7);
     });
 
     it("returns nothing for an empty schedule", () => {

@@ -4,13 +4,24 @@ import { toWeekDay } from "../utils/strings";
 import type { BangumiPayload, SeasonPayload, WeekDayPayload } from "./protocol";
 
 /**
- * `bangumiOpen.DisplayHistory` 关闭时，开头隐藏的天数。
+ * 裁掉今天之前的天，只留下从今天开始的日程。
  *
- * 周番接口会把过去的六天排在前面，用户没有要求查看时就把它们裁掉。
+ * 过去的几天排在前面，用户没有要求查看时就不渲染。天数由接口决定，
+ * 不能写死：接口返回的过去天数会变，写死会把昨天一并留下。
  *
+ * @param data 完整的周番数据
+ * @param now 当前时刻
  * @author sdttttt
  */
-export const HIDDEN_DAYS = 5;
+function fromToday(
+    data: ReadonlyArray<WeekBangumiData>,
+    now: number
+): Array<WeekBangumiData> {
+    const today = data.findIndex(day => isCurrentDay(day, now));
+
+    /* 找不到今天时不做裁剪，宁可多显示一天，也不要留白。 */
+    return 0 > today ? [...data] : data.slice(today);
+}
 
 /**
  * 把单部番剧转换为渲染载荷。
@@ -42,7 +53,7 @@ export function toWeekDayPayloads(
     displayHistory: boolean,
     now: number = Date.now()
 ): Array<WeekDayPayload> {
-    const days = displayHistory ? data : data.slice(HIDDEN_DAYS);
+    const days = displayHistory ? data : fromToday(data, now);
 
     return days.map(day => ({
         date: day.date,
