@@ -50,7 +50,7 @@ export default new (class BangumisView extends AbstractView {
      * @author sdttttt
      */
     private showPageNumber(): void {
-        vscode.window.showInformationMessage(`🐶 第${this._pageNumber}页`);
+        vscode.window.showInformationMessage(`第${this._pageNumber}页`);
     }
 
     /**
@@ -109,7 +109,7 @@ export default new (class BangumisView extends AbstractView {
             this.openBangumi();
         } else {
             this._pageNumber = 1;
-            vscode.window.showInformationMessage("😰真的一滴都没有了!");
+            vscode.window.showInformationMessage("真的一滴都没有了!");
             this.openBangumi();
         }
     }
@@ -123,7 +123,7 @@ export default new (class BangumisView extends AbstractView {
     jumpPage(): void {
         const inputOptions: vscode.InputBoxOptions = {
             value: "1",
-            prompt: "TIP: 如果一直在加载，那应该是没这一页了 🚀",
+            prompt: "TIP: 如果一直在加载，那应该是没这一页了",
         };
 
         vscode.window

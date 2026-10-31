@@ -20,9 +20,9 @@ export function showBeforeBangumiUpdateRemind(
     content: string,
     minuteTime: string | number
 ): void {
-    showRemind(`《${content}》 还有${minuteTime}分钟就更新啦！ 🎉`);
+    showRemind(`《${content}》 还有${minuteTime}分钟就更新啦！`);
 }
 
 export function showBangumiUpdateRemind(content: string): void {
-    showRemind(`《${content}》 更新啦！🎉`);
+    showRemind(`《${content}》 更新啦！`);
 }

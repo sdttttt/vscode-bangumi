@@ -84,19 +84,19 @@ describe("BangumiList", () => {
     it("marks a finished bangumi", () => {
         renderList({ bangumis: [payload({ finish: true })] });
 
-        expect(screen.getByText("已完结 😎")).toBeTruthy();
+        expect(screen.getByText("已完结")).toBeTruthy();
     });
 
     it("marks an unfinished bangumi", () => {
         renderList({ bangumis: [payload({ finish: false })] });
 
-        expect(screen.getByText("未完结 😕")).toBeTruthy();
+        expect(screen.getByText("未完结")).toBeTruthy();
     });
 
     it("falls back to a placeholder when the badge is empty", () => {
         renderList({ bangumis: [payload({ badge: "" })] });
 
-        expect(screen.getByText("❤白嫖")).toBeTruthy();
+        expect(screen.getByText("白嫖")).toBeTruthy();
     });
 
     it("shows the badge when it is present", () => {

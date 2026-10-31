@@ -143,7 +143,7 @@ describe("BangumisView", () => {
         view.nextPage();
 
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-            "🐶 第2页"
+            "第2页"
         );
     });
 
@@ -155,7 +155,7 @@ describe("BangumisView", () => {
         view.backPage();
 
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-            "🐶 第1页"
+            "第1页"
         );
     });
 
@@ -165,7 +165,7 @@ describe("BangumisView", () => {
         view.backPage();
 
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-            "😰真的一滴都没有了!"
+            "真的一滴都没有了!"
         );
     });
 
@@ -222,7 +222,7 @@ describe("BangumisView", () => {
         stub.receive({ type: "bangumi:nextPage" });
 
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-            "🐶 第2页"
+            "第2页"
         );
     });
 
@@ -234,7 +234,7 @@ describe("BangumisView", () => {
         stub.receive({ type: "bangumi:backPage" });
 
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-            "😰真的一滴都没有了!"
+            "真的一滴都没有了!"
         );
     });
 });

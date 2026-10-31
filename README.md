@@ -15,7 +15,7 @@
 > 该功能在配置文件中可以被关闭.
 
 **BangumiOpen**会在下面的状态栏处显示下一部即将更新的番剧 _（该状态栏可被关闭）_.
-插件有自带提醒的功能. 在番剧更新时会以提示窗的形式提醒你. 🎉
+插件有自带提醒的功能. 在番剧更新时会以提示窗的形式提醒你.
 如果你喜欢在评论区里快人一步, **BangumiOpen**也提供了能**提前**提醒时间的配置选项`ReminderAheadTime`.
 
 ## Quick Usage
@@ -32,7 +32,7 @@
 
 `Back Page` 可用 `Ctrl+alt+k` 代替
 
-## Configuration 🛠
+## Configuration
 
 ```json
 "bangumiOpen.DisplayHistory": false,  // 是否显示前六天的番剧更新

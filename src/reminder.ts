@@ -162,13 +162,13 @@ export default new (class Reminder {
                 const shortTitle =
                     7 < title.length ? `${title.slice(0, 7)}...` : title;
                 this.updateStatusBarContent(
-                    `《${shortTitle.trim()}》update at ${targetTime} ⏰`
+                    `《${shortTitle.trim()}》update at ${targetTime}`
                 );
             } else {
                 const { pub_time: targetTime } = bangumis[0];
                 const bangumiCount = bangumis.length;
                 this.updateStatusBarContent(
-                    `很神秘, 有${bangumiCount}部番 update at ${targetTime} ⏰`
+                    `很神秘, 有${bangumiCount}部番 update at ${targetTime}`
                 );
             }
         } else {

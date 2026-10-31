@@ -52,7 +52,7 @@ function BangumiRow({ bangumi }: { bangumi: BangumiPayload }) {
                 <div class="cover-head">
                     {title}
                     <span class="chip">
-                        {"" === bangumi.badge ? "❤白嫖" : bangumi.badge}
+                        {"" === bangumi.badge ? "白嫖" : bangumi.badge}
                     </span>
                 </div>
                 <div class="cover-meta">
@@ -61,7 +61,7 @@ function BangumiRow({ bangumi }: { bangumi: BangumiPayload }) {
                 </div>
                 <div class="cover-foot">
                     <span class={bangumi.finish ? "chip" : "chip chip-accent"}>
-                        {bangumi.finish ? "已完结 😎" : "未完结 😕"}
+                        {bangumi.finish ? "已完结" : "未完结"}
                     </span>
                     <span class="btn">To Chase Bangumi</span>
                 </div>

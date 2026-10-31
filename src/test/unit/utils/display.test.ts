@@ -17,7 +17,7 @@ describe("showBangumiUpdateRemind", () => {
         showBangumiUpdateRemind("咒术回战");
 
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-            "《咒术回战》 更新啦！🎉",
+            "《咒术回战》 更新啦！",
             "Open WeekBangumi"
         );
     });
@@ -52,7 +52,7 @@ describe("showBeforeBangumiUpdateRemind", () => {
         showBeforeBangumiUpdateRemind("咒术回战", 5);
 
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-            "《咒术回战》 还有5分钟就更新啦！ 🎉",
+            "《咒术回战》 还有5分钟就更新啦！",
             "Open WeekBangumi"
         );
     });

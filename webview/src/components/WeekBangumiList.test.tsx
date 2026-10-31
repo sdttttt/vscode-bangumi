@@ -111,8 +111,8 @@ describe("WeekBangumiList", () => {
         );
 
         expect(container.querySelectorAll(".time-point")).toHaveLength(2);
-        expect(screen.getByText("🕒20:00")).toBeTruthy();
-        expect(screen.getByText("🕒21:00")).toBeTruthy();
+        expect(screen.getByText("20:00")).toBeTruthy();
+        expect(screen.getByText("21:00")).toBeTruthy();
     });
 
     it("marks a delayed bangumi with the delay block", () => {

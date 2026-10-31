@@ -211,7 +211,7 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 ### Feat
 
 - 更新依赖.
-- 增加了一个计数通知请求, 现在 BangumiOpen 会统计大 🔥 的使用每个功能的次数. 这个数据是公开的我会定时发布.
+- 增加了一个计数通知请求, 现在 BangumiOpen 会统计大的使用每个功能的次数. 这个数据是公开的我会定时发布.
 
 ## [2.2.8] - 2022-3-11
 

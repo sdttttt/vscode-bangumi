@@ -139,7 +139,7 @@ function Day({
             <div class="timeline">
                 {groupByPubTime(day.seasons).map(group => (
                     <div class="time-group" key={group.pubTime}>
-                        <div class="time-point">🕒{group.pubTime}</div>
+                        <div class="time-point">{group.pubTime}</div>
                         {group.seasons.map(season => (
                             <Season key={season.url} season={season} />
                         ))}
