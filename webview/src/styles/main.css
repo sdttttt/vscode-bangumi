@@ -51,6 +51,16 @@ body {
     );
     --warning-line: color-mix(in srgb, var(--warning) 35%, transparent);
     --warning-soft: color-mix(in srgb, var(--warning) 8%, transparent);
+    /*
+     * Gold of the "you are here" marker. The warning token alone is a legible
+     * gold only on dark surfaces, so it is blended towards the foreground here
+     * and lifted again in the dark override below.
+     */
+    --gold: color-mix(
+        in srgb,
+        var(--vscode-editorWarning-foreground, #cca700) 62%,
+        var(--vscode-foreground)
+    );
     --card-shadow: 0 1px 2px rgb(0 0 0 / 5%), 0 8px 20px rgb(0 0 0 / 4%);
 
     margin: 0;
@@ -79,6 +89,12 @@ body {
 
 body.vscode-dark {
     --card-shadow: 0 1px 2px rgb(0 0 0 / 45%), 0 8px 20px rgb(0 0 0 / 25%);
+    /* Dark surfaces need the gold lifted towards the light foreground. */
+    --gold: color-mix(
+        in srgb,
+        var(--vscode-editorWarning-foreground, #cca700) 80%,
+        var(--vscode-foreground)
+    );
 }
 
 body.vscode-high-contrast {
@@ -95,6 +111,19 @@ body.vscode-high-contrast :is(.item, .cover, .bangumi:hover) {
     border-color: var(--vscode-contrastBorder, var(--vscode-foreground));
 }
 
+/*
+ * High contrast themes fix the palette to a few extreme colours, so the gold
+ * of the marker would drop below the contrast floor. Fall back to the
+ * foreground there.
+ */
+body.vscode-high-contrast .now-marker {
+    color: var(--vscode-contrastBorder, var(--vscode-foreground));
+}
+
 body.vscode-reduce-motion :is(.bangumi, .item, .cover) {
     transition: none;
+}
+
+body.vscode-reduce-motion .now-arrow {
+    animation: none;
 }

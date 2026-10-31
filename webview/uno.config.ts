@@ -36,6 +36,7 @@ export default defineConfig({
             hover: "var(--hover)",
             accent: "var(--accent)",
             "accent-soft": "var(--accent-soft)",
+            gold: "var(--gold)",
             muted: "var(--muted)",
             "warning-line": "var(--warning-line)",
             "warning-soft": "var(--warning-soft)",
@@ -113,6 +114,14 @@ export default defineConfig({
         timeline: "flex flex-col gap-4 p-3.5",
         "time-group": "flex flex-col gap-2",
         "time-point": "chip self-start font-600 tracking-[0.02em]",
+        // The "you are here" marker of the current day: a pulsing gold arrow
+        // and the current wall clock, so the marker stands out from the blue
+        // accents of the schedule without reading as one more publication slot.
+        "now-marker":
+            "flex items-center gap-1.5 py-0.5 text-[11px] font-600 leading-[1.4] text-gold tabular-nums select-none",
+        "now-arrow": "flex-none animate-pulse motion-reduce:animate-none",
+        "now-label": "flex-none whitespace-nowrap",
+        "now-countdown": "flex-none whitespace-nowrap opacity-90",
         bangumi:
             "grid grid-cols-[56px_minmax(0,1fr)] items-center gap-2.5 p-2 rounded-2 row-link border border-solid border-transparent focus-ring hover:bg-hover hover:border-line",
         // A delayed season keeps its warning colours even while hovered; the

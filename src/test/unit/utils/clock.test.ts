@@ -3,7 +3,9 @@ import {
     BILIBILI_OFFSET_MS,
     dayDistance,
     dayKey,
+    formatMinuteOfDay,
     isCurrentDay,
+    minuteOfDay,
     nextDayStart,
     toBilibiliTime,
 } from "@/utils/clock";
@@ -111,5 +113,33 @@ describe("dayDistance", () => {
         const next = atUtc8(2026, 11, 1, 0, 1);
 
         expect(dayDistance(now, next)).toBe(1);
+    });
+});
+
+describe("minuteOfDay", () => {
+    it("counts the minutes since UTC+8 midnight", () => {
+        expect(minuteOfDay(atUtc8(2026, 10, 31, 0, 0))).toBe(0);
+        expect(minuteOfDay(atUtc8(2026, 10, 31, 9, 30))).toBe(570);
+        expect(minuteOfDay(atUtc8(2026, 10, 31, 23, 59))).toBe(1439);
+    });
+
+    it("ignores the local time zone", () => {
+        const epoch = Date.UTC(2026, 9, 31, 1, 30);
+
+        expect(minuteOfDay(epoch)).toBe(570);
+    });
+});
+
+describe("formatMinuteOfDay", () => {
+    it("pads both parts to two digits", () => {
+        expect(formatMinuteOfDay(0)).toBe("00:00");
+        expect(formatMinuteOfDay(545)).toBe("09:05");
+        expect(formatMinuteOfDay(1439)).toBe("23:59");
+    });
+
+    it("round trips with minuteOfDay", () => {
+        const epoch = atUtc8(2026, 10, 31, 17, 12);
+
+        expect(formatMinuteOfDay(minuteOfDay(epoch))).toBe("17:12");
     });
 });

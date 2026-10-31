@@ -42,6 +42,33 @@ export function dayKey(epochMs: number): string {
 }
 
 /**
+ * Minutes elapsed since UTC+8 midnight, in the range `0`–`1439`.
+ *
+ * The weekly schedule reports wall clock times in UTC+8, so anything that has
+ * to be placed on that timetable — such as the "you are here" marker of the
+ * webview — needs the same clock instead of the user's local one.
+ *
+ * @author sdttttt
+ */
+export function minuteOfDay(epochMs: number): number {
+    const shifted = new Date(toBilibiliTime(epochMs));
+    return shifted.getUTCHours() * 60 + shifted.getUTCMinutes();
+}
+
+/**
+ * `HH:MM` label of a minute of the UTC+8 day.
+ *
+ * @author sdttttt
+ */
+export function formatMinuteOfDay(minute: number): string {
+    const hours = Math.floor(minute / 60);
+    const minutes = minute % 60;
+    const pad = (value: number): string => String(value).padStart(2, "0");
+
+    return `${pad(hours)}:${pad(minutes)}`;
+}
+
+/**
  * Epoch ms of the next UTC+8 midnight after the given instant.
  *
  * @author sdttttt
