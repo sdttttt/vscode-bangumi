@@ -75,12 +75,15 @@ jobs:
             # No token: `vsce` asks GitHub for a short lived OIDC token and
             # exchanges it for a Marketplace credential, which is what the
             # publisher's trusted publishing configuration allows.
+            #
+            # `--skip-duplicate` keeps a re-run of the same tag from failing
+            # because the version is already published.
             - name: publish to the Visual Studio Marketplace
               id: vsce
               continue-on-error: true
               run: |
                   set -eu
-                  args="--oidc --packagePath artifacts/bangumiopen.vsix"
+                  args="--oidc --skip-duplicate --packagePath artifacts/bangumiopen.vsix"
                   if [ "${{ steps.version.outputs.prerelease }}" = "true" ]; then
                       args="$args --pre-release"
                   fi
@@ -96,7 +99,7 @@ jobs:
               continue-on-error: true
               run: |
                   set -eu
-                  args="-i artifacts/bangumiopen.vsix"
+                  args="-i artifacts/bangumiopen.vsix --skip-duplicate"
                   if [ "${{ steps.version.outputs.prerelease }}" = "true" ]; then
                       args="$args --pre-release"
                   fi
