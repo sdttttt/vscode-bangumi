@@ -1,7 +1,7 @@
 import type { BangumiPayload } from "@shared/webview/protocol";
 
 /**
- * Props of the index list view.
+ * 索引列表视图的属性。
  *
  * @author sdttttt
  */
@@ -14,18 +14,17 @@ interface BangumiListProps {
 }
 
 /**
- * Title length above which the heading drops a level.
+ * 标题超过该长度时，标题层级下调一级。
  *
  * @author sdttttt
  */
 const LONG_TITLE = 17;
 
 /**
- * Renders one bangumi of the index list.
+ * 渲染索引列表中的单部番剧。
  *
- * The whole card is a single link, so the cover, the title and the action share
- * one tab stop. The action is a styled element instead of a nested anchor,
- * because an anchor inside an anchor is invalid HTML.
+ * 整张卡片就是一个链接，封面、标题与操作因此共用同一个 tab 焦点。
+ * 操作项用样式化的元素表示而不是嵌套的 `<a>`，因为 `<a>` 套 `<a>` 不合法。
  *
  * @author sdttttt
  */
@@ -71,7 +70,7 @@ function BangumiRow({ bangumi }: { bangumi: BangumiPayload }) {
 }
 
 /**
- * Index list view with its pager.
+ * 带分页器的索引列表视图。
  *
  * @author sdttttt
  */

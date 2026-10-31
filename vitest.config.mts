@@ -2,9 +2,9 @@ import { defineConfig } from "vitest/config";
 import path from "path";
 
 /**
- * JSX transform shared by the webview bundle and its tests.
+ * Webview 产物与其测试共用的 JSX 转换配置。
  *
- * Oxc defaults to the React runtime, so Preact has to be named explicitly.
+ * Oxc 默认使用 React 运行时，因此必须显式指定 Preact。
  */
 const oxc = {
     jsx: {
@@ -14,10 +14,9 @@ const oxc = {
 };
 
 /**
- * Aliases shared by every project.
+ * 各个 project 共用的别名。
  *
- * `@shared` points at the extension sources so the webview tests import the very
- * same protocol the two bundles compile against.
+ * `@shared` 指向扩展源码，Webview 测试因此导入的正是两份产物共同编译的同一份协议。
  */
 const alias = {
     "@": path.resolve(import.meta.dirname, "src"),
@@ -61,7 +60,7 @@ export default defineConfig({
                 "src/test/**",
                 "webview/src/**/*.test.tsx",
                 "webview/src/test/**",
-                // Bootstrap only: mounts the root component into #app.
+                // 仅用于启动：把根组件挂载到 #app。
                 "webview/src/main.tsx",
             ],
             thresholds: {

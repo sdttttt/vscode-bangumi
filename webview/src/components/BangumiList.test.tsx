@@ -4,7 +4,7 @@ import { BangumiList } from "@webview/components/BangumiList";
 import type { BangumiPayload } from "@shared/webview/protocol";
 
 /**
- * A complete bangumi payload.
+ * 一份完整的番剧渲染载荷。
  *
  * @author sdttttt
  */
@@ -20,7 +20,7 @@ const payload = (overrides: Partial<BangumiPayload> = {}): BangumiPayload => ({
 });
 
 /**
- * Renders the list with spy-able pager handlers.
+ * 渲染列表，并传入可断言的翻页处理器。
  *
  * @author sdttttt
  */

@@ -1,7 +1,7 @@
 import { valueFilter } from "./filterSpec";
 
 /**
- * Season type filter: main story, movie, or anything else.
+ * 番剧类型筛选：正片、电影或其他。
  *
  * @author sdttttt
  */

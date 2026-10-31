@@ -1,24 +1,24 @@
 import type { BangumisData, WeekBangumiData } from "./structure";
 
 /**
- * A time limited key value store.
+ * 带时效的键值缓存。
  *
  * @author sdttttt
  */
 export interface Cache<T> {
     get(key: string): T | undefined;
     set(key: string, value: T): void;
-    /** Drops every entry and pending expiry timer. */
+    /** 清空所有条目与待触发的过期定时器。 */
     clear(): void;
 }
 
 /**
- * Creates a cache whose entries expire on their own.
+ * 创建一个条目会自动过期的缓存。
  *
- * Every write arms its own timer, so overwriting a key also resets its lifetime
- * instead of letting the previous timer delete the fresh value.
+ * 每次写入都会装载自己的定时器，因此覆盖同一个键时寿命也会重置，
+ * 不会被上一个定时器把新值删掉。
  *
- * @param timeoutSeconds lifetime of an entry
+ * @param timeoutSeconds 条目的存活时长
  * @author sdttttt
  */
 export function useCache<T>(timeoutSeconds: number): Cache<T> {
@@ -54,13 +54,13 @@ export function useCache<T>(timeoutSeconds: number): Cache<T> {
 }
 
 /**
- * The caches of one extension session.
+ * 一次扩展会话使用的缓存。
  *
  * @author sdttttt
  */
 export interface RequestCaches {
-    /** Ten minutes of bangumi index pages. */
+    /** 番剧索引各页，缓存十分钟。 */
     readonly bangumi: Cache<BangumisData>;
-    /** One minute of weekly schedules. */
+    /** 周番数据，缓存一分钟。 */
     readonly week: Cache<Array<WeekBangumiData>>;
 }

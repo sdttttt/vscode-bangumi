@@ -1,10 +1,10 @@
 import type { ViewState, WebviewCommand } from "@shared/webview/protocol";
 
 /**
- * Typed access to the API VS Code injects into every webview.
+ * VS Code 注入到每个 Webview 的 API 的类型化封装。
  *
- * `acquireVsCodeApi` may only be called once per document, so every module
- * goes through this singleton instead of calling the global directly.
+ * 每个文档只允许调用一次 `acquireVsCodeApi`，因此各模块统一走这个单例，
+ * 而不是直接调用全局函数。
  *
  * @author sdttttt
  */
@@ -21,7 +21,7 @@ declare global {
 const api: VsCodeApi = acquireVsCodeApi();
 
 /**
- * Reads the state the host persisted before the document was recreated.
+ * 读取宿主在文档重建之前保存的状态。
  *
  * @author sdttttt
  */
@@ -30,7 +30,7 @@ export function readState(): ViewState | undefined {
 }
 
 /**
- * Persists the state so a hidden panel can be restored without a round trip.
+ * 持久化状态，隐藏的面板因此无需往返一次即可恢复内容。
  *
  * @author sdttttt
  */
@@ -39,7 +39,7 @@ export function saveState(state: ViewState): void {
 }
 
 /**
- * Sends a command to the extension host.
+ * 向扩展宿主发送命令。
  *
  * @author sdttttt
  */
@@ -48,9 +48,9 @@ export function send(command: WebviewCommand): void {
 }
 
 /**
- * Subscribes to state pushed by the extension host.
+ * 订阅扩展宿主推送的状态。
  *
- * @returns a function that removes the listener
+ * @returns 用于移除监听的函数
  * @author sdttttt
  */
 export function onHostMessage(

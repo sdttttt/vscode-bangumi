@@ -6,7 +6,7 @@ import type { WebviewCommand } from "../webview/protocol";
 import type { Panel } from "./panel";
 
 /**
- * Dependencies of the weekly schedule view.
+ * 周番表视图的依赖。
  *
  * @author sdttttt
  */
@@ -17,19 +17,19 @@ export interface WeekBangumiViewOptions {
 }
 
 /**
- * The commands of the weekly schedule view.
+ * 周番表视图的命令。
  *
  * @author sdttttt
  */
 export interface WeekBangumiView {
-    /** Opens the schedule, or refreshes the open panel. */
+    /** 打开周番表，或刷新已打开的面板。 */
     openWeekBangumi(): void;
-    /** Routes a command sent by the webview. */
+    /** 分派 Webview 发来的命令。 */
     handleCommand(command: WebviewCommand): void;
 }
 
 /**
- * Creates the weekly schedule view of one extension session.
+ * 创建一次扩展会话的周番表视图。
  *
  * @author sdttttt
  */
@@ -39,7 +39,7 @@ export function useWeekBangumiView(
     const { api, panel, settings } = options;
 
     /**
-     * Renders the schedule sent by the API.
+     * 渲染接口返回的周番数据。
      */
     const createWeekBangumiView = (data: Array<WeekBangumiData>): void => {
         panel.show({

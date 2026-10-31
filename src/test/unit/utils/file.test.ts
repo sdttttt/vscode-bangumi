@@ -3,7 +3,7 @@ import type { Webview } from "vscode";
 import { getResourceFile } from "@/utils/file";
 
 /**
- * Builds a webview whose `asWebviewUri` echoes the on-disk path with a prefix.
+ * 构建一个 Webview，其 `asWebviewUri` 会给磁盘路径加上前缀后返回。
  *
  * @author sdttttt
  */

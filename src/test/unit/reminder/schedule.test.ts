@@ -11,14 +11,14 @@ import {
 import { weekBangumiData, wBangumi } from "@/test/mocks/fixtures/weekBangumi";
 
 /**
- * Publication instant, expressed as an epoch second.
+ * 更新时刻，以 Unix 秒表示。
  *
  * @author sdttttt
  */
 const PUB_TS = 1_800_000_000;
 
 /**
- * Epoch ms of a pub_ts offset by the given seconds.
+ * 某个 `pub_ts` 偏移指定秒数后的毫秒时间戳。
  *
  * @author sdttttt
  */
@@ -192,7 +192,7 @@ describe("horizonOf", () => {
     it("covers the rest of today and the whole of tomorrow", () => {
         const now = Date.UTC(2026, 9, 31, 4, 0);
 
-        /* 2026-11-02 00:00 UTC+8, i.e. the end of tomorrow. */
+        /* 2026-11-02 00:00 UTC+8，也就是明天的结束时刻。 */
         expect(horizonOf(now)).toBe(Date.UTC(2026, 10, 2) - 8 * 3_600_000);
     });
 });
@@ -254,7 +254,7 @@ describe("todayIndex", () => {
 });
 
 describe("describeEvent", () => {
-    /** 2026-11-01 12:00 UTC+8. */
+    /** 2026-11-01 12:00 UTC+8。 */
     const now = Date.UTC(2026, 10, 1, 4, 0);
 
     it("leads with the time so the width stays stable", () => {

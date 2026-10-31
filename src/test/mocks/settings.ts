@@ -2,22 +2,22 @@ import { vi } from "vitest";
 import type { Settings } from "@/configuration";
 
 /**
- * Settings double backed by a mutable record.
+ * 由可变记录支撑的 Settings 替身。
  *
- * Writing to `values` between calls mimics a user changing a setting while the
- * extension runs, without touching the `vscode` workspace mock.
+ * 在两次调用之间写入 `values` 即可模拟扩展运行期间用户修改设置，
+ * 无需触碰 `vscode` 的 workspace 桩。
  *
  * @author sdttttt
  */
 export interface SettingsStub extends Settings {
-    /** Values the next read answers with. */
+    /** 下一次读取将要返回的值。 */
     readonly values: Record<string, unknown>;
 }
 
 /**
- * Builds a settings double.
+ * 创建 Settings 替身。
  *
- * @param values initial values, keyed by `ConfigKey`
+ * @param values 初始值，以 `ConfigKey` 为键
  * @author sdttttt
  */
 export function createSettingsStub(

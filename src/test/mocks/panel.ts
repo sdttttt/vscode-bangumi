@@ -3,10 +3,9 @@ import type { Uri, Webview, WebviewPanel } from "vscode";
 import type { ViewState } from "@/webview/protocol";
 
 /**
- * A `WebviewPanel` double that records what the extension posts to it.
+ * `WebviewPanel` 替身，记录扩展向它发送的内容。
  *
- * The stub also answers `asWebviewUri` so the host can build the document and
- * the asset URIs without a real editor.
+ * 该替身同时实现 `asWebviewUri`，宿主因此无需真实编辑器就能构建文档与资源 Uri。
  *
  * @author sdttttt
  */
@@ -18,16 +17,16 @@ export interface PanelStub {
         onDidReceiveMessage: ReturnType<typeof vi.fn>;
     };
     reveal: ReturnType<typeof vi.fn>;
-    /** Every state posted to the webview, in order. */
+    /** 按顺序记录发送给 Webview 的每一份状态。 */
     posted(): Array<ViewState>;
-    /** Simulates a message sent by the webview bundle. */
+    /** 模拟 Webview 产物发来的消息。 */
     receive(command: unknown): void;
-    /** Runs the listener registered through `onDidDispose`. */
+    /** 运行通过 `onDidDispose` 注册的监听。 */
     dispose(): void;
 }
 
 /**
- * Builds a panel double.
+ * 创建面板替身。
  *
  * @author sdttttt
  */

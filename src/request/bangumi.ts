@@ -13,7 +13,7 @@ import {
 } from "./structure";
 
 /**
- * Message shown when the API answers with something unusable.
+ * 接口返回不可用内容时展示的消息。
  *
  * @author sdttttt
  */
@@ -23,34 +23,34 @@ const BROKEN_RESPONSE_MESSAGE = `
     `;
 
 /**
- * Message shown when the weekly schedule cannot be pulled.
+ * 无法拉取周番数据时展示的消息。
  *
  * @author sdttttt
  */
 const MISSING_SCHEDULE_MESSAGE = "咦？没有找到番剧时间表……";
 
 /**
- * The bangumi endpoints of one extension session.
+ * 一次扩展会话使用的番剧接口。
  *
  * @author sdttttt
  */
 export interface BangumiApi {
     /**
-     * Gets all bangumi of one page.
+     * 获取某一页的全部番剧。
      *
-     * The url is built by `buildBangumiUrl` and doubles as the cache key, so
-     * the request layer never has to know which filter produced it.
+     * 地址由 `buildBangumiUrl` 构建，同时充当缓存键，
+     * 因此请求层无需知道是哪个筛选条件产生了它。
      */
     getAllBangumi(url: string): Promise<BangumisData | undefined>;
-    /** Gets the weekly schedule. */
+    /** 获取周番数据。 */
     getWeekBangumi(): Promise<Array<WeekBangumiData> | undefined>;
 }
 
 /**
- * Creates the bangumi endpoints of one extension session.
+ * 创建一次扩展会话使用的番剧接口。
  *
- * @param caches session caches owned by the composition root
- * @param notifier user facing output of the session
+ * @param caches 由组合根持有的会话缓存
+ * @param notifier 会话面向用户的输出
  * @author sdttttt
  */
 export function useBangumiApi(
@@ -88,9 +88,8 @@ export function useBangumiApi(
                 response = await getJson<WeekBangumiResponse>(BANGUMI_WEEK);
             } catch {
                 /*
-                 * A network failure is reported like an empty schedule: the
-                 * view falls back to "not found" and the reminder retries on
-                 * its own.
+                 * 网络失败按空日程上报：视图会回退到「未找到」，
+                 * 提醒则会自行重试。
                  */
                 notifier.info(MISSING_SCHEDULE_MESSAGE);
                 return;

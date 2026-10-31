@@ -11,7 +11,7 @@ import {
 } from "@/utils/clock";
 
 /**
- * Epoch ms of a UTC+8 wall clock instant.
+ * 某个 UTC+8 墙上时钟时刻对应的毫秒时间戳。
  *
  * @author sdttttt
  */

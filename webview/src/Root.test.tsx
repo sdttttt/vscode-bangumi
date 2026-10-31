@@ -6,7 +6,7 @@ import { vsCodeApi } from "@webview/test/setup";
 import { viewState } from "@webview/test/fixtures";
 
 /**
- * Builds the state the host would push for a weekly schedule.
+ * 构建宿主为周番视图推送的状态。
  *
  * @author sdttttt
  */
@@ -25,7 +25,7 @@ const schedule = (): ViewState =>
     });
 
 /**
- * Builds the state the host would push for the index list.
+ * 构建宿主为索引列表推送的状态。
  *
  * @author sdttttt
  */
@@ -47,7 +47,7 @@ const list = (): ViewState =>
     });
 
 /**
- * Dispatches a state the way the extension host does.
+ * 按扩展宿主的方式派发一份状态。
  *
  * @author sdttttt
  */

@@ -27,7 +27,7 @@ const manifest: Manifest = JSON.parse(
 );
 
 /**
- * Normalises a `^1.100.0` style range into a comparable major.minor tuple.
+ * 把 `^1.100.0` 形式的版本范围规范为可比较的 major.minor 元组。
  *
  * @author sdttttt
  */
@@ -68,7 +68,7 @@ describe("package.json manifest", () => {
     });
 
     it("keeps @types/vscode within the engines.vscode range", () => {
-        /* vsce refuses to package when types are newer than engines.vscode */
+        /* 类型版本高于 engines.vscode 时 vsce 会拒绝打包 */
         const types = JSON.parse(
             readFileSync(
                 resolve(

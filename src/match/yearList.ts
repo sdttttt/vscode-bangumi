@@ -2,7 +2,7 @@ import type { FilterSpec } from "./filterSpec";
 import { numberOfStringPlus } from "../utils/strings";
 
 /**
- * Labels offered by the year filter.
+ * 年份筛选提供的选项。
  *
  * @author sdttttt
  */
@@ -22,7 +22,7 @@ const CHOICES: ReadonlyArray<string> = [
 ];
 
 /**
- * Encodes a half open year range the way the API expects it.
+ * 按接口要求编码左闭右开的年份区间。
  *
  * @author sdttttt
  */
@@ -31,7 +31,7 @@ function encodeYear(min: string, max: string): string {
 }
 
 /**
- * Decades that do not follow the `min-max` pattern of the menu.
+ * 不遵循菜单中 `min-max` 形式的年代选项。
  *
  * @author sdttttt
  */
@@ -42,7 +42,7 @@ const NAMED_RANGES: ReadonlyMap<string, readonly [string, string]> = new Map([
 ]);
 
 /**
- * Turns a year menu label into the year parameter of the request.
+ * 把年份菜单文案转换为请求中的 year 参数。
  *
  * @author sdttttt
  */
@@ -61,7 +61,7 @@ export function decodeYear(label: string): string {
 }
 
 /**
- * Year filter.
+ * 时间（年份）筛选。
  *
  * @author sdttttt
  */

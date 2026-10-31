@@ -4,17 +4,16 @@ import { toWeekDay } from "../utils/strings";
 import type { BangumiPayload, SeasonPayload, WeekDayPayload } from "./protocol";
 
 /**
- * Number of leading days hidden when `bangumiOpen.DisplayHistory` is off.
+ * `bangumiOpen.DisplayHistory` 关闭时，开头隐藏的天数。
  *
- * The weekly API returns the six past days first, so they are dropped unless
- * the user asked to see them.
+ * 周番接口会把过去的六天排在前面，用户没有要求查看时就把它们裁掉。
  *
  * @author sdttttt
  */
 export const HIDDEN_DAYS = 5;
 
 /**
- * Converts one season entry into its render payload.
+ * 把单部番剧转换为渲染载荷。
  *
  * @author sdttttt
  */
@@ -32,10 +31,10 @@ export function toSeasonPayload(season: WBangumi): SeasonPayload {
 }
 
 /**
- * Converts the weekly schedule into render payloads.
+ * 把周番数据转换为渲染载荷。
  *
- * @param data the whole weekly schedule
- * @param displayHistory whether the past days must be rendered too
+ * @param data 完整的周番数据
+ * @param displayHistory 是否也渲染过去的几天
  * @author sdttttt
  */
 export function toWeekDayPayloads(
@@ -55,7 +54,7 @@ export function toWeekDayPayloads(
 }
 
 /**
- * Converts the index list into render payloads.
+ * 把索引列表转换为渲染载荷。
  *
  * @author sdttttt
  */

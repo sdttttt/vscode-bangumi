@@ -1,7 +1,7 @@
 import { valueFilter } from "./filterSpec";
 
 /**
- * Area filter.
+ * 地区筛选。
  *
  * @author sdttttt
  */

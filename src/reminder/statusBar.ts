@@ -4,33 +4,32 @@ import type { ScheduleEvent } from "./schedule";
 import { listTitles } from "../utils/titles";
 
 /**
- * Number of upcoming events listed in the status bar tooltip.
+ * 状态栏悬浮提示中列出的待更新事件数量。
  *
  * @author sdttttt
  */
 const TOOLTIP_EVENTS = 3;
 
 /**
- * The status bar entry of the reminder.
+ * 提醒的状态栏条目。
  *
  * @author sdttttt
  */
 export interface StatusBar {
-    /** Shows the first upcoming event, or hides the entry when none is left. */
+    /** 展示最近的待更新事件；没有待更新事件时隐藏条目。 */
     show(upcoming: ReadonlyArray<ScheduleEvent>, now: number): void;
-    /** Hides the entry, keeping it for the next schedule. */
+    /** 隐藏条目，但保留实例供下一个日程复用。 */
     hide(): void;
-    /** Releases the entry. */
+    /** 释放条目。 */
     dispose(): void;
 }
 
 /**
- * Creates the status bar entry of the reminder.
+ * 创建提醒的状态栏条目。
  *
- * The item is created lazily, so creating the reminder never touches the editor
- * UI, and it is released together with the reminder.
+ * 条目是懒创建的，因此创建提醒本身不会触碰编辑器 UI；它随提醒一起释放。
  *
- * @param command command run when the entry is clicked
+ * @param command 点击条目时执行的命令
  * @author sdttttt
  */
 export function useStatusBar(command: string): StatusBar {
@@ -55,8 +54,7 @@ export function useStatusBar(command: string): StatusBar {
     };
 
     /**
-     * Full titles and times of the next events. The status bar truncates, the
-     * tooltip never does.
+     * 待更新事件的完整标题与时刻。状态栏会截断，悬浮提示不会。
      */
     const buildTooltip = (
         next: ScheduleEvent,

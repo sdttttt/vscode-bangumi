@@ -1,20 +1,19 @@
 /**
- * Timeout of a single request, in milliseconds.
+ * 单次请求的超时时间，单位为毫秒。
  *
  * @author sdttttt
  */
 export const REQUEST_TIMEOUT_MS = 8888;
 
 /**
- * Requests a url and parses the JSON body.
+ * 请求一个地址并解析 JSON 响应体。
  *
- * The extension host ships Node.js 20, so the global `fetch` is available and
- * `AbortSignal.timeout` aborts the request once it takes too long. A non-2xx
- * status is reported as an error, matching the behaviour of the previous HTTP
- * client.
+ * 扩展宿主自带 Node.js 20，因此可以直接使用全局 `fetch`，
+ * 并由 `AbortSignal.timeout` 在超时后中断请求。非 2xx 状态按错误上报，
+ * 与此前的 HTTP 客户端行为一致。
  *
- * @param {string} url
- * @returns the parsed JSON body, typed by the caller
+ * @param url 请求地址
+ * @returns 解析后的 JSON 响应体，类型由调用方指定
  * @async
  * @author sdttttt
  */

@@ -1,7 +1,7 @@
 import type { Bangumi, BangumisData } from "@/request/structure";
 
 /**
- * A finished bangumi entry with a badge.
+ * 一条已完结、带徽标的番剧数据。
  *
  * @author sdttttt
  */
@@ -17,7 +17,7 @@ export const bangumi = (overrides: Partial<Bangumi> = {}): Bangumi => ({
 });
 
 /**
- * A page of bangumi results as returned by `/pgc/season/index/result`.
+ * `/pgc/season/index/result` 返回的一页番剧结果。
  *
  * @author sdttttt
  */

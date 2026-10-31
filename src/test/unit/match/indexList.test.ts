@@ -17,7 +17,7 @@ import {
 } from "@/test/mocks/ports";
 
 /**
- * Everything one case needs, wired the way the composition root does it.
+ * 单个用例所需的全部内容，按组合根的方式装配。
  *
  * @author sdttttt
  */
@@ -30,7 +30,7 @@ interface Harness {
 }
 
 /**
- * Builds a harness with its own state and doubles.
+ * 构建一套拥有独立状态与替身的测试环境。
  *
  * @author sdttttt
  */
@@ -52,7 +52,7 @@ function harness(): Harness {
 }
 
 /**
- * Runs the filter menu on a filter with the given answer.
+ * 用一个给定的选择结果运行筛选菜单。
  *
  * @author sdttttt
  */
@@ -73,7 +73,7 @@ async function pickFrom(
 }
 
 /**
- * Runs the index menu with the given answer.
+ * 用一个给定的选择结果运行索引菜单。
  *
  * @author sdttttt
  */
@@ -94,7 +94,7 @@ async function pickIndex(h: Harness, label: string): Promise<void> {
 }
 
 /**
- * Query parameter of the url produced by the given state.
+ * 取出给定状态所生成地址中的某个查询参数。
  *
  * @author sdttttt
  */

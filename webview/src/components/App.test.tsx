@@ -4,7 +4,7 @@ import { App } from "@webview/components/App";
 import { assets, viewState } from "@webview/test/fixtures";
 
 /**
- * Renders the root component with the given state.
+ * 用给定状态渲染根组件。
  *
  * @author sdttttt
  */

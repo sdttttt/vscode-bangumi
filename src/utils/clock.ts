@@ -1,9 +1,8 @@
 /**
- * Bilibili reports the weekly schedule in China Standard Time (UTC+8).
+ * B 站按中国标准时间（UTC+8）返回周番数据。
  *
- * Day boundaries therefore have to be computed in that fixed offset instead of
- * the user's local time zone, otherwise a user west of UTC sees yesterday's
- * entry flagged as today and the reminder stays silent.
+ * 因此日界必须按这个固定偏移计算，而不是按用户本地时区；否则位于 UTC 以西的
+ * 用户会看到昨天的条目被标记为今天，提醒也就不再发声。
  *
  * @author sdttttt
  */
@@ -12,7 +11,7 @@ export const BILIBILI_OFFSET_MS = 8 * 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /**
- * One day of the weekly schedule, as far as day arithmetic is concerned.
+ * 周番数据中的一天，仅保留日期运算需要的字段。
  *
  * @author sdttttt
  */
@@ -23,7 +22,7 @@ export interface DayStamp {
 }
 
 /**
- * Shifts an epoch millisecond value onto the UTC+8 wall clock.
+ * 把毫秒时间戳平移到 UTC+8 的墙上时钟。
  *
  * @author sdttttt
  */
@@ -32,7 +31,7 @@ export function toBilibiliTime(epochMs: number): number {
 }
 
 /**
- * `month-day` key of the UTC+8 day containing the given instant.
+ * 给定时刻所在的 UTC+8 日期的 `月-日` 键。
  *
  * @author sdttttt
  */
@@ -42,11 +41,10 @@ export function dayKey(epochMs: number): string {
 }
 
 /**
- * Minutes elapsed since UTC+8 midnight, in the range `0`–`1439`.
+ * 自 UTC+8 午夜起经过的分钟数，范围为 `0`–`1439`。
  *
- * The weekly schedule reports wall clock times in UTC+8, so anything that has
- * to be placed on that timetable — such as the "you are here" marker of the
- * webview — needs the same clock instead of the user's local one.
+ * 周番数据里的时刻都是 UTC+8 的墙上时钟，因此任何需要落在同一时间表上的内容
+ * ——例如 Webview 里的「你在这里」标记——都必须使用同一套时钟，而不是用户本地时钟。
  *
  * @author sdttttt
  */
@@ -56,7 +54,7 @@ export function minuteOfDay(epochMs: number): number {
 }
 
 /**
- * `HH:MM` label of a minute of the UTC+8 day.
+ * UTC+8 一天中某一分钟对应的 `HH:MM` 文案。
  *
  * @author sdttttt
  */
@@ -69,7 +67,7 @@ export function formatMinuteOfDay(minute: number): string {
 }
 
 /**
- * Epoch ms of the next UTC+8 midnight after the given instant.
+ * 给定时刻之后最近的 UTC+8 午夜的毫秒时间戳。
  *
  * @author sdttttt
  */
@@ -79,10 +77,10 @@ export function nextDayStart(epochMs: number): number {
 }
 
 /**
- * Whether the given schedule day is the current UTC+8 day.
+ * 周番数据中的某一天是否为当前 UTC+8 日。
  *
- * `is_today` from the API wins when it is set; `date_ts` is the fallback for
- * responses that omit it, and the string `date` is the last resort.
+ * 接口给出的 `is_today` 优先；响应缺少该字段时回退到 `date_ts`，
+ * 最后才使用字符串 `date`。
  *
  * @author sdttttt
  */
@@ -97,10 +95,10 @@ export function isCurrentDay(day: DayStamp, now: number): boolean {
 }
 
 /**
- * `dayKey` distance between two instants, in UTC+8 days.
+ * 两个时刻之间相隔的 `dayKey` 天数，按 UTC+8 计算。
  *
- * Used to decide whether an upcoming update still happens today or already
- * tomorrow, so the status bar can say which one without guessing.
+ * 用于判断即将到来的更新发生在今天还是明天，
+ * 状态栏因此可以直接说明，而不必猜测。
  *
  * @author sdttttt
  */

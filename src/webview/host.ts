@@ -6,58 +6,57 @@ import { getResourceFile } from "../utils/file";
 import type { AssetUris, ViewState } from "./protocol";
 
 /**
- * Directory of the built webview bundle, relative to the extension root.
+ * 构建后的 Webview 产物目录，相对于扩展根目录。
  *
- * It deliberately lives outside `dist/` so the extension rebuild (`pnpm watch`)
- * can keep emptying `dist/` without deleting the webview bundle.
+ * 它特意放在 `dist/` 之外，这样扩展的重新构建（`pnpm watch`）可以不断清空
+ * `dist/`，而不会把 Webview 产物一并删掉。
  *
  * @author sdttttt
  */
 export const WEBVIEW_DIST = "webview-dist";
 
 /**
- * Script file emitted by `vite.webview.mts`.
+ * 由 `vite.webview.mts` 产出的脚本文件。
  *
  * @author sdttttt
  */
 const WEBVIEW_SCRIPT = "main.js";
 
 /**
- * Stylesheet file emitted by `vite.webview.mts`.
+ * 由 `vite.webview.mts` 产出的样式表文件。
  *
  * @author sdttttt
  */
 const WEBVIEW_STYLE = "main.css";
 
 /**
- * The webview document factory of one extension session.
+ * 一次扩展会话使用的 Webview 文档工厂。
  *
  * @author sdttttt
  */
 export interface WebviewHost {
-    /** Options every bangumi panel shares. */
+    /** 所有番剧面板共用的配置项。 */
     options(): vscode.WebviewPanelOptions & vscode.WebviewOptions;
-    /** Asset URIs of the current webview. */
+    /** 当前 Webview 的静态资源 Uri。 */
     assets(webview: vscode.Webview): AssetUris;
-    /** Document that boots the webview application. */
+    /** 用于启动 Webview 应用的文档。 */
     html(webview: vscode.Webview, title: string): string;
-    /** Fills in the asset URIs of a state that is about to be posted. */
+    /** 为即将发送的状态补上静态资源 Uri。 */
     withAssets(webview: vscode.Webview, state: ViewState): ViewState;
 }
 
 /**
- * Creates the webview document factory of one extension session.
+ * 创建一次扩展会话使用的 Webview 文档工厂。
  *
- * `enableScripts` is required because the panel renders a bundled application
- * instead of a static document, and `localResourceRoots` keeps the webview from
- * reading anything outside the bundled assets and the `resources` folder.
+ * `enableScripts` 是必需的，因为面板渲染的是打包后的应用而不是静态文档；
+ * `localResourceRoots` 则限制 Webview 只能读取打包资源与 `resources/` 目录。
  *
- * @param extensionPath root of the installed extension
+ * @param extensionPath 已安装扩展的根目录
  * @author sdttttt
  */
 export function useWebviewHost(extensionPath: string): WebviewHost {
     /**
-     * Resolves a file of the built webview bundle to a webview-safe URI.
+     * 把 Webview 产物中的文件解析为 Webview 可安全访问的 Uri。
      */
     const bundleFile = (
         webview: vscode.Webview,
@@ -82,7 +81,7 @@ export function useWebviewHost(extensionPath: string): WebviewHost {
     });
 
     /**
-     * Builds a 32 character nonce for the webview content security policy.
+     * 为 Webview 的内容安全策略生成 32 位 nonce。
      */
     const nonce = (): string => randomBytes(16).toString("hex");
 
@@ -104,8 +103,8 @@ export function useWebviewHost(extensionPath: string): WebviewHost {
             const scriptNonce = nonce();
 
             /*
-             * `img-src ... https:` is required for the bilibili cover images,
-             * and `data:` covers the inlined placeholder assets.
+             * `img-src ... https:` 是 B 站封面图所必需的，
+             * `data:` 则用于内联的占位图资源。
              */
             const csp = [
                 "default-src 'none'",

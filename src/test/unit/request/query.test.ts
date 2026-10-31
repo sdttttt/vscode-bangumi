@@ -7,7 +7,7 @@ import {
 } from "@/request/query";
 
 /**
- * Extracts the query parameters of a built url as a plain record.
+ * 把已构建地址的查询参数提取为普通记录。
  *
  * @author sdttttt
  */

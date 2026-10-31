@@ -1,7 +1,7 @@
 import type { WBangumi, WeekBangumiData } from "@/request/structure";
 
 /**
- * A single season entry of the weekly schedule.
+ * 周番数据中的单部番剧。
  *
  * @author sdttttt
  */
@@ -22,7 +22,7 @@ export const wBangumi = (overrides: Partial<WBangumi> = {}): WBangumi => ({
 });
 
 /**
- * One day of the weekly schedule.
+ * 周番数据中的一天。
  *
  * @author sdttttt
  */
@@ -38,7 +38,7 @@ export const weekBangumiData = (
 });
 
 /**
- * A full weekly schedule of seven days.
+ * 完整的七天周番数据。
  *
  * @author sdttttt
  */

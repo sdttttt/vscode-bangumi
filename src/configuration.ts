@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 
 /**
- * Keys of the settings this extension reads.
+ * 本扩展读取的设置键。
  *
  * @author sdttttt
  */
@@ -14,31 +14,30 @@ export enum ConfigKey {
 }
 
 /**
- * The user settings, read through the editor.
+ * 通过编辑器读取的用户设置。
  *
- * Consumers take this as a dependency instead of reaching for the workspace
- * themselves, so a caller can hand in a different implementation and the
- * factory never reads ambient state.
+ * 使用方把它作为依赖接收，而不是自己去读 workspace；调用方可以传入别的实现，
+ * 工厂也不会去读环境状态。
  *
  * @author sdttttt
  */
 export interface Settings {
-    /** Lead time of the reminder, in seconds. */
+    /** 提醒的提前量，单位为秒。 */
     reminderAheadTime(): number;
-    /** Whether the update reminder may schedule notifications. */
+    /** 更新提醒是否允许安排通知。 */
     isReminderEnabled(): boolean;
-    /** Whether the picked index tags are collected and shown. */
+    /** 是否收集并展示已选的索引标签。 */
     isDisplayIndexTags(): boolean;
-    /** Whether the status bar entry is shown. */
+    /** 是否展示状态栏条目。 */
     isDisplayStatusBar(): boolean;
-    /** Whether the past days of the weekly schedule are shown. */
+    /** 是否展示周番表中过去的几天。 */
     isDisplayHistory(): boolean;
 }
 
 /**
- * Whether the settings that shape the reminder changed.
+ * 影响提醒的设置是否发生了变化。
  *
- * Pure: the caller passes the `affectsConfiguration` probe of the event.
+ * 纯函数：调用方传入事件的 `affectsConfiguration` 探针。
  *
  * @author sdttttt
  */
@@ -53,10 +52,9 @@ export function affectsReminder(
 }
 
 /**
- * Creates the settings reader of one extension session.
+ * 创建一次扩展会话的设置读取器。
  *
- * The workspace lookup happens per read, so a setting changed while the
- * extension runs is picked up without rebuilding the session.
+ * 每次读取都会查询 workspace，因此扩展运行期间修改的设置无需重建会话即可生效。
  *
  * @author sdttttt
  */

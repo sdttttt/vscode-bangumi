@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { getJson, REQUEST_TIMEOUT_MS } from "@/request/http";
 
 /**
- * Builds a fetch response carrying a JSON body.
+ * 构建一个携带 JSON 响应体的 fetch 响应。
  *
  * @author sdttttt
  */

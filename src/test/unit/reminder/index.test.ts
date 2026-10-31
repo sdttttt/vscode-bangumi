@@ -14,7 +14,7 @@ import { weekBangumiData, wBangumi } from "@/test/mocks/fixtures/weekBangumi";
 import { nextDayStart } from "@/utils/clock";
 
 /**
- * Status bar double handed out by the `vscode` mock.
+ * 由 `vscode` 桩返回的状态栏替身。
  *
  * @author sdttttt
  */
@@ -29,7 +29,7 @@ interface StatusBarStub {
 }
 
 /**
- * Builds a status bar double and wires it into the `vscode` mock.
+ * 构建状态栏替身，并把它接到 `vscode` 桩上。
  *
  * @author sdttttt
  */
@@ -49,7 +49,7 @@ function stubStatusBar(): StatusBarStub {
 }
 
 /**
- * A schedule flagged by the API as today.
+ * 接口标记为今天的一份日程。
  *
  * @author sdttttt
  */
@@ -76,8 +76,8 @@ function today(options: {
 }
 
 /**
- * Wires a reminder the way the composition root does: the status bar and the
- * scheduler are created here and handed in, so the reminder owns nothing.
+ * 按组合根的方式装配提醒：状态栏与调度器在这里创建后传入，
+ * 提醒本身不拥有任何东西。
  *
  * @author sdttttt
  */

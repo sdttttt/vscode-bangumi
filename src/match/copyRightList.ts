@@ -1,7 +1,7 @@
 import { valueFilter } from "./filterSpec";
 
 /**
- * Copyright filter.
+ * 版权筛选。
  *
  * @author sdttttt
  */

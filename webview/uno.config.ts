@@ -1,19 +1,16 @@
 import { defineConfig } from "unocss";
 
 /**
- * UnoCSS configuration of the webview.
+ * Webview 的 UnoCSS 配置。
  *
- * All webview styling is authored with atomic utilities: inline in the JSX when
- * a rule applies to one element, and as the shortcuts below when several
- * elements share it. The shortcuts keep the semantic class names the components
- * already used, so the markup stays readable and the tests keep their selectors.
+ * Webview 的样式全部用原子类编写：只作用于单个元素时直接写在 JSX 上，
+ * 多个元素共用时写成下面的 shortcut。shortcut 保留了组件原本就在用的语义类名，
+ * 因此结构可读，测试里的选择器也不受影响。
  *
- * Colours are mapped onto the surface tokens declared in
- * `src/styles/main.css`, which in turn resolve to `--vscode-*` values. Every
- * screen therefore shares one palette and follows the active theme.
+ * 颜色映射到 `webview/src/styles/main.css` 里声明的表面 token，
+ * 而这些 token 又解析到 `--vscode-*` 变量，所有界面因此共用同一套配色并跟随当前主题。
  *
- * `unocss/vite` already supplies the `presetWind3()` preset, so it is not
- * repeated here.
+ * `unocss/vite` 已经内置 `presetWind3()`，这里不再重复声明。
  *
  * @author sdttttt
  */
@@ -44,15 +41,14 @@ export default defineConfig({
         },
     },
     shortcuts: {
-        /* -------------------------------------------------------------- shared */
+        /* -------------------------------------------------------------- 共享 */
 
-        // The scrolling root of every screen. `.board` also owns the scrollbar
-        // sizing in the base stylesheet.
+        // 每个界面的滚动根节点。`.board` 还在基础样式表里负责滚动条尺寸。
         board: "box-border overflow-auto p-3 min-[600px]:p-5",
-        // Card surface shared by the index cards and the week columns.
+        // 索引卡片与周番列共用的卡片表面。
         surface:
             "box-border min-w-0 bg-surface border border-solid border-line rounded-3 [box-shadow:var(--card-shadow)]",
-        // Small rounded label used by dates, times, badges and page numbers.
+        // 日期、时刻、徽标与页码共用的小圆角标签。
         chip: "inline-flex flex-none items-center px-2 py-0.5 text-[11px] leading-normal text-fg bg-tint rounded-full tabular-nums",
         "chip-accent": "text-accent bg-accent-soft",
         "chip-warning": "text-warning-text bg-warning-soft",
@@ -61,14 +57,14 @@ export default defineConfig({
         "focus-ring":
             "focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-1 focus-visible:outline-accent",
 
-        /* ----------------------------------------------------------------- pager */
+        /* ----------------------------------------------------------------- 分页器 */
 
         pager: "sticky top-0 z-10 flex flex-wrap items-center gap-3 px-5 py-3 bg-editor border-b-1 border-b-solid border-line",
         "pager-button":
             "px-3 py-1 text-button-fg bg-button border-none rounded-[3px] cursor-pointer [font:inherit] hover:bg-button-hover",
         "page-number": "chip",
 
-        /* ------------------------------------------------------------ index list */
+        /* ------------------------------------------------------------ 索引列表 */
 
         "bangumi-grid":
             "grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr))]",
@@ -84,7 +80,7 @@ export default defineConfig({
         "cover-foot": "mt-auto flex items-center justify-between gap-2 pt-1",
         btn: "inline-flex flex-none items-center rounded-[3px] px-[11px] py-[3px] text-[11px] text-button-fg bg-button border border-solid border-button-border hover:bg-button-hover hover:text-button-fg hover:no-underline",
 
-        /* ---------------------------------------------------------- placeholder */
+        /* ---------------------------------------------------------- 占位界面 */
 
         load: "box-border flex h-screen flex-col items-center justify-center gap-4 p-6",
         "load-card":
@@ -92,15 +88,15 @@ export default defineConfig({
         "load-image": "w-30 h-32.5 bg-tint rounded-2 object-contain",
         "load-text": "m-0 text-sm font-500 text-muted",
 
-        /* ----------------------------------------------------------- week board */
+        /* ----------------------------------------------------------- 周番面板 */
 
-        // `.board` supplies the padding and scrolling; the week view also pins
-        // itself to the viewport height so the columns scroll sideways.
+        // 内边距与滚动由 `.board` 提供；周番视图还会把自己固定为视口高度，
+        // 让各列可以横向滚动。
         "week-board":
             "h-screen [scroll-padding-inline:12px] min-[600px]:[scroll-padding-inline:20px]",
         week: "grid grid-flow-col auto-cols-[232px] min-[600px]:auto-cols-[252px] items-stretch gap-3 min-[600px]:gap-4 w-max m-0 p-0",
         item: "surface flex flex-col",
-        // `!` wins over the colours of `item` regardless of the utilities order.
+        // 无论工具类的输出顺序如何，`!` 都能压过 `item` 的颜色。
         today: "!border-accent [box-shadow:var(--card-shadow),0_0_0_1px_var(--accent)]",
         day: "flex items-center justify-between gap-2 px-3.5 py-3 border-b-1 border-b-solid border-line",
         "day-today":
@@ -114,9 +110,8 @@ export default defineConfig({
         timeline: "flex flex-col gap-4 p-3.5",
         "time-group": "flex flex-col gap-2",
         "time-point": "chip self-start font-600 tracking-[0.02em]",
-        // The "you are here" marker of the current day: a pulsing gold arrow
-        // and the current wall clock, so the marker stands out from the blue
-        // accents of the schedule without reading as one more publication slot.
+        // 当天的「你在这里」标记：闪烁的金色箭头加上当前时刻，使标记既能在日程的
+        // 蓝色强调中脱颖而出，又不会被误读成又一个更新时段。
         "now-marker":
             "flex items-center gap-1.5 py-0.5 text-[11px] font-600 leading-[1.4] text-gold tabular-nums select-none",
         "now-arrow": "flex-none animate-pulse motion-reduce:animate-none",
@@ -124,8 +119,7 @@ export default defineConfig({
         "now-countdown": "flex-none whitespace-nowrap opacity-90",
         bangumi:
             "grid grid-cols-[56px_minmax(0,1fr)] items-center gap-2.5 p-2 rounded-2 row-link border border-solid border-transparent focus-ring hover:bg-hover hover:border-line",
-        // A delayed season keeps its warning colours even while hovered; the
-        // hover colours of `bangumi` would otherwise tie on specificity.
+        // 延期番剧在悬浮时也保持警告色，否则会和 `bangumi` 的悬浮色权重打平。
         delay: "!border-warning-line !bg-warning-soft",
         "season-cover": "block w-14 h-14 overflow-hidden bg-tint rounded-1.5",
         "season-cover-image": "block w-full h-full object-cover",

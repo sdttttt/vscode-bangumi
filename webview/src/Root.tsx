@@ -4,11 +4,10 @@ import { App } from "./components/App";
 import { onHostMessage, readState, saveState, send } from "./api";
 
 /**
- * Root of the webview application.
+ * Webview 应用的根组件。
  *
- * The extension host owns the data: it posts a state whenever something
- * changes. The last state is also mirrored into `setState` so a panel restored
- * from the background paints immediately, before the host answers.
+ * 数据由扩展宿主持有：内容变化时它会推送一份状态。最后一份状态同时写入
+ * `setState`，从后台恢复的面板因此可以先绘制出来，无需等待宿主响应。
  *
  * @author sdttttt
  */
@@ -21,7 +20,7 @@ export function Root() {
             saveState(next);
         });
 
-        // The document was just (re)created, so ask for the current data.
+        // 文档刚刚（重新）创建，因此向宿主索取当前数据。
         send({ type: "ready" });
 
         return stop;

@@ -3,7 +3,7 @@ import { useScheduler, GRACE_MS, MAX_SLEEP_MS } from "@/reminder/scheduler";
 import type { Schedule, ScheduleEvent } from "@/reminder/schedule";
 
 /**
- * Builds an event that fires at the given instant.
+ * 构建一个在给定时触发的事件。
  *
  * @author sdttttt
  */
@@ -12,7 +12,7 @@ function event(at: number, title = "甲"): ScheduleEvent {
 }
 
 /**
- * Builds a schedule from its events, with a far away rollover.
+ * 用事件列表构建日程，并把滚动时刻放到很远的将来。
  *
  * @author sdttttt
  */
@@ -85,7 +85,7 @@ describe("useScheduler", () => {
         const at = Date.now() + 1_000;
 
         scheduler.arm(schedule([event(at)]));
-        /* The machine slept for an hour. */
+        /* 机器休眠了一小时。 */
         vi.setSystemTime(at + GRACE_MS + 1);
         vi.advanceTimersByTime(MAX_SLEEP_MS);
 
@@ -101,7 +101,7 @@ describe("useScheduler", () => {
         const at = Date.now() + 1_000;
 
         scheduler.arm(schedule([event(at)]));
-        /* The machine woke up late, but inside the grace window. */
+        /* 机器醒得晚了，但仍在宽限窗口内。 */
         vi.setSystemTime(at + GRACE_MS - 1_000);
         vi.advanceTimersByTime(1_000);
 

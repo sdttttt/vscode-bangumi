@@ -1,9 +1,9 @@
 /**
- * Detroit: Become Number
+ * 把可能为空的文本转换为数字。
  *
  * @export
- * @param {(string | undefined)} text
- * @returns {number}
+ * @param text 待转换的文本
+ * @returns 转换结果，无法解析时返回 0
  *
  * @author sdttttt
  */
@@ -23,10 +23,10 @@ export function toNumber(text: string | undefined): number {
 }
 
 /**
- * Determines whether empty array is
+ * 判断数组是否为空。
  *
- * @param {Array<any>} array
- * @returns true if empty array
+ * @param array 待判断的数组
+ * @returns 空数组或未定义时返回 true
  *
  * @author sdttttt
  */
@@ -35,10 +35,10 @@ export function isEmptyArray(array: Array<unknown>): boolean {
 }
 
 /**
- * Determines whether empty object is
+ * 判断对象是否为空。
  *
- * @param {any} obj
- * @returns true if empty object
+ * @param obj 待判断的对象
+ * @returns 空对象时返回 true
  *
  * @author sdttttt
  */

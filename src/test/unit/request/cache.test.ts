@@ -40,7 +40,7 @@ describe("useCache", () => {
         vi.advanceTimersByTime(5_000);
 
         cache.set("key", 2);
-        /* the first timer would fire here and delete the fresh value */
+        /* 旧的定时器本会在这里触发并删掉新值 */
         vi.advanceTimersByTime(5_500);
 
         expect(cache.get("key")).toBe(2);
@@ -67,7 +67,7 @@ describe("useCache", () => {
 
         expect(cache.get("one")).toBeUndefined();
         expect(cache.get("two")).toBeUndefined();
-        /* a leftover timer must not throw or resurrect anything */
+        /* 残留的定时器不得抛错，也不得让条目复活 */
         vi.advanceTimersByTime(20_000);
         expect(cache.get("one")).toBeUndefined();
         expect(vi.getTimerCount()).toBe(0);

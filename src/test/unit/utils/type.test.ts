@@ -49,7 +49,7 @@ describe("isEmptyObject", () => {
     });
 
     it("treats an object whose keys are all undefined as not empty", () => {
-        /* JSON.stringify drops undefined values, so this is an empty object */
+        /* JSON.stringify 会丢弃 undefined 值，因此这里等价于空对象 */
         expect(isEmptyObject({ a: undefined })).toBe(true);
     });
 });

@@ -1,13 +1,13 @@
 import { isEmptyArray, isEmptyObject } from "../utils/type";
 
 /**
- * Determines whether success is
+ * 判断接口响应是否成功。
  *
- * Reporting the failure is the job of the caller, which owns the user facing
- * message; this predicate stays pure so it can be tested without an editor.
+ * 上报失败是调用方的事，面向用户的文案由调用方持有；这个判定保持纯函数，
+ * 因此无需编辑器即可测试。
  *
- * @param {BiliResponse} res
- * @returns true if success
+ * @param res 接口响应
+ * @returns 成功时返回 true
  * @author sdttttt
  */
 export function isSuccess(res: BiliResponse): boolean {
@@ -15,11 +15,11 @@ export function isSuccess(res: BiliResponse): boolean {
 }
 
 /**
- *  The bangumisResponse is Valid Bangumis Request ?
+ * 番剧索引响应是否为有效的番剧数据。
  *
  * @export
- * @param {BangumisResponse} bangumisResponse
- * @returns
+ * @param bangumisResponse 番剧索引响应
+ * @returns 有效时返回 true
  * @author sdttttt
  */
 export function isValidBangumisRequest(
@@ -33,21 +33,21 @@ export function isValidBangumisRequest(
 }
 
 /**
- * Bili response
+ * B 站接口的通用响应结构。
  *
  * @interface BiliResponse
  * @author sdttttt
  */
 export interface BiliResponse {
-    // 0 is Success
+    // 0 表示成功
     code: number;
 
-    // success
+    // 成功时的文案
     message: string;
 }
 
 /**
- * Structure of Bangumi Response
+ * 番剧索引响应的结构。
  *
  * @export
  * @interface BangumisResponse
@@ -58,7 +58,7 @@ export interface BangumisResponse extends BiliResponse {
 }
 
 /**
- *  Bangumi Data
+ * 番剧索引的数据部分。
  *
  * @export
  * @interface BangumisData
@@ -71,33 +71,33 @@ export interface BangumisData {
 }
 
 /**
- * Bangumi Structure
+ * 单部番剧的结构。
  *
  * @export
- * @interface Bangumis
+ * @interface Bangumi
  * @author sdttttt
  */
 export interface Bangumi {
-    // Bangumis of Bilibili, need Play permission
+    // 番剧徽标，需要播放权限才会显示
     badge: string;
-    // Number of sets
+    // 封面地址
     cover: string;
-    // 几集了
+    // 更新进度，例如「更新至第 3 话」
     index_show: string;
-    // The end?
+    // 是否完结
     is_finish: number;
-    // Play Address
+    // 播放地址
     link: string;
-    // count of Chase Bangumi
+    // 追番人数
     order: string;
-    // Bangumi name
+    // 番剧名称
     title: string;
 }
 
-//=============================== Week Bangumi =============================
+//=============================== 周番数据 =================================
 
 /**
- *  Week Bangumi Response
+ * 周番数据响应的结构。
  *
  * @export
  * @interface WeekBangumiResponse
@@ -108,7 +108,7 @@ export interface WeekBangumiResponse extends BiliResponse {
 }
 
 /**
- * Week Bangumi Data
+ * 周番数据中某一天的内容。
  *
  * @export
  * @interface WeekBangumiData
@@ -123,7 +123,7 @@ export interface WeekBangumiData {
 }
 
 /**
- * Bangumi of Week
+ * 周番表中的单部番剧。
  *
  * @export
  * @interface WBangumi

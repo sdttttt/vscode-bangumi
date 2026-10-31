@@ -1,27 +1,26 @@
 /**
- * Minimal state container.
+ * 最小状态容器。
  *
- * Everything mutable in the extension is reduced to one of these, so the state
- * of the whole session lives in a single object and can be reset without
- * reloading the module that happens to hold it.
+ * 扩展里所有可变状态都收敛为这一个容器，整个会话的状态因此集中在一处，
+ * 不重新加载持有它的模块也能重置。
  *
  * @author sdttttt
  */
 export interface Store<T> {
-    /** Current state. Treat the returned value as immutable. */
+    /** 当前状态。请把返回值视为不可变。 */
     get(): T;
-    /** Replaces the state. */
+    /** 替换状态。 */
     set(next: T): void;
-    /** Replaces the state with the result of a pure transform. */
+    /** 用纯变换的结果替换状态。 */
     update(updater: (state: T) => T): void;
-    /** Restores the initial state. */
+    /** 恢复初始状态。 */
     reset(): void;
 }
 
 /**
- * Builds a store around an initial state.
+ * 围绕初始状态创建一个 store。
  *
- * @param initial state the store starts with, and returns to on `reset()`
+ * @param initial store 的起始状态，也是 `reset()` 回到的状态
  * @author sdttttt
  */
 export function createStore<T>(initial: T): Store<T> {

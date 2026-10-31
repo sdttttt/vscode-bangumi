@@ -13,7 +13,7 @@ import {
 } from "@/test/mocks/ports";
 
 /**
- * Runs the year filter with the given quick pick answer.
+ * 用给定的选择结果运行年份筛选。
  *
  * @author sdttttt
  */

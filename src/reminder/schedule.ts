@@ -3,48 +3,47 @@ import { dayDistance, isCurrentDay, nextDayStart } from "../utils/clock";
 import { truncateToColumns } from "../utils/titles";
 
 /**
- * One instant of the schedule at which at least one season updates.
+ * 日程中至少有一部番剧更新的某一时刻。
  *
- * Seasons sharing a `pub_ts` are folded into a single event so the user gets
- * one notification instead of one per season.
+ * 共享同一个 `pub_ts` 的番剧会合并成一个事件，这样用户收到的是一条通知，
+ * 而不是每部番剧各一条。
  *
  * @author sdttttt
  */
 export interface ScheduleEvent {
-    /** Instant the reminder has to fire at, pre-shift already applied. */
+    /** 提醒应当触发的时刻，已应用提前量。 */
     readonly at: number;
-    /** Instant the episode actually publishes. */
+    /** 剧集真正更新的时刻。 */
     readonly pubTs: number;
-    /** Publication wall clock as reported by the API, e.g. `20:00`. */
+    /** 接口返回的更新时刻文案，例如 `20:00`。 */
     readonly pubTime: string;
-    /** Titles of the seasons updating together, in schedule order. */
+    /** 同一时刻更新的番剧标题，按日程顺序排列。 */
     readonly titles: ReadonlyArray<string>;
 }
 
 /**
- * Everything the reminder needs, derived once from the weekly schedule.
+ * 提醒所需的全部信息，由周番数据一次性推导得出。
  *
  * @author sdttttt
  */
 export interface Schedule {
-    /** Upcoming notification events, ascending by `at`. */
+    /** 尚未触发的通知事件，按 `at` 升序排列。 */
     readonly events: ReadonlyArray<ScheduleEvent>;
-    /** Instant at which the schedule has to be pulled again for the next day. */
+    /** 需要重新拉取次日日程的时刻。 */
     readonly rolloverAt: number;
 }
 
 /**
- * Grace period after midnight before the schedule is refreshed.
+ * 午夜之后重新拉取日程的缓冲时长。
  *
- * The API switches its `is_today` flag at midnight sharp, so a small delay
- * avoids reading a half updated response.
+ * 接口在午夜整点切换 `is_today` 标记，稍微延后可以避免读到只更新了一半的响应。
  *
  * @author sdttttt
  */
 export const ROLLOVER_DELAY_MS = 5 * 60 * 1000;
 
 /**
- * Whether an entry is a delayed season, which has no reliable update instant.
+ * 判断该条目是否为延期番剧，延期番剧没有可靠的更新时间。
  *
  * @author sdttttt
  */
@@ -53,11 +52,10 @@ function isDelayed(season: WBangumi): boolean {
 }
 
 /**
- * Builds the notification events of the schedule.
+ * 构建日程中的通知事件。
  *
- * Delayed seasons are skipped, as are seasons without a publication instant.
- * The `aheadSeconds` lead time is clamped per event, so a lead longer than the
- * remaining time fires immediately instead of at a negative delay.
+ * 延期番剧会被跳过，没有更新时刻的番剧同样跳过。`aheadSeconds` 提前量按事件
+ * 逐个收敛，提前量大于剩余时间时立即触发，而不是算出一个负的延迟。
  *
  * @author sdttttt
  */
@@ -92,7 +90,7 @@ export function buildEvents(
 
     const events: Array<ScheduleEvent> = [];
     for (const [pubTs, group] of groups) {
-        /* Already published, or too far away to be worth a timer. */
+        /* 已经播出，或者远到不值得再上定时器。 */
         if (pubTs * 1000 <= now || pubTs * 1000 >= horizonAt) {
             continue;
         }
@@ -108,11 +106,10 @@ export function buildEvents(
 }
 
 /**
- * Instant up to which the current schedule covers the API's seasons.
+ * 当前日程覆盖到接口番剧的哪个时刻为止。
  *
- * Two day boundaries: the rest of today plus the whole of tomorrow, matching
- * how far ahead the reminder is expected to look. The daily rollover pulls the
- * schedule again, so coverage never lapses.
+ * 跨两个日界：今天剩余的时间加上整个明天，正好是提醒需要前瞻的范围。
+ * 每日滚动时会重新拉取日程，因此覆盖面不会断档。
  *
  * @author sdttttt
  */
@@ -121,7 +118,7 @@ export function horizonOf(now: number): number {
 }
 
 /**
- * Builds the whole schedule, including the instant of the next day rollover.
+ * 构建完整日程，包括次日滚动的时刻。
  *
  * @author sdttttt
  */
@@ -137,9 +134,9 @@ export function buildSchedule(
 }
 
 /**
- * Index of today in the weekly schedule.
+ * 今天在周番数据中的下标。
  *
- * The API flags the day directly, so no local date arithmetic is needed.
+ * 接口直接标记了当天，因此不需要做本地日期运算。
  *
  * @author sdttttt
  */
@@ -152,37 +149,36 @@ export function todayIndex(
 }
 
 /**
- * Icon rendered at the head of the status bar entry.
+ * 状态栏条目开头渲染的图标。
  *
- * A codicon costs one glyph while `update at` costs nine columns, and it makes
- * the entry recognisable at a glance in a crowded status bar.
+ * codicon 只占一个字形，而写出「更新于」要占九列；同时它能让条目在拥挤的
+ * 状态栏里一眼被认出来。
  *
  * @author sdttttt
  */
 export const STATUS_BAR_ICON = "$(clock)";
 
 /**
- * How many days ahead an event is announced as `明日` in the status bar.
+ * 事件距今天多少天时，状态栏会标注为「明日」。
  *
  * @author sdttttt
  */
 const TOMORROW_DAYS = 1;
 
 /**
- * Columns reserved for the subject of the status bar entry.
+ * 状态栏条目中留给标题的列数。
  *
- * Seven CJK characters plus the ellipsis: long enough for a recognisable title,
- * short enough that the time never gets pushed out of view.
+ * 七个中日韩字符加省略号：足够认出剧名，又不会把时间挤出可视区域。
  *
  * @author sdttttt
  */
 export const STATUS_BAR_NAME_COLUMNS = 15;
 
 /**
- * Name of a group, without the book quotes notifications use.
+ * 分组标题的展示名，不带通知里使用的书名号。
  *
- * The status bar is the narrowest surface of the extension, and the quotes add
- * two columns each without adding meaning; the tooltip keeps them.
+ * 状态栏是扩展里最窄的展示面，书名号每处要占两列却没有增加信息量；
+ * 悬浮提示里仍然保留书名号。
  *
  * @author sdttttt
  */
@@ -193,12 +189,10 @@ function groupName(event: ScheduleEvent): string {
 }
 
 /**
- * `明日 ` prefix of an event that does not happen today.
+ * 非当天事件的「明日 」前缀。
  *
- * Empty for today, the common case that must stay free of noise. The trailing
- * space is part of the prefix so callers concatenate it with the time directly;
- * the tooltip and the accessibility label reuse it to stay consistent with the
- * entry itself.
+ * 当天事件返回空串，这是最常见的情况，必须保持无噪声。前缀自带尾随空格，
+ * 调用方可以直接和时刻拼接；悬浮提示与无障碍标签复用它，保持与条目本身一致。
  *
  * @author sdttttt
  */
@@ -207,10 +201,10 @@ export function dayMarker(event: ScheduleEvent, now: number): string {
 }
 
 /**
- * Status bar text of an event.
+ * 事件在状态栏中的文本。
  *
- * Time first so the entry keeps a constant width and the eye lands on the only
- * part that changes between refreshes; the subject follows, without quotes.
+ * 时间放在最前面，条目宽度才能保持稳定，视线也会落在刷新之间唯一变化的部分；
+ * 标题接在后面，不带书名号。
  *
  * @author sdttttt
  */

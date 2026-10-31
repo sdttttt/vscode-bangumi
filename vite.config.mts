@@ -9,11 +9,11 @@ const nodeBuiltins = [
 
 export default defineConfig({
     resolve: {
-        // Bundle the Node.js entry points (`main`), never the browser ones.
+        // 解析到 Node.js 入口（`main`），绝不解析浏览器版本。
         mainFields: ["module", "main"],
         /*
-         * Prefer the `node` export condition so any dependency resolves to its
-         * Node.js implementation instead of the browser one.
+         * 优先使用 `node` 这个导出条件，任何依赖都会解析到 Node.js 实现，
+         * 而不是浏览器实现。
          */
         conditions: ["node"],
         alias: {
@@ -23,22 +23,22 @@ export default defineConfig({
     build: {
         outDir: "dist",
         emptyOutDir: true,
-        // VS Code 1.100 ships Electron 34, which bundles Node.js 20.
+        // VS Code 1.100 自带 Electron 34，其中内置 Node.js 20。
         target: "node20",
         minify: false,
         sourcemap: false,
         lib: {
             entry: path.resolve(import.meta.dirname, "src/extension.ts"),
             /*
-             * ES modules, matching `type: module` in package.json. The Node.js
-             * extension host understands ESM since VS Code 1.100, which is the
-             * version `engines.vscode` requires anyway.
+             * 输出 ES module，与 package.json 里的 `type: module` 一致。
+             * Node.js 扩展宿主自 VS Code 1.100 起支持 ESM，而 `engines.vscode`
+             * 要求的下限正是这个版本。
              */
             formats: ["es"],
             fileName: () => "extension.js",
         },
         rolldownOptions: {
-            // `import("vscode")` is provided by the host, never bundled.
+            // `import("vscode")` 由宿主提供，绝不打包进产物。
             external: ["vscode", ...nodeBuiltins],
         },
     },

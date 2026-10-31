@@ -4,14 +4,14 @@ import type { ScheduleEvent } from "@/reminder/schedule";
 import { useStatusBar } from "@/reminder/statusBar";
 
 /**
- * 2026-11-01 12:00 UTC+8, the instant the status bar is rendered at.
+ * 2026-11-01 12:00 UTC+8，渲染状态栏的时刻。
  *
  * @author sdttttt
  */
 const NOW = Date.UTC(2026, 10, 1, 4, 0);
 
 /**
- * Event double.
+ * 事件替身。
  *
  * @author sdttttt
  */
@@ -20,7 +20,7 @@ function event(pubTime: string, titles: Array<string>): ScheduleEvent {
 }
 
 /**
- * Status bar double installed into the `vscode` mock.
+ * 装入 `vscode` 桩的状态栏替身。
  *
  * @author sdttttt
  */

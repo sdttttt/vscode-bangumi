@@ -12,14 +12,14 @@ import YearList from "./yearList";
 import StyleList from "./styleList";
 
 /**
- * Label that clears every filter.
+ * 清空所有筛选的菜单文案。
  *
  * @author sdttttt
  */
 export const RESTORE_LABEL = "(恢复默认)";
 
 /**
- * Every filter of the menu, in the order it is offered.
+ * 菜单中的全部筛选，按展示顺序排列。
  *
  * @author sdttttt
  */
@@ -35,7 +35,7 @@ export const FILTERS: ReadonlyArray<FilterSpec> = [
 ];
 
 /**
- * Menu labels, with the restore entry last.
+ * 菜单文案，恢复默认项排在最后。
  *
  * @author sdttttt
  */
@@ -45,20 +45,20 @@ export const MENU_LABELS: ReadonlyArray<string> = [
 ];
 
 /**
- * Dependencies of the index menu command.
+ * 索引菜单命令的依赖。
  *
  * @author sdttttt
  */
 export interface IndexCommandOptions {
     readonly state: AppStore;
     readonly menu: FilterMenu;
-    /** User facing output. */
+    /** 面向用户的输出。 */
     readonly notifier: Notifier;
     readonly filters?: ReadonlyArray<FilterSpec>;
 }
 
 /**
- * Builds the filter menu command of one extension session.
+ * 创建一次扩展会话的筛选菜单命令。
  *
  * @author sdttttt
  */

@@ -2,7 +2,7 @@ import { afterEach, vi } from "vitest";
 import { cleanup } from "@testing-library/preact";
 
 /**
- * Stand-in for the API VS Code injects into a webview.
+ * VS Code 注入 Webview 的 API 的替身。
  *
  * @author sdttttt
  */
@@ -13,9 +13,8 @@ export const vsCodeApi = {
 };
 
 /*
- * The bundle runs inside VS Code, where `acquireVsCodeApi` is injected. The
- * module is evaluated at import time, so the global must exist before any test
- * imports `api.ts`.
+ * 打包产物运行在 VS Code 中，`acquireVsCodeApi` 由宿主注入。模块在导入时就会求值，
+ * 因此这个全局函数必须在任何测试导入 `api.ts` 之前存在。
  */
 Object.assign(globalThis, {
     acquireVsCodeApi: () => vsCodeApi,

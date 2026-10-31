@@ -16,7 +16,7 @@ import { useCommands, type CommandId } from "./commands";
 import { useNotifier } from "./notifier";
 
 /**
- * Everything one activation created, so `deactivate()` can release it.
+ * 一次激活创建的全部内容，供 `deactivate()` 释放。
  *
  * @author sdttttt
  */
@@ -27,13 +27,12 @@ interface Session {
 let session: Session | undefined;
 
 /**
- * Composition root: builds every closure with the dependencies it needs.
+ * 组合根：用各自的依赖构建所有闭包。
  *
- * Each module only declares what it needs, never what it owns, so this is the
- * single place where a session is wired together. Nothing is created at module
- * load, and a second `activate()` reuses the session of the first.
+ * 每个模块只声明自己需要什么，从不声明自己拥有什么，因此这里是唯一装配会话的地方。
+ * 模块加载阶段不会创建任何东西，第二次 `activate()` 会复用第一次的会话。
  *
- * @param context activation context owned by the host
+ * @param context 宿主持有的激活上下文
  * @author sdttttt
  */
 function createSession(
@@ -53,7 +52,7 @@ function createSession(
     const host = useWebviewHost(context.extensionPath);
 
     /**
-     * Opens a panel in the editor column the user was last active in.
+     * 在用户最近活动的编辑器列中打开面板。
      */
     const createViewPanel = (
         viewType: string,
@@ -118,7 +117,7 @@ function createSession(
     bangumiPanel.onCommand(bangumi.handleCommand);
     weekPanel.onCommand(weekBangumi.handleCommand);
 
-    /* The reminder registers its own settings listener, so it owns a disposable. */
+    /* 提醒会自行注册设置监听，因此它自己持有一个可释放对象。 */
     context.subscriptions.push(reminder);
     void reminder.start();
     session = { reminder };
@@ -134,9 +133,9 @@ function createSession(
 }
 
 /**
- *  Main Function
+ * 扩展入口。
  *
- * @param {vscode.ExtensionContext} context
+ * @param context 宿主持有的激活上下文
  * @author sdttttt
  */
 export function activate(context: vscode.ExtensionContext): void {
@@ -147,9 +146,8 @@ export function activate(context: vscode.ExtensionContext): void {
     const handlers = createSession(context);
 
     /*
-     * The command has been defined in the package.json file
-     * Now provide the implementation of the command with registerCommand
-     * The commandId parameter must match the command field in package.json
+     * 命令已在 package.json 中声明，这里用 registerCommand 提供实现。
+     * 命令 id 必须与 package.json 中的 command 字段一致。
      */
     context.subscriptions.push(
         ...Object.entries(handlers).map(([id, handler]) =>
@@ -159,7 +157,7 @@ export function activate(context: vscode.ExtensionContext): void {
 }
 
 /**
- * this method is called when your extension is deactivated
+ * 扩展被停用时调用。
  *
  * @export
  * @author sdttttt

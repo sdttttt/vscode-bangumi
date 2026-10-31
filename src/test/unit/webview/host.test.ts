@@ -3,7 +3,7 @@ import type { Webview } from "vscode";
 import { useWebviewHost, WEBVIEW_DIST, type WebviewHost } from "@/webview/host";
 
 /**
- * Builds a webview double whose `asWebviewUri` stays readable.
+ * 构建一个 Webview 替身，其 `asWebviewUri` 返回可读的字符串。
  *
  * @author sdttttt
  */

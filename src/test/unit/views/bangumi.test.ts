@@ -10,7 +10,7 @@ import { usePanel } from "@/views/panel";
 import { useBangumiView, type BangumiView } from "@/views/bangumi";
 
 /**
- * Builds a view of its own, so every case starts with a closed panel.
+ * 构建独立的视图实例，每个用例因此都从关闭的面板开始。
  *
  * @author sdttttt
  */
@@ -51,7 +51,7 @@ function loadView(stubs: ReadonlyArray<PanelStub>): {
 }
 
 /**
- * Query parameter of the url handed to the request layer.
+ * 交给请求层的地址中的某个查询参数。
  *
  * @author sdttttt
  */

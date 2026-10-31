@@ -1,5 +1,5 @@
 /**
- * Props shared by the placeholder screens.
+ * 占位界面共用的属性。
  *
  * @author sdttttt
  */
@@ -9,10 +9,9 @@ interface PlaceholderProps {
 }
 
 /**
- * Full panel placeholder used by the loading and empty screens.
+ * 加载与空态界面使用的整屏占位。
  *
- * It shares the card surface of the week view, so the three screens read as one
- * application instead of three unrelated pages.
+ * 它复用周番视图的卡片表面，三个界面因此看起来是同一个应用，而不是三个互不相干的页面。
  *
  * @author sdttttt
  */

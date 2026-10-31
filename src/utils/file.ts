@@ -2,15 +2,15 @@ import * as vscode from "vscode";
 import * as path from "path";
 
 /**
- * Gets a resource Uri usable inside a Webview.
+ * 获取 Webview 中可用的资源 Uri。
  *
- * The old `vscode-resource` scheme is deprecated, `asWebviewUri` is the
- * supported way to reference extension files from Webview HTML.
+ * 旧的 `vscode-resource` scheme 已废弃，`asWebviewUri` 才是从 Webview HTML
+ * 引用扩展文件的受支持方式。
  *
- * @param webview the Webview that will load the resource
- * @param filename resource file name, relative to `resources/`
- * @param extensionPath root of the installed extension
- * @returns resource file
+ * @param webview 将要加载该资源的 Webview
+ * @param filename 资源文件名，相对于 `resources/`
+ * @param extensionPath 已安装扩展的根目录
+ * @returns 资源文件
  * @author sdttttt
  */
 export function getResourceFile(

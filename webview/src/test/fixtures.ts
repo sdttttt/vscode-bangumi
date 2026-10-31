@@ -1,7 +1,7 @@
 import type { ViewState } from "@shared/webview/protocol";
 
 /**
- * Local images every state carries in production.
+ * 生产环境中每份状态都会携带的本地图片。
  *
  * @author sdttttt
  */
@@ -12,7 +12,7 @@ export const assets = {
 };
 
 /**
- * A ready to render state.
+ * 一份可直接渲染的状态。
  *
  * @author sdttttt
  */

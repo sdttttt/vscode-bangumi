@@ -8,7 +8,7 @@ import {
 } from "@/configuration";
 
 /**
- * Makes `workspace.getConfiguration().get` answer with the given map.
+ * 让 `workspace.getConfiguration().get` 按给定映射返回结果。
  *
  * @author sdttttt
  */

@@ -1,21 +1,21 @@
 import { describeTitles } from "./titles";
 
 /**
- * Titles of a reminder: either one title, or every season of an update group.
+ * 提醒的标题：单个剧名，或某个更新分组的全部剧名。
  *
  * @author sdttttt
  */
 export type RemindTitles = string | ReadonlyArray<string>;
 
 /**
- * Label of the action button of a reminder.
+ * 提醒中操作按钮的文案。
  *
  * @author sdttttt
  */
 export const REMIND_ACTION = "打开周番表";
 
 /**
- * Renders the titles through the shared notification formatter.
+ * 通过共用的通知格式化器渲染标题。
  *
  * @author sdttttt
  */
@@ -26,7 +26,7 @@ function formatTitles(titles: RemindTitles): string {
 }
 
 /**
- * Message of a reminder that an episode is out.
+ * 剧集已更新的提醒文案。
  *
  * @author sdttttt
  */
@@ -35,7 +35,7 @@ export function updatedMessage(titles: RemindTitles): string {
 }
 
 /**
- * Message of a reminder that an episode is about to be out.
+ * 剧集即将更新的提醒文案。
  *
  * @author sdttttt
  */

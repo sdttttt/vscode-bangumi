@@ -1,7 +1,7 @@
 import { valueFilter } from "./filterSpec";
 
 /**
- * Whether the season has finished.
+ * 是否完结的筛选。
  *
  * @author sdttttt
  */

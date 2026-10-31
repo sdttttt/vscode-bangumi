@@ -9,7 +9,7 @@ import { usePanel } from "@/views/panel";
 import { useWeekBangumiView, type WeekBangumiView } from "@/views/weekBangumi";
 
 /**
- * Builds a view of its own, so every case starts with a closed panel.
+ * 构建独立的视图实例，每个用例因此都从关闭的面板开始。
  *
  * @author sdttttt
  */

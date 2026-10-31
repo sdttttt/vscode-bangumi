@@ -3,14 +3,14 @@ import { describeNotice, PUBLISHED_THRESHOLD_MS } from "@/reminder/notice";
 import type { ScheduleEvent } from "@/reminder/schedule";
 
 /**
- * 2026-11-01 20:00 UTC+8, the publication instant of the event under test.
+ * 2026-11-01 20:00 UTC+8，被测事件的更新时刻。
  *
  * @author sdttttt
  */
 const PUB_TS = Date.UTC(2026, 10, 1, 12, 0);
 
 /**
- * Event double publishing at `PUB_TS`.
+ * 在 `PUB_TS` 更新的时间事件替身。
  *
  * @author sdttttt
  */

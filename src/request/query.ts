@@ -1,15 +1,15 @@
-// bilibili API => Week Bangumi
+// bilibili 接口 => 周番数据
 export const BANGUMI_WEEK =
     "https://bangumi.bilibili.com/web_api/timeline_global";
 
-// bilibili API => Base url of show all Bangumi
+// bilibili 接口 => 番剧索引的基础地址
 const BANGUMI_SHOW = "https://api.bilibili.com/pgc/season/index/result?";
 
 /**
- * Filters of the bangumi index request.
+ * 番剧索引请求的筛选条件。
  *
- * Every value travels to the API verbatim, so callers that need an escaped
- * value (a year range, a list of area ids) encode it themselves.
+ * 每个值都会原样发往接口，因此需要转义的值（年份区间、地区 id 列表）
+ * 由调用方自行编码。
  *
  * @author sdttttt
  */
@@ -31,7 +31,7 @@ export interface BangumiQuery {
 }
 
 /**
- * The unfiltered query.
+ * 不带任何筛选的 query。
  *
  * @author sdttttt
  */
@@ -53,13 +53,13 @@ export const DEFAULT_QUERY: BangumiQuery = Object.freeze({
 });
 
 /**
- * Builds the request url of one page of the bangumi index.
+ * 构建番剧索引某一页的请求地址。
  *
- * The parameters are concatenated instead of being handed to `URLSearchParams`
- * so the pre-encoded values (`%5B2020%2C2021%29`) reach the API untouched.
+ * 参数直接拼接，而不是交给 `URLSearchParams`，这样已编码的值
+ * （例如 `%5B2020%2C2021%29`）能原样到达接口。
  *
- * @param query filters of the request
- * @param page page number, starting at 1
+ * @param query 请求的筛选条件
+ * @param page 页码，从 1 开始
  * @author sdttttt
  */
 export function buildBangumiUrl(query: BangumiQuery, page: number): string {

@@ -3,7 +3,7 @@ import type { Commands, CommandId } from "@/commands";
 import type { Notifier } from "@/notifier";
 
 /**
- * Notifier double that records what the extension would have shown.
+ * Notifier 替身，记录扩展本应展示的内容。
  *
  * @author sdttttt
  */
@@ -13,13 +13,13 @@ export interface NotifierStub {
     readonly ask: ReturnType<typeof vi.fn<Notifier["ask"]>>;
     readonly pick: ReturnType<typeof vi.fn<Notifier["pick"]>>;
     readonly action: ReturnType<typeof vi.fn<Notifier["action"]>>;
-    /** The double as a `Notifier`. */
+    /** 该替身作为 `Notifier` 使用。 */
     readonly notifier: Notifier;
 }
 
 /**
- * Builds a notifier double. `pick` and `action` answer `undefined` unless a
- * case resolves them, which mirrors a dismissed prompt.
+ * 创建 Notifier 替身。除非用例自行设定返回值，`pick` 与 `action` 都返回 `undefined`，
+ * 与用户取消选择的场景一致。
  *
  * @author sdttttt
  */
@@ -41,18 +41,18 @@ export function createNotifierStub(): NotifierStub {
 }
 
 /**
- * Commands double that records every executed id.
+ * Commands 替身，记录每一个被执行的命令 id。
  *
  * @author sdttttt
  */
 export interface CommandsStub {
     readonly execute: ReturnType<typeof vi.fn<(id: CommandId) => void>>;
-    /** The double as a `Commands`. */
+    /** 该替身作为 `Commands` 使用。 */
     readonly commands: Commands;
 }
 
 /**
- * Builds a commands double.
+ * 创建 Commands 替身。
  *
  * @author sdttttt
  */

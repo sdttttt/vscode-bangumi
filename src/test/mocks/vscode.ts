@@ -1,22 +1,21 @@
 import { vi } from "vitest";
 
 /**
- * A disposable matching the shape of `vscode.Disposable`.
+ * 与 `vscode.Disposable` 形状一致的可释放对象。
  *
  * @author sdttttt
  */
 export class Disposable {
     public dispose(): void {
-        /* nothing to release in tests */
+        /* 测试中无需释放任何东西 */
     }
 }
 
 /**
- * Builds a stub of the `vscode` module.
+ * 构建 `vscode` 模块的桩。
  *
- * Unit tests run in plain Node.js, so the real module is unavailable. The stub
- * only covers the API surface this extension touches; extend it when a new API
- * is imported by production code.
+ * 单元测试运行在纯 Node.js 中，真实模块不可用。这个桩只覆盖扩展用到的 API；
+ * 生产代码引入新 API 时请在这里补齐。
  *
  * @author sdttttt
  */
@@ -64,11 +63,11 @@ export function createVSCodeMock() {
             public readonly event = vi.fn();
 
             public fire(): void {
-                /* no listeners in tests */
+                /* 测试中没有监听者 */
             }
 
             public dispose(): void {
-                /* nothing to release in tests */
+                /* 测试中无需释放任何东西 */
             }
         },
         commands,

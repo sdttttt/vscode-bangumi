@@ -19,59 +19,57 @@ import type { Scheduler } from "./scheduler";
 import type { StatusBar } from "./statusBar";
 
 /**
- * Delays used when the weekly schedule cannot be pulled.
+ * 无法拉取周番数据时的重试间隔。
  *
- * The reminder is the only part of the extension that has to survive a network
- * outage on its own, so it retries instead of leaving the status bar empty for
- * the rest of the session.
+ * 提醒是扩展里唯一需要独自扛过断网的部分，因此它会重试，而不是让状态栏在
+ * 本次会话余下的时间里一直空着。
  *
  * @author sdttttt
  */
 const RETRY_DELAYS_MS: ReadonlyArray<number> = [30_000, 120_000, 600_000];
 
 /**
- * Pulls the weekly schedule. Injectable so tests never touch the network and
- * the session can hand in its own `BangumiApi`.
+ * 拉取周番数据。可注入，测试因此不会触碰网络，会话也可以传入自己的 `BangumiApi`。
  *
  * @author sdttttt
  */
 export type WeekSource = () => Promise<Array<WeekBangumiData> | undefined>;
 
 /**
- * The reminder surface used by the extension entry.
+ * 扩展入口使用的提醒能力。
  *
  * @author sdttttt
  */
 export interface Reminder {
-    /** Starts the reminder and follows the related settings. */
+    /** 启动提醒，并跟随相关设置的变更。 */
     start(): Promise<void>;
-    /** Pulls the schedule again and re-arms the reminder. */
+    /** 重新拉取日程并重新装载提醒。 */
     refresh(): Promise<void>;
-    /** Announces one due event and drops it from the status bar. */
+    /** 播报一个到期事件，并把它从状态栏移除。 */
     fire(event: ScheduleEvent): void;
-    /** Releases every timer, the status bar entry and the settings listener. */
+    /** 释放所有定时器、状态栏条目与设置监听。 */
     dispose(): void;
 }
 
 /**
- * Dependencies of a reminder.
+ * 提醒所需的依赖。
  *
  * @author sdttttt
  */
 export interface ReminderOptions {
-    /** Pulls the weekly schedule. */
+    /** 拉取周番数据。 */
     readonly source: WeekSource;
-    /** Status bar entry owned by the composition root. */
+    /** 由组合根持有的状态栏条目。 */
     readonly statusBar: StatusBar;
-    /** Scheduler owned by the composition root. */
+    /** 由组合根持有的调度器。 */
     readonly scheduler: Scheduler;
-    /** Settings of the session. */
+    /** 本次会话的设置。 */
     readonly settings: Settings;
-    /** User facing output. */
+    /** 面向用户的输出。 */
     readonly notifier: Notifier;
-    /** Runs the extension commands. */
+    /** 执行扩展命令。 */
     readonly commands: Commands;
-    /** Subscribes to setting changes and returns the disposable. */
+    /** 订阅设置变更，并返回可释放对象。 */
     readonly onSettingsChanged: (
         listener: (affected: (section: string) => boolean) => void
     ) => vscode.Disposable;
@@ -79,12 +77,11 @@ export interface ReminderOptions {
 }
 
 /**
- * Schedules the update reminders and owns the status bar entry.
+ * 调度更新提醒，并负责状态栏条目。
  *
- * A whole schedule is reduced to a single armed timer: the scheduler wakes up
- * at the next deadline (bounded by half an hour), fires every due event as one
- * notification per update group, and re-arms. Nothing accumulates between
- * schedule changes, and `refresh()` is idempotent.
+ * 整个日程被收敛为单个已装载的定时器：调度器在下一个截止时刻醒来（以半小时为上限），
+ * 把每个到期事件按更新分组各发一条通知，然后重新装载。日程切换之间不会累积任何东西，
+ * `refresh()` 也是幂等的。
  *
  * @author sdttttt
  */
@@ -101,7 +98,7 @@ export function useReminder(options: ReminderOptions): Reminder {
     let events: ReadonlyArray<ScheduleEvent> = [];
     let listener: vscode.Disposable | undefined;
     let retryTimer: ReturnType<typeof setTimeout> | undefined;
-    /* Bumped on every refresh so a slow response cannot overwrite a newer one. */
+    /* 每次刷新自增，避免慢响应覆盖更新的结果。 */
     let generation = 0;
     let retryAttempt = 0;
     let warnedMissingToday = false;
@@ -171,7 +168,7 @@ export function useReminder(options: ReminderOptions): Reminder {
             days = undefined;
         }
 
-        /* A newer refresh, or a dispose, invalidates this response. */
+        /* 更新的刷新或 dispose 会让本次响应作废。 */
         if (current !== generation || disposed) {
             return;
         }

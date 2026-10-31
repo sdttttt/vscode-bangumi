@@ -9,10 +9,9 @@ import type { WebviewCommand } from "../webview/protocol";
 import type { Panel } from "./panel";
 
 /**
- * Dependencies of the bangumi list view.
+ * 番剧列表视图的依赖。
  *
- * The panel is built by the composition root and handed in: a view decides
- * *what* to render, never *how* the panel is created.
+ * 面板由组合根创建后传入：视图只决定「渲染什么」，从不决定「面板怎么创建」。
  *
  * @author sdttttt
  */
@@ -24,25 +23,25 @@ export interface BangumiViewOptions {
 }
 
 /**
- * The commands of the bangumi list view.
+ * 番剧列表视图的命令。
  *
  * @author sdttttt
  */
 export interface BangumiView {
-    /** Opens the bangumi list at the current page. */
+    /** 在当前页打开番剧列表。 */
     openBangumi(): void;
-    /** Shows the next page. */
+    /** 展示下一页。 */
     nextPage(): void;
-    /** Shows the previous page, or says there is none. */
+    /** 展示上一页；已经是第一页时给出提示。 */
     backPage(): void;
-    /** Asks the user for a page number and opens it. */
+    /** 让用户输入页码并打开该页。 */
     jumpPage(): Promise<void>;
-    /** Routes a command sent by the webview. */
+    /** 分派 Webview 发来的命令。 */
     handleCommand(command: WebviewCommand): void;
 }
 
 /**
- * Creates the bangumi list view of one extension session.
+ * 创建一次扩展会话的番剧列表视图。
  *
  * @author sdttttt
  */
@@ -50,7 +49,7 @@ export function useBangumiView(options: BangumiViewOptions): BangumiView {
     const { state, api, panel, notifier } = options;
 
     /**
-     * Renders a page of bangumi results.
+     * 渲染一页番剧结果。
      */
     const createBangumiView = (bangumiRes: BangumisData | undefined): void => {
         if (!bangumiRes) {
@@ -66,7 +65,7 @@ export function useBangumiView(options: BangumiViewOptions): BangumiView {
     };
 
     /**
-     * Shows the number of the current page.
+     * 提示当前页码。
      */
     const showPageNumber = (): void => {
         notifier.info(`第${state.getPage()}页`);

@@ -1,7 +1,7 @@
 import { valueFilter } from "./filterSpec";
 
 /**
- * Style filter.
+ * 风格筛选。
  *
  * @author sdttttt
  */

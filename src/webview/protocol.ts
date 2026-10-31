@@ -1,35 +1,35 @@
 /**
- * Message protocol shared by the extension host and the webview bundle.
+ * 扩展宿主与 Webview 打包产物共用的消息协议。
  *
- * This file must stay free of runtime dependencies: it is imported by both
- * sides, and the webview bundle must never pull in `vscode` or Node.js.
+ * 这个文件必须保持零运行时依赖：两端都会导入它，而 Webview 产物绝不能
+ * 引入 `vscode` 或 Node.js。
  *
  * @author sdttttt
  */
 
 /**
- * Which screen the webview should render.
+ * Webview 应当渲染哪个界面。
  *
  * @author sdttttt
  */
 export type ViewKind = "loading" | "notFound" | "bangumi" | "weekBangumi";
 
 /**
- * A day of the weekly schedule, flattened for rendering.
+ * 周番数据中的一天，为渲染而展平。
  *
  * @author sdttttt
  */
 export interface WeekDayPayload {
     date: string;
     dayOfWeek: number;
-    /** Localised weekday label, resolved by the host. */
+    /** 本地化的星期文案，由宿主解析。 */
     label: string;
     isToday: boolean;
     seasons: Array<SeasonPayload>;
 }
 
 /**
- * One season entry of the weekly schedule.
+ * 周番数据中的单部番剧。
  *
  * @author sdttttt
  */
@@ -45,7 +45,7 @@ export interface SeasonPayload {
 }
 
 /**
- * One bangumi of the index list.
+ * 索引列表中的单部番剧。
  *
  * @author sdttttt
  */
@@ -60,23 +60,23 @@ export interface BangumiPayload {
 }
 
 /**
- * Data sent from the extension host to the webview.
+ * 由扩展宿主发往 Webview 的数据。
  *
  * @author sdttttt
  */
 export interface ViewState {
     kind: ViewKind;
-    /** Rendered page number, only meaningful for `bangumi`. */
+    /** 当前渲染的页码，仅对 `bangumi` 有意义。 */
     page?: number;
     bangumis?: Array<BangumiPayload>;
     days?: Array<WeekDayPayload>;
-    /** URIs the webview cannot guess, resolved through `asWebviewUri`. */
+    /** Webview 无法自行推出的 Uri，由 `asWebviewUri` 解析。 */
     assets?: AssetUris;
 }
 
 /**
- * Local files the webview has to load. The host fills them in because only the
- * extension side can turn a disk path into a webview-safe URI.
+ * Webview 需要加载的本地文件。由宿主填充，因为只有扩展侧才能把磁盘路径
+ * 转换成 Webview 可安全访问的 Uri。
  *
  * @author sdttttt
  */
@@ -87,7 +87,7 @@ export interface AssetUris {
 }
 
 /**
- * Commands the webview may send back to the extension host.
+ * Webview 可能回传给扩展宿主的命令。
  *
  * @author sdttttt
  */

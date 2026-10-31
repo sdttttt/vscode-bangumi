@@ -41,7 +41,7 @@ vi.mock("@/match/index", () => ({
 }));
 
 /**
- * Minimal `ExtensionContext` good enough for `activate()`.
+ * 足够 `activate()` 使用的最小 `ExtensionContext`。
  *
  * @author sdttttt
  */
@@ -53,7 +53,7 @@ function makeContext(): ExtensionContext {
 }
 
 /**
- * Loads a fresh copy of the extension entry so its session starts empty.
+ * 重新加载扩展入口，使其会话从空状态开始。
  *
  * @author sdttttt
  */
@@ -147,7 +147,7 @@ describe("activate", () => {
     });
 
     it("keeps following the setting even when it starts disabled", async () => {
-        /* The reminder has to stay subscribed so enabling it later works. */
+        /* 提醒必须保持订阅，之后重新开启设置才能生效。 */
         const { activate } = await loadExtension();
 
         activate(makeContext());

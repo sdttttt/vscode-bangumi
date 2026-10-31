@@ -3,22 +3,22 @@ import type { WebviewHost } from "../webview/host";
 import type { ViewState, WebviewCommand } from "../webview/protocol";
 
 /**
- * What a panel needs to know about the view it hosts.
+ * 面板需要知道的、关于它所承载视图的信息。
  *
  * @author sdttttt
  */
 export interface PanelConfig {
-    /** Webview panel type, unique per view. */
+    /** Webview 面板类型，每个视图唯一。 */
     readonly viewType: string;
-    /** Document title shown by the editor chrome. */
+    /** 编辑器界面展示的文档标题。 */
     readonly title: string;
-    /** Document factory of the same session. */
+    /** 同一会话的文档工厂。 */
     readonly host: WebviewHost;
-    /** Disposables of the same session, usually `context.subscriptions`. */
+    /** 同一会话的可释放对象，通常是 `context.subscriptions`。 */
     readonly subscriptions: Array<vscode.Disposable>;
     /**
-     * Creates the editor panel. Injected so the module never decides on its own
-     * which column to open in, and so a test can install a panel double.
+     * 创建编辑器面板。注入而非内部实现，模块因此不会自行决定开在哪一列，
+     * 测试也可以装载一个面板替身。
      */
     readonly createPanel: (
         viewType: string,
@@ -27,31 +27,28 @@ export interface PanelConfig {
 }
 
 /**
- * The surface a view talks to.
+ * 视图所面对的面板接口。
  *
  * @author sdttttt
  */
 export interface Panel {
-    /** Sends a state to the webview, creating the panel when needed. */
+    /** 向 Webview 发送状态，需要时创建面板。 */
     show(state: ViewState): void;
     showLoading(): void;
     showNotFound(): void;
     /**
-     * Registers the command handler the webview messages are forwarded to.
+     * 注册 Webview 消息转发的命令处理器。
      *
-     * Registered by the composition root after the view exists, so the panel
-     * never has to know which view it belongs to.
+     * 由组合根在视图创建之后注册，面板因此无需知道自己属于哪个视图。
      */
     onCommand(handler: (command: WebviewCommand) => void): void;
 }
 
 /**
- * Creates the panel of one view.
+ * 创建某个视图的面板。
  *
- * The panel is created on the first render and released when the user closes
- * it, and the last state is replayed whenever the webview document is
- * recreated — which happens every time the panel is hidden and shown again,
- * because `retainContextWhenHidden` is off.
+ * 面板在首次渲染时创建，用户关闭时释放；每当 Webview 文档被重建时就重放最后一份状态
+ * ——由于 `retainContextWhenHidden` 关闭，面板每次隐藏再显示都会重建文档。
  *
  * @author sdttttt
  */

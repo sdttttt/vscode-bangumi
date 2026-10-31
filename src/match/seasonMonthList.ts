@@ -1,7 +1,7 @@
 import { valueFilter } from "./filterSpec";
 
 /**
- * Season month filter.
+ * 季度（月份）筛选。
  *
  * @author sdttttt
  */

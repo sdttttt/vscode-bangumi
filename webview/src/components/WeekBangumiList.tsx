@@ -8,19 +8,19 @@ import type {
 import { formatMinuteOfDay, minuteOfDay } from "@shared/utils/clock";
 
 /**
- * Props of the weekly schedule view.
+ * 周番视图的属性。
  *
  * @author sdttttt
  */
 interface WeekBangumiListProps {
     days: Array<WeekDayPayload>;
     assets: AssetUris | undefined;
-    /** Overrides the ticking clock; tests pin it to a fixed instant. */
+    /** 覆盖走动的时钟；测试用它把时间固定住。 */
     now?: number;
 }
 
 /**
- * One publication slot of a day.
+ * 一天中的一个更新时段。
  *
  * @author sdttttt
  */
@@ -30,40 +30,39 @@ export interface SeasonGroup {
 }
 
 /**
- * Refresh cadence of the "you are here" marker.
+ * 「你在这里」标记的刷新频率。
  *
- * The marker only moves once a minute, so polling twice per minute keeps it
- * exact without waking the webview more often than needed.
+ * 标记一分钟才移动一次，因此每分钟轮询两次既保证准确，又不会让 Webview 醒得太频繁。
  *
  * @author sdttttt
  */
 export const NOW_TICK_MS = 30_000;
 
 /**
- * Label of the marker drawn at the current time of the day.
+ * 画在当前时刻标记中的文案。
  *
  * @author sdttttt
  */
 export const NOW_LABEL = "你在这里~";
 
 /**
- * Marker suffix once every slot of the day has aired.
+ * 当天所有时段都已播出后，标记显示的后缀。
  *
  * @author sdttttt
  */
 export const NOW_DONE_LABEL = "今日已播完";
 
 /**
- * Marker suffix for a day without any publication slot.
+ * 当天没有任何更新时段时，标记显示的后缀。
  *
  * @author sdttttt
  */
 export const NOW_EMPTY_LABEL = "今日没有更新";
 
 /**
- * Minute of the day of a `HH:MM` publication slot.
+ * `HH:MM` 更新时段对应的当天分钟数。
  *
- * @returns the minute, or `undefined` when the slot is malformed
+ * @returns 分钟数；时段格式不合法时返回 `undefined`
  * @author sdttttt
  */
 export function pubTimeMinute(pubTime: string): number | undefined {
@@ -82,14 +81,13 @@ export function pubTimeMinute(pubTime: string): number | undefined {
 }
 
 /**
- * Slot index the "you are here" marker has to be drawn in front of.
+ * 「你在这里」标记应当画在哪个时段之前。
  *
- * `0` means the current time is before every slot, `groups.length` means it is
- * after the last one. A slot that cannot be parsed ends the scan, so a
- * malformed entry never pushes the marker below a slot that is still ahead.
+ * `0` 表示当前时间早于所有时段，`groups.length` 表示晚于最后一个时段。
+ * 无法解析的时段会终止扫描，因此格式错误的条目不会把标记推到仍在等待的时段之下。
  *
- * A slot airing on the current minute counts as aired, so the mark stays on the
- * `time-group` the reader is watching instead of jumping above it.
+ * 正好在当前分钟播出的时段算作已播出，标记因此停留在读者正在看的那一组，
+ * 而不会跳到它上面。
  *
  * @author sdttttt
  */
@@ -111,10 +109,10 @@ export function markerIndex(
 }
 
 /**
- * Remaining minutes until the first slot at or after the current instant.
+ * 距离当前时刻之后最近一个时段的剩余分钟数。
  *
- * `undefined` when the day has no such slot, which happens after the last
- * update aired or on a day without any update.
+ * 当天没有这样的时段时返回 `undefined`，这发生在最后一场更新播出之后，
+ * 或者当天没有任何更新的时候。
  *
  * @author sdttttt
  */
@@ -123,9 +121,8 @@ export function nextGapMinutes(
     nowMinute: number
 ): number | undefined {
     /*
-     * The scan starts where the marker sits, so a slot that airs on the very
-     * minute already counts as aired: the countdown always points below the
-     * marker instead of at the row right above it.
+     * 扫描从标记所在的位置开始，因此正在这一分钟播出的时段算作已播出：
+     * 倒计时始终指向标记下方，而不是紧挨着它的上一行。
      */
     for (const group of groups.slice(markerIndex(groups, nowMinute))) {
         const at = pubTimeMinute(group.pubTime);
@@ -138,11 +135,10 @@ export function nextGapMinutes(
 }
 
 /**
- * Human readable countdown of the marker.
+ * 标记中便于阅读的倒计时文案。
  *
- * Below an hour the minutes are enough; above it the hours come first so the
- * number stays easy to read at a glance. Both spell out the unit, because a
- * bare `2:05` reads as a wall clock next to the `HH:MM` slots.
+ * 不足一小时时只写分钟；超过一小时则先写小时，数字一眼就能看清。
+ * 两种写法都带上单位，因为在 `HH:MM` 时段旁边，光秃秃的 `2:05` 会被当成时刻。
  *
  * @author sdttttt
  */
@@ -158,7 +154,7 @@ export function describeGap(minutes: number): string {
 }
 
 /**
- * Countdown the "you are here" marker has to display.
+ * 「你在这里」标记需要展示的倒计时文案。
  *
  * @author sdttttt
  */
@@ -175,11 +171,10 @@ export function describeNow(
 }
 
 /**
- * Current instant, ticking once every {@link NOW_TICK_MS} while `active`.
+ * 当前时刻，`active` 为真时每隔 {@link NOW_TICK_MS} 走动一次。
  *
- * Only the current day subscribes: the other six columns are static, so they
- * must not re-render every time the marker moves. A pinned `pinned` value
- * short-circuits the timer, so tests can freeze the marker on an exact minute.
+ * 只有当天会订阅：其余六列是静态的，不应在标记每次移动时重新渲染。
+ * 传入固定的 `pinned` 值会跳过定时器，测试因此可以把标记冻结在某一分钟上。
  *
  * @author sdttttt
  */
@@ -195,9 +190,8 @@ function useNow(pinned: number | undefined, active: boolean): number {
         const timer = setInterval(update, NOW_TICK_MS);
 
         /*
-         * A hidden panel is throttled by Chromium, and a suspended machine
-         * stops timers altogether. Re-reading the clock on the way back in
-         * moves the marker at once instead of up to half a minute later.
+         * 隐藏的面板会被 Chromium 降频，机器挂起时定时器更是完全停止。
+         * 回到前台时重新读一次时钟，可以让标记立刻归位，而不是最多晚半分钟。
          */
         document.addEventListener("visibilitychange", update);
 
@@ -211,10 +205,9 @@ function useNow(pinned: number | undefined, active: boolean): number {
 }
 
 /**
- * Groups the seasons of a day by publication time, keeping the original order.
+ * 按更新时间把一天的番剧分组，并保持原有顺序。
  *
- * The API already sorts seasons by `pub_time`, so one pass is enough and the
- * neighbouring groups stay adjacent.
+ * 接口已经按 `pub_time` 排好序，因此一趟遍历即可，相邻的分组也会保持相邻。
  *
  * @author sdttttt
  */
@@ -236,10 +229,9 @@ export function groupByPubTime(
 }
 
 /**
- * Renders one season entry of the schedule.
+ * 渲染日程中的单部番剧。
  *
- * The whole row is a single link so the cover, title and episode all share one
- * tab stop instead of three.
+ * 整行是一个链接，封面、标题与集数因此共用同一个 tab 焦点，而不是三个。
  *
  * @author sdttttt
  */
@@ -287,14 +279,12 @@ function Season({ season }: { season: SeasonPayload }) {
 }
 
 /**
- * The "you are here" marker, drawn between two publication slots.
+ * 画在两个更新时段之间的「你在这里」标记。
  *
- * The suffix is a countdown instead of the wall clock: the marker already sits
- * at its own position on the timetable, so the useful information is how long
- * the reader has to wait for the next update.
+ * 后缀是倒计时而不是墙上时钟：标记本身已经落在时间表的对应位置上，
+ * 真正有用的信息是读者还要等多久才到下一场更新。
  *
- * `role="separator"` keeps it out of the reading flow of the schedule while the
- * label still announces the current time for assistive technology.
+ * `role="separator"` 让它不进入日程的阅读流，同时标签仍会为辅助技术播报当前时间。
  *
  * @author sdttttt
  */
@@ -316,14 +306,12 @@ function NowMarker({ now, countdown }: { now: number; countdown: string }) {
 }
 
 /**
- * Renders one day of the schedule.
+ * 渲染日程中的一天。
  *
- * The header keeps the weekday, the date and the "today" badge together so the
- * column reads as a single unit for assistive technology.
+ * 表头把星期、日期与「今天」徽标放在一起，整列因此对辅助技术而言是一个整体。
  *
- * Today also carries the "you are here" marker: the current instant is drawn
- * between the slots that already aired and the ones still ahead, which is the
- * one place on the board where the reader's position is unambiguous.
+ * 今天这一列还会带上「你在这里」标记：当前时刻画在已经播出与尚未播出的时段之间，
+ * 这是整个面板上唯一能明确表达读者位置的地方。
  *
  * @author sdttttt
  */
@@ -385,13 +373,11 @@ function Day({
 }
 
 /**
- * Weekly schedule view.
+ * 周番视图。
  *
- * The markup keeps the original semantics (day → publication slot → season) and
- * wraps them in a grid of equal-height day columns that scrolls horizontally.
+ * 结构保留原有语义（天 → 更新时段 → 番剧），并外层套上等高、可横向滚动的按天网格。
  *
- * `today` is the anchor the board scrolls to, so the current day is visible
- * without the user dragging the strip.
+ * `today` 是面板滚动的锚点，当前这一天因此无需用户拖动即可看到。
  *
  * @author sdttttt
  */

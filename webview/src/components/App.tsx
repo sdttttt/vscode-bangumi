@@ -4,7 +4,7 @@ import { Placeholder } from "./Placeholder";
 import { WeekBangumiList } from "./WeekBangumiList";
 
 /**
- * Props of the root component.
+ * 根组件的属性。
  *
  * @author sdttttt
  */
@@ -16,7 +16,7 @@ export interface AppProps {
 }
 
 /**
- * Picks the screen matching the state sent by the extension host.
+ * 根据扩展宿主发送的状态选择要渲染的界面。
  *
  * @author sdttttt
  */
@@ -63,7 +63,7 @@ export function App({ state, onNextPage, onBackPage, onJumpPage }: AppProps) {
 }
 
 /**
- * Compile time guard: adding a `ViewKind` without a screen fails to build.
+ * 编译期守卫：新增 `ViewKind` 却没有对应界面时会导致构建失败。
  *
  * @author sdttttt
  */

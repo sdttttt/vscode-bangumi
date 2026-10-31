@@ -1,60 +1,58 @@
 import type { Schedule, ScheduleEvent } from "./schedule";
 
 /**
- * Longest a single timer may sleep.
+ * 单个定时器最长可休眠的时长。
  *
- * A longer sleep would be lost across a system suspend or a wall clock change,
- * so the scheduler wakes up at least this often and re-evaluates the schedule.
+ * 休眠更久会在系统挂起或系统时钟跳变时失效，所以调度器至少每隔这么久醒来
+ * 一次，重新评估日程。
  *
  * @author sdttttt
  */
 export const MAX_SLEEP_MS = 30 * 60 * 1000;
 
 /**
- * How late an event may fire and still be worth a notification.
+ * 事件可以迟到多久仍然值得通知。
  *
- * Anything older than this was missed while the machine was asleep; telling the
- * user about it afterwards is noise, not a reminder.
+ * 比这更早的事件是机器休眠期间错过的；事后告知用户只是噪声，起不到提醒作用。
  *
  * @author sdttttt
  */
 export const GRACE_MS = 5 * 60 * 1000;
 
 /**
- * Callbacks of the scheduler.
+ * 调度器的回调。
  *
  * @author sdttttt
  */
 export interface SchedulerHooks {
-    /** Called once per due event, in schedule order. */
+    /** 每个到期事件调用一次，按日程顺序。 */
     readonly onEvent: (event: ScheduleEvent) => void;
-    /** Called when the day changed and the schedule has to be pulled again. */
+    /** 日期已变、需要重新拉取日程时调用。 */
     readonly onRollover: () => void;
 }
 
 /**
- * Keeps at most one timer armed for the whole schedule.
+ * 整个日程最多只保留一个已装载的定时器。
  *
- * Re-arming on every wake up replaces the previous timer, so triggered handles
- * never accumulate, and each sleep is bounded by `MAX_SLEEP_MS` so a suspended
- * machine or a clock jump is noticed within half an hour.
+ * 每次醒来都重新装载会替换掉上一个定时器，因此已触发的句柄不会累积；
+ * 每次休眠都以 `MAX_SLEEP_MS` 为上限，机器挂起或时钟跳变半小时内即可察觉。
  *
  * @author sdttttt
  */
 export interface Scheduler {
-    /** Replaces the armed schedule and arms its next deadline. */
+    /** 替换已装载的日程，并装载它的下一个截止时刻。 */
     arm(schedule: Schedule): void;
-    /** Cancels the pending timer. Safe to call at any time. */
+    /** 取消待触发的定时器。任何时候调用都安全。 */
     disarm(): void;
-    /** Whether a timer is currently armed. */
+    /** 当前是否装载了定时器。 */
     isArmed(): boolean;
 }
 
 /**
- * Creates a scheduler around the given clock.
+ * 围绕给定时钟创建一个调度器。
  *
- * @param hooks callbacks fired by the timer
- * @param now clock, injectable so tests never depend on the wall clock
+ * @param hooks 定时器触发时调用的回调
+ * @param now 时钟，可注入，测试因此不依赖真实时间
  * @author sdttttt
  */
 export function useScheduler(
@@ -63,7 +61,7 @@ export function useScheduler(
 ): Scheduler {
     let timer: ReturnType<typeof setTimeout> | undefined;
     let schedule: Schedule | undefined;
-    /* How many leading events of the armed schedule already fired. */
+    /* 已装载日程中，前面多少个事件已经触发。 */
     let consumed = 0;
 
     const clearTimer = (): void => {
@@ -102,8 +100,7 @@ export function useScheduler(
         const at = now();
 
         /*
-         * Events the machine slept through are consumed without a word: the
-         * reminder is only useful while the episode is still fresh.
+         * 机器休眠期间错过的事件会被静默消费：只有剧集还热乎时提醒才有意义。
          */
         while (consumed < schedule.events.length) {
             const event = schedule.events[consumed];
@@ -118,9 +115,8 @@ export function useScheduler(
 
         if (schedule.rolloverAt <= at) {
             /*
-             * Drop the schedule before calling out: the callback is expected to
-             * pull fresh data and arm a new schedule, and keeping the stale one
-             * would make the next tick fire its leftovers again.
+             * 先清空日程再回调：回调应当拉取新数据并装载新日程，若保留旧日程，
+             * 下一次 tick 会把它剩下的内容再触发一遍。
              */
             schedule = undefined;
             consumed = 0;

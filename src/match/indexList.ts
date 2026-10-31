@@ -5,36 +5,35 @@ import type { Notifier } from "../notifier";
 import type { FilterSpec } from "./filterSpec";
 
 /**
- * Dependencies of the filter menu.
+ * 筛选菜单的依赖。
  *
  * @author sdttttt
  */
 export interface FilterMenuOptions {
-    /** State the picked filters are written to. */
+    /** 选中的筛选写入的状态。 */
     readonly state: AppStore;
-    /** Settings of the session. */
+    /** 本次会话的设置。 */
     readonly settings: Settings;
-    /** User facing output. */
+    /** 面向用户的输出。 */
     readonly notifier: Notifier;
-    /** Runs the extension commands. */
+    /** 执行扩展命令。 */
     readonly commands: Commands;
 }
 
 /**
- * The filter menu of one extension session.
+ * 一次扩展会话的筛选菜单。
  *
  * @author sdttttt
  */
 export interface FilterMenu {
-    /** Shows the choices of a filter and applies the picked one. */
+    /** 展示某个筛选的选项，并应用选中的那项。 */
     open(filter: FilterSpec): void;
 }
 
 /**
- * Creates the filter menu of one extension session.
+ * 创建一次扩展会话的筛选菜单。
  *
- * The tag is recorded before the query changes, and the bangumi list is only
- * opened once the query changed, matching the previous hook pipeline.
+ * 先记录标签再修改 query，query 改完才打开番剧列表，与此前的 hook 流水线一致。
  *
  * @author sdttttt
  */
@@ -42,7 +41,7 @@ export function useFilterMenu(options: FilterMenuOptions): FilterMenu {
     const { state, settings, notifier, commands } = options;
 
     /**
-     * Shows the labels of the tags picked so far.
+     * 展示目前已选标签的文案。
      */
     const showTags = (): void => {
         if (!settings.isDisplayIndexTags()) {

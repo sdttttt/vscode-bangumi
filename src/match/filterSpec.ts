@@ -1,32 +1,31 @@
 import type { BangumiQuery } from "../request/query";
 
 /**
- * One entry of the index menu.
+ * 索引菜单中的一个筛选项。
  *
- * A filter is pure data: the labels it offers and the query patch each label
- * produces. Everything with a side effect — the quick pick, the tag bookkeeping,
- * opening the list — belongs to `useFilterMenu`.
+ * 筛选是纯数据：它提供的选项，以及每个选项产生的 query 补丁。所有带副作用的
+ * 部分——选择框、标签记录、打开列表——都归 `useFilterMenu` 负责。
  *
  * @author sdttttt
  */
 export interface FilterSpec {
-    /** Menu label, e.g. "地区". */
+    /** 菜单文案，例如「地区」。 */
     readonly label: string;
-    /** Dimension recorded in the tag map, e.g. "Area". */
+    /** 记录在标签表中的维度，例如 `Area`。 */
     readonly tag: string;
-    /** Labels offered by the quick pick, in menu order. */
+    /** 选择框提供的选项，按菜单顺序排列。 */
     readonly choices: ReadonlyArray<string>;
-    /** Pure: the filters a picked label selects. */
+    /** 纯函数：选中某个选项所对应的筛选条件。 */
     readonly query: (label: string) => Partial<BangumiQuery>;
 }
 
 /**
- * Builds a filter whose labels map one to one onto query values.
+ * 创建选项与 query 取值一一对应的筛选。
  *
- * @param label menu label
- * @param tag dimension recorded in the tag map
- * @param entries label / value pairs, in menu order
- * @param key query field written by the pick
+ * @param label 菜单文案
+ * @param tag 记录在标签表中的维度
+ * @param entries 选项与取值的配对，按菜单顺序排列
+ * @param key 选中后写入的 query 字段
  * @author sdttttt
  */
 export function valueFilter(

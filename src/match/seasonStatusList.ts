@@ -1,7 +1,7 @@
 import { valueFilter } from "./filterSpec";
 
 /**
- * Payment filter.
+ * 付费方式筛选。
  *
  * @author sdttttt
  */

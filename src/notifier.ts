@@ -1,29 +1,28 @@
 import * as vscode from "vscode";
 
 /**
- * The user facing output of the extension.
+ * 扩展面向用户的输出。
  *
- * Modules take this as a dependency instead of calling `vscode.window`
- * themselves, so a caller can hand in a different implementation and the tests
- * never need an editor.
+ * 各模块把它作为依赖接收，而不是自己调用 `vscode.window`；这样调用方可以传入
+ * 别的实现，测试也不需要有编辑器。
  *
  * @author sdttttt
  */
 export interface Notifier {
-    /** Shows an informational message. */
+    /** 展示提示消息。 */
     info(message: string): void;
-    /** Shows an error message. */
+    /** 展示错误消息。 */
     error(message: string): void;
-    /** Asks the user for a line of text. */
+    /** 让用户输入一行文本。 */
     ask(options: vscode.InputBoxOptions): Promise<string | undefined>;
-    /** Asks the user to pick one of the given labels. */
+    /** 让用户从给定标签中选择一项。 */
     pick(labels: ReadonlyArray<string>): Promise<string | undefined>;
-    /** Shows a message with one action button and reports the chosen action. */
+    /** 展示带一个操作按钮的消息，并回传用户选择的动作。 */
     action(message: string, action: string): Promise<string | undefined>;
 }
 
 /**
- * Creates the notifier backed by the editor window.
+ * 创建由编辑器窗口实现的 notifier。
  *
  * @author sdttttt
  */

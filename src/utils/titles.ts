@@ -1,12 +1,12 @@
 /**
- * How many titles a notification lists before collapsing into a count.
+ * 通知中最多列出多少个标题，超出后收敛为数量。
  *
  * @author sdttttt
  */
 export const MAX_NOTIFICATION_TITLES = 3;
 
 /**
- * Compact title list, e.g. `《甲》、《乙》` or `《甲》等 5 部`.
+ * 紧凑的标题列表，例如 `《甲》、《乙》` 或 `《甲》等 5 部`。
  *
  * @author sdttttt
  */
@@ -20,18 +20,17 @@ export function describeTitles(titles: ReadonlyArray<string>): string {
 }
 
 /**
- * Half width columns taken by a full width CJK / emoji character.
+ * 全角中日韩字符或 emoji 占用的半角列数。
  *
  * @author sdttttt
  */
 const WIDE_COLUMNS = 2;
 
 /**
- * Whether a code point is rendered two columns wide in a monospace UI.
+ * 判断某个码点在等宽界面中是否渲染为两列宽。
  *
- * Covers the CJK, Hangul, full width and emoji blocks. A precise East Asian
- * width table is not worth its weight here: the goal is a stable entry, not an
- * exact on-screen measurement.
+ * 覆盖中日韩、谚文、全角与 emoji 区段。这里没必要引入精确的东亚宽度表：
+ * 目标只是让条目宽度稳定，而不是精确测量屏幕上的宽度。
  *
  * @author sdttttt
  */
@@ -50,7 +49,7 @@ function isWide(char: string): boolean {
 }
 
 /**
- * Columns taken by a string in a monospace UI.
+ * 字符串在等宽界面中占用的列数。
  *
  * @author sdttttt
  */
@@ -63,10 +62,10 @@ export function displayColumns(text: string): number {
 }
 
 /**
- * Shortens text to a column budget, on a code point boundary.
+ * 把文本裁剪到给定的列数预算内，并保证落在码点边界上。
  *
- * Iterating code points instead of `slice` keeps surrogate pairs and combining
- * marks intact, so a title never ends with a broken character.
+ * 按码点遍历而不是用 `slice`，可以保持代理对与组合字符完整，
+ * 标题因此不会以残缺字符结尾。
  *
  * @author sdttttt
  */
@@ -75,7 +74,7 @@ export function truncateToColumns(text: string, maxColumns: number): string {
         return text;
     }
 
-    /* One column is reserved for the ellipsis. */
+    /* 预留一列给省略号。 */
     const budget = Math.max(0, maxColumns - 1);
     let columns = 0;
     let result = "";
@@ -93,10 +92,9 @@ export function truncateToColumns(text: string, maxColumns: number): string {
 }
 
 /**
- * Every title of a group, quoted, without collapsing.
+ * 分组的全部标题，带书名号，不做收敛。
  *
- * The status bar has to stay short, so it collapses long groups; a tooltip has
- * room for the whole list.
+ * 状态栏必须保持简短，长分组会被收敛；悬浮提示则有空间容纳整个列表。
  *
  * @author sdttttt
  */

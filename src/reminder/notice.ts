@@ -1,14 +1,14 @@
 import type { ScheduleEvent } from "./schedule";
 
 /**
- * Remaining time under which an event is announced as already published.
+ * 剩余时间低于该值的事件按「已更新」播报。
  *
  * @author sdttttt
  */
 export const PUBLISHED_THRESHOLD_MS = 60_000;
 
 /**
- * What the user has to be told about a due event.
+ * 到期事件需要告知用户的内容。
  *
  * @author sdttttt
  */
@@ -17,10 +17,9 @@ export type Notice =
     | { readonly kind: "ahead"; readonly minutes: number };
 
 /**
- * Decides which notification a due event deserves.
+ * 判断到期事件应当发出哪种通知。
  *
- * Pure, so the threshold and the rounding of the remaining time are covered by
- * the unit tests without a fake editor.
+ * 纯函数，因此阈值与剩余时间取整都能由单元测试覆盖，无需伪造编辑器。
  *
  * @author sdttttt
  */

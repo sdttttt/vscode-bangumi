@@ -18,28 +18,28 @@ import type { SeasonPayload, WeekDayPayload } from "@shared/webview/protocol";
 import { assets } from "@webview/test/fixtures";
 
 /**
- * A UTC+8 instant used to pin the "you are here" marker.
+ * 用于固定「你在这里」标记的 UTC+8 时刻。
  *
  * @author sdttttt
  */
 const AT_09_30 = Date.UTC(2026, 9, 31, 1, 30);
 
 /**
- * A UTC+8 instant after every publication slot of the fixture.
+ * 晚于测试数据中所有更新时段的 UTC+8 时刻。
  *
  * @author sdttttt
  */
 const AT_23_00 = Date.UTC(2026, 9, 31, 15, 0);
 
 /**
- * A UTC+8 instant before every publication slot of the fixture.
+ * 早于测试数据中所有更新时段的 UTC+8 时刻。
  *
  * @author sdttttt
  */
 const AT_08_00 = Date.UTC(2026, 9, 31, 0, 0);
 
 /**
- * A season payload.
+ * 一份番剧渲染载荷。
  *
  * @author sdttttt
  */
@@ -56,7 +56,7 @@ const season = (overrides: Partial<SeasonPayload> = {}): SeasonPayload => ({
 });
 
 /**
- * A day payload.
+ * 一份日程渲染载荷。
  *
  * @author sdttttt
  */
