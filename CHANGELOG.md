@@ -268,6 +268,8 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 - 视图文档统一由 `createWebviewHtml()` 生成，补齐 `<!DOCTYPE html>`、`charset`、`viewport`，并加入 CSP 与 nonce；面板现在设置 `enableScripts: true`。
 - 分类/周番视图的 `viewType` 由共用的 `html` 拆分为 `bangumiOpen.list` 与 `bangumiOpen.week`，避免面板类型冲突。
 - 样式改用 `--vscode-*` CSS 变量，跟随编辑器明暗主题；删除 `resources/css/` 下的三份静态样式表。
+- Webview 样式迁移到 UnoCSS（`webview/uno.config.ts`）：颜色映射到 VS Code 主题变量，复用规则写成 shortcut，`webview/src/styles/main.css` 只保留 reset、`:where(a)`、共享表面 token 与主题覆盖。
+- 索引列表页与加载/空态页按周番页的设计语言重写：三页共用 `board` / `surface` / `chip` 表面与卡片样式，索引卡片改为自适应网格、整卡可点击，封面比例与周番条目一致。
 - `pnpm build` 改为依次构建扩展与 Webview；`pnpm typecheck` 同时检查 `webview/tsconfig.json`。
 
 ### Test

@@ -64,17 +64,34 @@ function Season({ season }: { season: SeasonPayload }) {
             class={season.delay ? "bangumi delay" : "bangumi"}
             href={season.url}
             title={season.title}>
-            <span class="cover">
+            <span class="season-cover">
                 <img
+                    class={
+                        season.delay
+                            ? "season-cover-image season-cover-delay"
+                            : "season-cover-image"
+                    }
                     alt=""
                     src={season.cover}
                     loading="lazy"
                     decoding="async"
                 />
             </span>
-            <span class="info">
-                <span class="title">{season.title}</span>
-                <span class="part-number">
+            <span class="season-info">
+                <span
+                    class={
+                        season.delay
+                            ? "season-title season-title-delay"
+                            : "season-title"
+                    }>
+                    {season.title}
+                </span>
+                <span
+                    class={
+                        season.delay
+                            ? "season-part season-part-delay"
+                            : "season-part"
+                    }>
                     {season.delay
                         ? `${season.delayIndex} w(ﾟДﾟ)w ${season.delayReason}`
                         : season.pubIndex}
@@ -101,12 +118,19 @@ function Day({
 }) {
     return (
         <section class={day.isToday ? "item today" : "item"}>
-            <header class="day">
-                <h2>
-                    <span class="day-label">{day.label}</span>
+            <header class={day.isToday ? "day day-today" : "day"}>
+                <h2
+                    class={
+                        day.isToday ? "day-title day-title-today" : "day-title"
+                    }>
+                    <span>{day.label}</span>
                     {day.isToday && assets ? (
                         <span class="today-badge">
-                            <img src={assets.todayBadge} alt="今天更新" />
+                            <img
+                                class="today-badge-image"
+                                src={assets.todayBadge}
+                                alt="今天更新"
+                            />
                         </span>
                     ) : null}
                 </h2>
@@ -148,7 +172,7 @@ export function WeekBangumiList({ days, assets }: WeekBangumiListProps) {
     }, [days]);
 
     return (
-        <div class="week-board" ref={board}>
+        <div class="board week-board" ref={board}>
             <div class="week">
                 {days.map(day => (
                     <Day key={day.date} day={day} assets={assets} />

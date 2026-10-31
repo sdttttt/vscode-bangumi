@@ -41,7 +41,7 @@
 - `src/extension.ts` —— 激活入口，注册 `package.json` 中声明的所有命令。
 - `src/views/` —— `AbstractView` 封装 Webview 面板生命周期与消息通道，另有番剧列表视图、周番视图及翻页状态。
 - `src/webview/` —— 宿主侧 Webview 基础设施：`protocol.ts`（双向消息类型，两段共享）、`host.ts`（CSP、nonce、`localResourceRoots`、资源 URI）、`viewModel.ts`（API 原始数据 → 渲染载荷）。
-- `webview/` —— 独立的前端工程（Preact + TypeScript），源码在 `webview/src/`，产物由 `vite.webview.mts` 输出到 `webview-dist/`。
+- `webview/` —— 独立的前端工程（Preact + TypeScript + UnoCSS），源码在 `webview/src/`，样式配置在 `webview/uno.config.ts`，产物由 `vite.webview.mts` 输出到 `webview-dist/`。
 - `src/request/` —— axios 实例、URL 构造器、响应类型定义以及内存缓存（`cache.ts`）。
 - `src/match/` —— 索引视图（年份 / 季度 / 标签 / 地区筛选），由若干静态列表模块组合而成。
 - `src/reminder.ts` —— 状态栏条目，以及基于周番数据的更新提醒。
@@ -65,6 +65,7 @@
 - `resolve.mainFields: ["module", "main"]` 与 `resolve.conditions: ["node"]` 是必需的。缺少它们时 Vite 会解析到 axios 的浏览器版本，把 http 适配器替换成空实现，导致所有网络请求失效。验证方法是检查产物中仍存在 `isHttpAdapterSupported` 且不含 `browser-external` 桩。
 - `build.target` 为 `node20`，对应 VS Code 1.100 自带的 Electron 34（内含 Node.js 20）。升级 `engines.vscode` 时记得同步调整这里的 target；`vite.webview.mts` 的 `chrome132` 同理（Electron 34 = Chromium 132）。
 - Webview 配置里 `base: "./"` 与 `build.lib` + `formats: ["es"]` 是必需的。`base` 绝对路径会在 `vscode-webview://` 源下解析失败；lib 模式保证产物文件名固定为 `main.js`，宿主无需读取 manifest。CSS 通过 `rolldownOptions.output.assetFileNames` 固定为 `main.css`，因为 ES 格式的 lib 产物不会 import 自己的样式表。
+- UnoCSS 插件必须传入配置文件路径（`UnoCSS(path.resolve(import.meta.dirname, "webview/uno.config.ts"))`），不能依赖默认的文件查找：Vite 的 root 是 `webview/`，但插件按 `process.cwd()`（仓库根）查找，会报 `Config file not found` 并退回默认配置，产物里所有自定义颜色与 shortcut 都会消失。
 - Webview 侧不允许 `import "vscode"`，也不允许 Node.js 内置模块；`webview/tsconfig.json` 已把 `types` 限定为 `vscode-webview`，越界会直接编译失败。
 - `@types/vscode` 的 major.minor **不能高于** `engines.vscode`，这是 `vsce package` 的强制校验（`validateVSCodeTypesCompatibility`），不满足会直接打包失败。两者必须同步升级。
 - `@types/vscode` 只用于类型检查，扩展运行时不受它影响；但不要依赖比 `engines.vscode` 更新的 API，否则老版本 VS Code 上会调用不存在的接口。
@@ -130,7 +131,11 @@ Vitest 配置了两个 project，互不干扰：
 - 宿主侧跨目录引用使用 `@/*` 别名指向 `src/*`，该别名在 `vite.config.mts` 与 `vitest.config.mts` 中均已配置。
 - Webview 侧代码放在 `webview/src/`，用相对路径引用同目录模块；共享协议用 `@shared/webview/protocol`（映射到 `src/webview/protocol.ts`）。`protocol.ts` 必须保持零运行时依赖，两端都要能编译。
 - Webview 组件一律写成函数组件 + Preact hooks，JSX 走 `jsx: "react-jsx"` + `jsxImportSource: "preact"`（`webview/tsconfig.json` 与 `vitest.config.mts` 的 `oxc.jsx.importSource` 各配一份，改一处就要同步另一处）。
-- 样式统一写在 `webview/src/styles/main.css`，颜色用 `--vscode-*` CSS 变量，不要硬编码色值，否则明暗主题下会看不清。
+- 样式统一用 UnoCSS（`webview/uno.config.ts`）编写：单元素规则直接写原子类，多处复用的写成 shortcut。颜色只能来自 `theme.colors` 里映射的 `--vscode-*` 变量与 `--surface` / `--line` / `--accent` 等表面 token，不要硬编码色值，否则明暗主题下会看不清。
+- `webview/src/styles/main.css` 只保留原子类表达不了的部分：文档 reset、`:where(a)` 默认链接样式、共享表面 token（`--surface` / `--line` / `--tint` / `--hover` / `--accent` / `--muted` / `--warning-*` / `--card-shadow`），以及依赖祖先选择器的主题覆盖（`body.vscode-dark`、`vscode-high-contrast`、`vscode-reduce-motion`、滚动条）。它在 `uno.css` 之后导入，同权重时后者胜出，所以这里的规则可以放心覆盖工具类。
+- 三个页面（索引列表、周番、加载/空态）共用同一套 shortcut：`board`（滚动根）、`surface`（卡片表面）、`chip`（小标签）、`row-link`（整行链接）、`focus-ring`。新增页面优先复用它们，不要另造一套色值。
+- `.today` / `.delay` 用 `!` 前缀（如 `!border-accent`）压过同一元素的其它颜色工具类：UnoCSS 的输出顺序不按 class 书写顺序，不加 `!` 时结果不可预测。
+- `@unocss/vite` 会自动扫描 `.tsx`，但也会把源码里的普通英文单词当成候选类名（例如注释里的 `tab stop` 会生成 `.tab`）。这些多出来的规则无害，不要为了消除它们而下调 `content` 的扫描范围：关掉 pipeline 会让 Vite 引入的虚拟样式表解析失败。
 - 视图类与提醒模块沿用 `export default new (class ...)` 的模块级单例写法，状态放在实例上，不要新增游离的模块级变量。
 - 新增命令需同时修改 `contributes.commands`、`src/commands.ts` 的 `COMMAND_IDS` 与 `src/extension.ts` 的 `handlers`。`handlers` 是 `Record<CommandId, …>`，漏写会编译失败；注册时统一 push 进 `context.subscriptions`。
 - 用户配置统一通过 `src/configuration.ts` 的 `ConfigKey` 读取，不要直接调用 `workspace.getConfiguration`。

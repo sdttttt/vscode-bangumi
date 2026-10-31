@@ -133,6 +133,17 @@ describe("BangumiList", () => {
         expect(container.querySelectorAll(".cover")).toHaveLength(0);
     });
 
+    it("makes the whole card a single link", () => {
+        const { container } = renderList({
+            bangumis: [payload({ link: "https://a.test/ss1" })],
+        });
+
+        const card = container.querySelector(".cover");
+        expect(card?.tagName).toBe("A");
+        expect(card?.getAttribute("href")).toBe("https://a.test/ss1");
+        expect(card?.querySelectorAll("a")).toHaveLength(0);
+    });
+
     it("reports pager clicks to the host", () => {
         const handlers = renderList();
 

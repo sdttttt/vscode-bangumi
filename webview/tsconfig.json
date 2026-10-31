@@ -15,6 +15,6 @@
             "@webview/*": ["./src/*"]
         }
     },
-    "include": ["src", "../src/webview/protocol.ts"],
+    "include": ["src", "uno.config.ts", "../src/webview/protocol.ts"],
     "exclude": ["src/**/*.test.tsx", "src/test"]
 }
