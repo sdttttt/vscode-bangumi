@@ -17,6 +17,10 @@ updates:
       groups:
           npm:
               patterns: ["*"]
+      ignore:
+          # Must stay `<= engines.vscode`, which `vsce package` enforces, so it
+          # is bumped by hand together with the engine version.
+          - dependency-name: "@types/vscode"
 
     # Keep the workflow actions themselves up to date too; Dependabot bumps the
     # pinned tags and the composite action in the same pull request.
