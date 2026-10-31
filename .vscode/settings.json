@@ -9,7 +9,8 @@
     "search.exclude": {
         "out": true,
         "dist": true,
-        "coverage": true
+        "coverage": true,
+        "webview-dist": true
     },
     // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
     "typescript.tsc.autoDetect": "off",
@@ -23,6 +24,9 @@
     "vitest.commandLine": "pnpm test --",
     "files.eol": "\n",
     "[typescript]": {
+        "editor.defaultFormatter": "oxc.oxfmt-vscode"
+    },
+    "[typescriptreact]": {
         "editor.defaultFormatter": "oxc.oxfmt-vscode"
     },
     "[javascript]": {

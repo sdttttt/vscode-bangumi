@@ -12,7 +12,7 @@
                 "pattern": [],
                 "background": {
                     "activeOnStart": true,
-                    "beginsPattern": "build started",
+                    "beginsPattern": "build started|building",
                     "endsPattern": "built in"
                 }
             },

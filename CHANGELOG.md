@@ -251,6 +251,15 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 
 ## [Unreleased]
 
+### Changed
+
+- Webview 渲染从宿主侧字符串拼接迁移到独立的前端工程（Preact + TypeScript，`webview/` 目录），由 `vite.webview.mts` 单独构建到 `webview-dist/`。
+- 宿主与 Webview 改为 `postMessage` 通信：宿主推送 `ViewState`，Webview 回传翻页/刷新命令，业务状态（页码、缓存）仍留在扩展侧。
+- 视图文档统一由 `createWebviewHtml()` 生成，补齐 `<!DOCTYPE html>`、`charset`、`viewport`，并加入 CSP 与 nonce；面板现在设置 `enableScripts: true`。
+- 分类/周番视图的 `viewType` 由共用的 `html` 拆分为 `bangumiOpen.list` 与 `bangumiOpen.week`，避免面板类型冲突。
+- 样式改用 `--vscode-*` CSS 变量，跟随编辑器明暗主题；删除 `resources/css/` 下的三份静态样式表。
+- `pnpm build` 改为依次构建扩展与 Webview；`pnpm typecheck` 同时检查 `webview/tsconfig.json`。
+
 ### Test
 
 - 测试目录重组为 `src/test/unit/`，按被测模块镜像分层（`utils`、`request`、`html`、`match`、`views`），替代原先含义模糊的 `test/suite/`。
@@ -262,7 +271,11 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 - 新增 `src/commands.ts` 与 `src/test/unit/manifest.test.ts`，校验 `package.json` 的命令声明、`activationEvents`、`@types/vscode` 与 `engines.vscode` 的一致性。
 - 删除从未被 Vitest 收集的 `src/test/suite/request.ts`（线上 API 测试），请求层改为 mock axios 的确定性用例。
 
+- Vitest 改为双 project：`extension`（node 环境，`src/test/unit`）与 `webview`（happy-dom 环境，`webview/src/**/*.test.tsx`）。
+- 新增 `src/test/mocks/panel.ts` 与 `src/test/unit/webview/`，覆盖消息通道、CSP/nonce 与数据映射。
+
 ### Fix
 
 - 修复 `Cache.set` 覆盖同一 key 时旧计时器未取消，导致新值被提前清除的问题；新增 `Cache.clear()`。
+- 修复标签页与周番页共用 `viewType` 为 `html` 导致的 Webview 面板类型冲突。
 - 修复 `Reminder` 在今日索引为 0 时误判为"没有找到今日的索引"而跳过提醒的问题。

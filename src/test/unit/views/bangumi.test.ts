@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as vscode from "vscode";
-import type { WebviewPanel } from "vscode";
 
 vi.mock("@/request/bangumi", () => ({
     getAllBangumi: vi.fn(),
@@ -9,23 +8,7 @@ vi.mock("@/request/bangumi", () => ({
 
 import { getAllBangumi } from "@/request/bangumi";
 import { bangumisData } from "@/test/mocks/fixtures/bangumi";
-
-/**
- * Minimal `WebviewPanel` double that records the assigned html.
- *
- * @author sdttttt
- */
-function makePanel() {
-    return {
-        webview: {
-            html: "",
-            asWebviewUri: (uri: { fsPath: string }) => `webview:${uri.fsPath}`,
-        },
-        reveal: vi.fn(),
-        onDidDispose: vi.fn(),
-        dispose: vi.fn(),
-    };
-}
+import { createPanelStub, PanelStub } from "@/test/mocks/panel";
 
 /**
  * Reloads the view module so its singleton state (page number, open panel)
@@ -48,13 +31,11 @@ async function loadView(): Promise<
 
 describe("BangumisView", () => {
     let view: (typeof import("@/views/bangumi"))["default"];
-    let panel: ReturnType<typeof makePanel>;
+    let stub: PanelStub;
 
     beforeEach(async () => {
-        panel = makePanel();
-        vi.mocked(vscode.window.createWebviewPanel).mockReturnValue(
-            panel as unknown as WebviewPanel
-        );
+        stub = createPanelStub();
+        vi.mocked(vscode.window.createWebviewPanel).mockReturnValue(stub.panel);
         vi.mocked(vscode.window.showInformationMessage).mockResolvedValue(
             undefined
         );
@@ -62,13 +43,35 @@ describe("BangumisView", () => {
         view = await loadView();
     });
 
-    it("opens a webview panel with the loading view first", () => {
+    it("opens a panel that boots the bundled webview", () => {
         vi.mocked(getAllBangumi).mockReturnValue(new Promise(() => {}));
 
         view.openBangumi();
 
         expect(vscode.window.createWebviewPanel).toHaveBeenCalledTimes(1);
-        expect(panel.webview.html).toContain("Loading...");
+        expect(stub.webview.html).toContain("<!DOCTYPE html>");
+        expect(stub.webview.html).toContain("main.js");
+        expect(stub.webview.html).toContain("main.css");
+    });
+
+    it("enables scripts and restricts local resources", () => {
+        vi.mocked(getAllBangumi).mockReturnValue(new Promise(() => {}));
+
+        view.openBangumi();
+
+        const options = vi.mocked(vscode.window.createWebviewPanel).mock
+            .calls[0][3];
+        expect(options?.enableScripts).toBe(true);
+        expect(options?.retainContextWhenHidden).toBe(false);
+        expect(options?.localResourceRoots).toHaveLength(2);
+    });
+
+    it("posts the loading state first", () => {
+        vi.mocked(getAllBangumi).mockReturnValue(new Promise(() => {}));
+
+        view.openBangumi();
+
+        expect(stub.posted().at(-1)?.kind).toBe("loading");
     });
 
     it("renders the bangumi list once the request resolves", async () => {
@@ -77,7 +80,29 @@ describe("BangumisView", () => {
         view.openBangumi();
 
         await vi.waitFor(() => {
-            expect(panel.webview.html).toContain("测试番剧");
+            const state = stub.posted().at(-1);
+            expect(state?.kind).toBe("bangumi");
+            expect(state?.bangumis?.[0].title).toBe("测试番剧");
+        });
+    });
+
+    it("passes the current page to the webview", async () => {
+        vi.mocked(getAllBangumi).mockResolvedValue(bangumisData());
+
+        view.openBangumi();
+
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.page).toBe(1);
+        });
+    });
+
+    it("maps the api fields into render payloads", async () => {
+        vi.mocked(getAllBangumi).mockResolvedValue(bangumisData({ list: [] }));
+
+        view.openBangumi();
+
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.bangumis).toHaveLength(0);
         });
     });
 
@@ -87,8 +112,20 @@ describe("BangumisView", () => {
         view.openBangumi();
 
         await vi.waitFor(() => {
-            expect(panel.webview.html).toContain("没有数据!");
+            expect(stub.posted().at(-1)?.kind).toBe("notFound");
         });
+    });
+
+    it("replays the last state when the webview asks to be ready", async () => {
+        vi.mocked(getAllBangumi).mockResolvedValue(bangumisData());
+        view.openBangumi();
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.kind).toBe("bangumi");
+        });
+
+        stub.receive({ type: "ready" });
+
+        expect(stub.posted().at(-1)?.kind).toBe("bangumi");
     });
 
     it("requests the first page by default", () => {
@@ -164,6 +201,40 @@ describe("BangumisView", () => {
         view.nextPage();
 
         expect(vscode.window.createWebviewPanel).toHaveBeenCalledTimes(1);
-        expect(panel.reveal).toHaveBeenCalled();
+        expect(stub.reveal).toHaveBeenCalled();
+    });
+
+    it("opens a fresh panel after the previous one was closed", () => {
+        vi.mocked(getAllBangumi).mockReturnValue(new Promise(() => {}));
+
+        view.openBangumi();
+        stub.dispose();
+        view.openBangumi();
+
+        expect(vscode.window.createWebviewPanel).toHaveBeenCalledTimes(2);
+    });
+
+    it("routes the pager commands sent by the webview", () => {
+        vi.mocked(getAllBangumi).mockReturnValue(new Promise(() => {}));
+        view.openBangumi();
+        vi.mocked(vscode.window.showInformationMessage).mockClear();
+
+        stub.receive({ type: "bangumi:nextPage" });
+
+        expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
+            "🐶 第2页"
+        );
+    });
+
+    it("ignores the back command while on the first page", () => {
+        vi.mocked(getAllBangumi).mockReturnValue(new Promise(() => {}));
+        view.openBangumi();
+        vi.mocked(vscode.window.showInformationMessage).mockClear();
+
+        stub.receive({ type: "bangumi:backPage" });
+
+        expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
+            "😰真的一滴都没有了!"
+        );
     });
 });

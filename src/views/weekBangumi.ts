@@ -1,7 +1,8 @@
 import { getWeekBangumi } from "../request/bangumi";
-import * as vscode from "vscode";
-import WeekBangumisHTMLGenerator from "../html/weekBangumiHtml";
 import { WeekBangumiData } from "../request/structure";
+import { isDisplayHistory } from "../configuration";
+import { toWeekDayPayloads } from "../webview/viewModel";
+import type { WebviewCommand } from "../webview/protocol";
 import AbstractView from "./view";
 
 /**
@@ -12,27 +13,22 @@ import AbstractView from "./view";
  * @author sdttttt
  */
 export default new (class WeekBangumisView extends AbstractView {
-    protected readonly viewType = "html";
+    protected readonly viewType = "bangumiOpen.week";
     protected readonly title = "Week Bangumis";
-
-    private remindTimers: Array<NodeJS.Timeout> = [];
 
     constructor() {
         super();
     }
 
     /**
-     * Creates Week bangumi view
+     * Renders the schedule sent by the API.
      *
-     * @param {Array<WeekBangumiData>} data
      * @author sdttttt
      */
     private createWeekBangumiView(data: Array<WeekBangumiData>): void {
-        this.openWebViewPanel((pv: vscode.WebviewPanel) => {
-            pv.webview.html = WeekBangumisHTMLGenerator.generateHTML(
-                data,
-                pv.webview
-            );
+        this.render({
+            kind: "weekBangumi",
+            days: toWeekDayPayloads(data, isDisplayHistory()),
         });
     }
 
@@ -49,5 +45,16 @@ export default new (class WeekBangumisView extends AbstractView {
                 this.createWeekBangumiView(result);
             }
         });
+    }
+
+    /**
+     * Routes the refresh command sent by the webview.
+     *
+     * @author sdttttt
+     */
+    protected handleWebviewCommand(command: WebviewCommand): void {
+        if ("weekBangumi:refresh" === command.type) {
+            this.openWeekBangumi();
+        }
     }
 })();

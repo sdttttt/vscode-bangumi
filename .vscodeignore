@@ -23,5 +23,7 @@ CONTRIBUTING.md
 .oxlintrc.json
 .oxfmtrc.json
 vite.config.mts
+vite.webview.mts
 vitest.config.mts
 pnpm-lock.yaml
+webview/**

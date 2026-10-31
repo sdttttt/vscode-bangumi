@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as vscode from "vscode";
-import type { WebviewPanel } from "vscode";
 
 vi.mock("@/request/bangumi", () => ({
     getAllBangumi: vi.fn(),
@@ -10,23 +9,7 @@ vi.mock("@/request/bangumi", () => ({
 import { getWeekBangumi } from "@/request/bangumi";
 import { ConfigKey } from "@/configuration";
 import { weekBangumi } from "@/test/mocks/fixtures/weekBangumi";
-
-/**
- * Minimal `WebviewPanel` double that records the assigned html.
- *
- * @author sdttttt
- */
-function makePanel() {
-    return {
-        webview: {
-            html: "",
-            asWebviewUri: (uri: { fsPath: string }) => `webview:${uri.fsPath}`,
-        },
-        reveal: vi.fn(),
-        onDidDispose: vi.fn(),
-        dispose: vi.fn(),
-    };
-}
+import { createPanelStub, PanelStub } from "@/test/mocks/panel";
 
 /**
  * Makes the configuration read answer with the given values.
@@ -60,43 +43,99 @@ async function loadView(): Promise<
 
 describe("WeekBangumiView", () => {
     let view: (typeof import("@/views/weekBangumi"))["default"];
-    let panel: ReturnType<typeof makePanel>;
+    let stub: PanelStub;
 
     beforeEach(async () => {
         stubConfig({ [ConfigKey.DisplayHistory]: true });
 
-        panel = makePanel();
-        vi.mocked(vscode.window.createWebviewPanel).mockReturnValue(
-            panel as unknown as WebviewPanel
-        );
+        stub = createPanelStub();
+        vi.mocked(vscode.window.createWebviewPanel).mockReturnValue(stub.panel);
 
         view = await loadView();
     });
 
-    it("shows the loading view before the schedule arrives", () => {
+    it("posts the loading state before the schedule arrives", () => {
         vi.mocked(getWeekBangumi).mockReturnValue(new Promise(() => {}));
 
         view.openWeekBangumi();
 
-        expect(panel.webview.html).toContain("Loading...");
+        expect(stub.posted().at(-1)?.kind).toBe("loading");
     });
 
-    it("renders the schedule once the request resolves", async () => {
+    it("renders every day when history is enabled", async () => {
         vi.mocked(getWeekBangumi).mockResolvedValue(weekBangumi());
 
         view.openWeekBangumi();
 
         await vi.waitFor(() => {
-            expect(panel.webview.html).toContain("第1天的番剧");
+            const state = stub.posted().at(-1);
+            expect(state?.kind).toBe("weekBangumi");
+            expect(state?.days).toHaveLength(7);
+            expect(state?.days?.[0].dayOfWeek).toBe(1);
         });
     });
 
-    it("keeps the loading view when the request fails", async () => {
+    it("hides the past days when history is disabled", async () => {
+        stubConfig({ [ConfigKey.DisplayHistory]: false });
+        vi.mocked(getWeekBangumi).mockResolvedValue(weekBangumi());
+
+        view.openWeekBangumi();
+
+        await vi.waitFor(() => {
+            const days = stub.posted().at(-1)?.days ?? [];
+            expect(days).toHaveLength(2);
+            expect(days[0].dayOfWeek).toBe(6);
+        });
+    });
+
+    it("converts the season fields into render payloads", async () => {
+        vi.mocked(getWeekBangumi).mockResolvedValue(weekBangumi());
+
+        view.openWeekBangumi();
+
+        await vi.waitFor(() => {
+            const season = stub.posted().at(-1)?.days?.[0].seasons[0];
+            expect(season?.title).toBe("第1天的番剧");
+            expect(season?.delay).toBe(false);
+            expect(season?.cover).toBe(
+                "https://i0.hdslb.com/bfs/cover/a-square.jpg"
+            );
+        });
+    });
+
+    it("keeps the loading state when the request fails", async () => {
         vi.mocked(getWeekBangumi).mockResolvedValue(undefined);
 
         view.openWeekBangumi();
         await Promise.resolve();
 
-        expect(panel.webview.html).toContain("Loading...");
+        expect(stub.posted().at(-1)?.kind).toBe("loading");
+    });
+
+    it("reloads the schedule when the webview asks to refresh", async () => {
+        vi.mocked(getWeekBangumi).mockResolvedValue(weekBangumi());
+        view.openWeekBangumi();
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.kind).toBe("weekBangumi");
+        });
+        vi.mocked(getWeekBangumi).mockClear();
+
+        stub.receive({ type: "weekBangumi:refresh" });
+
+        expect(getWeekBangumi).toHaveBeenCalledTimes(1);
+    });
+
+    it("replays the last state when the webview asks to be ready", async () => {
+        vi.mocked(getWeekBangumi).mockResolvedValue(weekBangumi());
+        view.openWeekBangumi();
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.kind).toBe("weekBangumi");
+        });
+        const before = stub.posted().length;
+
+        stub.receive({ type: "ready" });
+
+        expect(stub.posted()).toHaveLength(before + 1);
+        expect(stub.posted().at(-1)?.kind).toBe("weekBangumi");
     });
 });

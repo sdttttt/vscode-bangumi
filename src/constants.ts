@@ -6,10 +6,6 @@ export const HUIHUI = "loading.gif";
 
 export const ENTERRPRISE = "enterprise.jpg";
 
-export const WEEK_BANGUMI_CSS = "css/weekBangumi.css";
-export const BANGUMI_CSS = "css/bangumi.css";
-export const LOADING_CSS = "css/loading.css";
-
 let _context: vscode.ExtensionContext;
 
 /**

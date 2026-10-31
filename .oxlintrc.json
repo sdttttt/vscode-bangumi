@@ -11,6 +11,7 @@
         "node_modules/**",
         "dist/**",
         "out/**",
+        "webview-dist/**",
         "resources/**",
         "public/**",
         "**/*.png",

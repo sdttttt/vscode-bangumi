@@ -17,6 +17,7 @@
         "dist/",
         "out/",
         "coverage/",
+        "webview-dist/",
         "public/",
         "pnpm-lock.yaml",
         "resources/"

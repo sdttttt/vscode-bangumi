@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "preserve",
+        "moduleResolution": "bundler",
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
+        "jsx": "react-jsx",
+        "jsxImportSource": "preact",
+        "strict": true,
+        "skipLibCheck": true,
+        "noEmit": true,
+        "types": ["vscode-webview"],
+        "paths": {
+            "@shared/*": ["../src/*"],
+            "@webview/*": ["./src/*"]
+        }
+    },
+    "include": ["src", "../src/webview/protocol.ts"],
+    "exclude": ["src/**/*.test.tsx", "src/test"]
+}

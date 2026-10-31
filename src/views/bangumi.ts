@@ -1,9 +1,10 @@
 import * as vscode from "vscode";
 import { getAllBangumi } from "../request/bangumi";
-import BangumisHTMLGenerator from "../html/bangumiHtml";
 import { BangumiUrl } from "../request/bangumiUrl";
-import { Bangumi, BangumisData } from "../request/structure";
+import { BangumisData } from "../request/structure";
 import { toNumber } from "../utils/type";
+import { toBangumiPayloads } from "../webview/viewModel";
+import type { WebviewCommand } from "../webview/protocol";
 import AbstractView from "./view";
 
 /**
@@ -13,7 +14,7 @@ import AbstractView from "./view";
  * @author sdttttt
  */
 export default new (class BangumisView extends AbstractView {
-    protected readonly viewType: string = "html";
+    protected readonly viewType: string = "bangumiOpen.list";
     protected readonly title: string = "bangumis";
 
     private _pageNumber: number;
@@ -27,9 +28,8 @@ export default new (class BangumisView extends AbstractView {
     }
 
     /**
-     * Creates bangumi view
+     * Renders a page of bangumi results.
      *
-     * @param bangumis
      * @author sdttttt
      */
     private createBangumiView(bangumiRes: BangumisData | undefined): void {
@@ -38,13 +38,10 @@ export default new (class BangumisView extends AbstractView {
             return;
         }
 
-        const bangumis: Array<Bangumi> = bangumiRes.list;
-
-        this.openWebViewPanel((pv: vscode.WebviewPanel) => {
-            pv.webview.html = BangumisHTMLGenerator.generateHTML(
-                bangumis,
-                pv.webview
-            );
+        this.render({
+            kind: "bangumi",
+            page: this._pageNumber,
+            bangumis: toBangumiPayloads(bangumiRes.list),
         });
     }
 
@@ -118,7 +115,7 @@ export default new (class BangumisView extends AbstractView {
     }
 
     /**
-     * Jump to number of Page
+     * Asks the user for a page number and opens it.
      *
      * @export
      * @author sdttttt
@@ -129,19 +126,38 @@ export default new (class BangumisView extends AbstractView {
             prompt: "TIP: 如果一直在加载，那应该是没这一页了 🚀",
         };
 
-        const inputResult = vscode.window.showInputBox(inputOptions);
-
-        inputResult.then((text: string | undefined) => {
-            const number = toNumber(text);
-            if (0 === number) {
-                vscode.window.showInformationMessage(`
+        vscode.window
+            .showInputBox(inputOptions)
+            .then((text: string | undefined) => {
+                const number = toNumber(text);
+                if (0 === number) {
+                    vscode.window.showInformationMessage(`
         输入的内容,不能是0或者非数字
         数字大小不做限制.
       `);
-                return;
-            }
-            this._pageNumber = number;
-            this.openBangumi();
-        });
+                    return;
+                }
+                this._pageNumber = number;
+                this.openBangumi();
+            });
+    }
+
+    /**
+     * Routes the pager commands sent by the webview.
+     *
+     * @author sdttttt
+     */
+    protected handleWebviewCommand(command: WebviewCommand): void {
+        switch (command.type) {
+            case "bangumi:nextPage":
+                this.nextPage();
+                break;
+            case "bangumi:backPage":
+                this.backPage();
+                break;
+            case "bangumi:jumpPage":
+                this.jumpPage();
+                break;
+        }
     }
 })();
