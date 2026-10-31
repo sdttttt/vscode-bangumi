@@ -224,102 +224,46 @@
 
 - 修复 Match 模块循环依赖问题.
 
-## [2.3.0] - 2026-10-31
+## [3.0.0] - 2026-10-31
 
-### Feat
+自 2.2.8 以来的第一次发布。这四年里扩展的内部实现、构建工具链与界面都被彻底重写，因此直接跳到 3.0.0；日常使用的命令、快捷键与配置项保持不变。
 
-- 构建工具链迁移到 Vite 8（Rolldown），移除 tsup 与 Babel 配置.
-- 依赖全面升级: TypeScript 7, Vitest 5, axios 1.21.
-- 类型检查切换到 TypeScript 7 原生编译器, 本项目类型检查耗时下降约 2.7 倍.
-- 代码检查与格式化从 ESLint + Prettier 迁移到 oxlint + oxfmt, 两者均为 Rust 原生实现, 运行速度大幅提升.
-- 移除 typescript-eslint 后不再需要兼容 TypeScript 6 的 API, 依赖树中 TypeScript 只保留 7.0.2 一个版本.
-- 依赖升级到最新版: `@types/node` 26.6.6, axios 1.21.0, oxlint 1.90.0, oxfmt 0.75.0, TypeScript 7.0.2, Vite 8.3.5, Vitest 5.0.5. `@types/vscode` 保持 `~1.100.0` 以匹配 `engines.vscode`（vsce 要求类型包版本不得高于引擎版本）.
-- CI 中 `vsce` 与 `ovsx` 锁定到明确版本, 避免发布流程随时间漂移.
-- 包管理器升级到 pnpm 10, CI 使用 Node.js 22.
-- 最低 VS Code 版本提升到 1.100, 构建目标对齐扩展宿主自带的 Node.js 20（Electron 34）.
-- Webview 资源改用 `webview.asWebviewUri`, 移除已废弃的 `vscode-resource` scheme.
-- 新增 `pnpm test:watch` 监听模式, `pnpm test` 改为单次运行.
+### 新增
 
-### Style
+- **重新设计的周番表**：按星期排成等宽列、可横向滚动，打开时自动定位到当天；明暗主题各自适配。
+- **「你在这里」标记**：在当天那一列按当前时刻插入一条标记，并显示距离下一场更新的倒计时；当天播完或没有更新时分别显示对应文案。
+- **状态栏条目重做**：由「《番剧名》update at 20:00 ⏰」改为「$(clock) 20:00 番剧名」——时钟图标 + 时刻 + 截断到 15 列的标题，同一时刻更新的多部番剧折叠为「N部番」；悬浮提示列出接下来三场更新，跨到明天时标注「明日」。点击条目仍可打开周番表。
+- 提醒通知会写明更新时间与剩余分钟（「还有 N 分钟就更新啦」），同一时刻更新的番剧合并为一条通知。
+- 新增 `pnpm test:watch` 监听模式，`pnpm test` 为单次运行。
 
-- 代码风格从 Allman 花括号改为 K&R, 与 oxfmt 的输出保持一致.
+### 变更
 
-### Fix
+- **界面语言改为简体中文**：命令标题、配置项说明、面板标题、通知与按钮、索引菜单、Webview 内的全部可见文本都是中文。命令 id 与配置键不变，原有的快捷键与设置无需迁移。
+- 命令标题统一加「番剧时间表：」前缀，便于在命令面板里按类别找到；`openBangumi` 的标题由 `Open Bangumi` 改为「番剧时间表：打开番剧列表」。
+- 加载页与「没有找到数据」页改为与周番表一致的卡片样式。
+- 通知与状态栏文案去掉表情符号。
+- `description` 由英文改为中文，并更新为「在 VS Code 中查看 B 站番剧时间表与番剧索引。」
+- 最低支持的 VS Code 版本由 1.41 提升到 **1.100**。
+- **周番表在关闭「显示历史」时只从今天开始展示**：旧实现固定裁掉开头 5 天，而 B 站接口现在返回 13 天（过去 6 天 + 今天起 7 天），会多显示一天。现在按接口标记的「今天」裁剪，接口返回几天都不影响结果；找不到「今天」时完整展示，不再裁空。
+- 请求层由 axios 换成原生 `fetch`，单次请求超时 8.888 秒。
+- 番剧列表、周番表与索引菜单的翻页、提示与标签记录行为不变。
 
-- 修复加载页面与未找到页面的 HTML 缓存导致跨面板复用旧资源 URI 的问题.
-- 移除 `isValidBangumisRequest as isValidBangumisRequest` 这类无意义的重命名导入.
+### 修复
 
-## [Unreleased]
+- 修复提醒定时器随设置重复累积的问题：旧实现每次应用设置都会新建一批定时器，现在整个日程只保留一个，日切后自动重排，`refresh()` 幂等。
+- 修复面板隐藏再显示后内容丢失的问题：Webview 文档重建时会重放最后一份状态。
+- 修复加载页与未找到页的 HTML 缓存导致跨面板复用旧资源 URI 的问题。
+- 修复 `Match` 模块的循环依赖。
+- 修复提醒在找不到当天数据时反复弹窗：现在只在首次提示一次。
+- 修复接口失败后状态栏一直为空：现在按 30 秒 / 2 分钟 / 10 分钟退避重试。
+- 修复机器休眠或时钟跳变后错过提醒：现在每次休眠以 30 分钟为上限，醒来后 5 分钟内的更新仍会通知，更早的静默跳过。
 
-### Changed
+### 内部
 
-- 许可证由 Unlicense 改为 **Zero-Clause BSD (0BSD)**，`package.json` 的 `license` 字段同步改为 SPDX 短标识 `0BSD`。两者都允许任意使用与分发，0BSD 额外是 OSI 认可的许可证，Marketplace 的许可证识别也更准确。
-
-### Added
-
-- 新增 `THIRD-PARTY-NOTICES.txt`，声明随扩展分发的第三方代码（当前仅 preact，MIT）并附上其完整版权声明。该文件会打进 VSIX——Webview 打包后的 `webview-dist/main.js` 含 preact 的完整代码，但构建过程会剥离依赖自带的 license header，需要在本文件里补齐。
-- README 新增「许可证」与「素材来源」两节：前者说明 0BSD 的条款，后者说明扩展图标与界面插图是《日常》的同人素材、版权归原作者所有，不在本项目授权范围内。
-
-### CI
-
-- `.github/workflows/build.yml` 拆成 `quality` / `test` / `package` 三个 job，不再重复跑 `pnpm test` 与 `pnpm test:coverage`。
-- 合并 `upload_release.yml` 与 `vsce_publish.yml` 为 `release.yml`：标签触发时先复用 `build.yml` 做完整校验并产出 VSIX，再下载同一份产物发布到 VS Code Marketplace、Open VSX 与 GitHub Release，三处不再各自打包。
-- 新增 `.github/actions/setup` 复合 action 与 `.nvmrc`，`pnpm` 版本取自 `packageManager`，Node 版本取自 `.nvmrc`。
-- 新增标签与 `package.json` 版本的一致性校验，以及 `--pre-release` 的自动判定。
-- 工作流升级到 `actions/checkout@v7`、`actions/setup-node@v7`、`pnpm/action-setup@v6`、`actions/upload-artifact@v7`、`actions/download-artifact@v8`、`softprops/action-gh-release@v3`，并补上 `permissions`、`concurrency`、`timeout-minutes`。
-- `vsce` 与 `ovsx` 改为 devDependency，新增 `pnpm package` / `pnpm publish:vsce` / `pnpm publish:ovsx`。
-- 覆盖率报告（`coverage/lcov.info`）作为 artifact 上传；Dependabot 增加 `github-actions` 生态并按周分组。
-
-### Changed
-
-- 扩展产物从 CommonJS 切换为 ES module（`formats: ["es"]` + `package.json` 的 `"type": "module"`）。Node.js 扩展宿主自 VS Code 1.100 起支持 ESM，正好等于 `engines.vscode` 的下限；产物去掉 CJS 互操作样板后体积略降。Web 扩展宿主仍不支持 ESM，将来支持 vscode.dev 时需要另出一份 CJS 产物。
-- 请求层改用原生 `fetch`（Node.js 20 自带），移除 `axios` 依赖：新增 `src/request/http.ts` 提供带 8.888s 超时的 `getJson<T>()`，删除 `src/request/instance.ts`，请求头简化为 `Accept: application/json`。
-- Webview 渲染从宿主侧字符串拼接迁移到独立的前端工程（Preact + TypeScript，`webview/` 目录），由 `vite.webview.mts` 单独构建到 `webview-dist/`。
-- 宿主与 Webview 改为 `postMessage` 通信：宿主推送 `ViewState`，Webview 回传翻页/刷新命令，业务状态（页码、缓存）仍留在扩展侧。
-- 视图文档统一由 `createWebviewHtml()` 生成，补齐 `<!DOCTYPE html>`、`charset`、`viewport`，并加入 CSP 与 nonce；面板现在设置 `enableScripts: true`。
-- 分类/周番视图的 `viewType` 由共用的 `html` 拆分为 `bangumiOpen.list` 与 `bangumiOpen.week`，避免面板类型冲突。
-- 样式改用 `--vscode-*` CSS 变量，跟随编辑器明暗主题；删除 `resources/css/` 下的三份静态样式表。
-- Webview 样式迁移到 UnoCSS（`webview/uno.config.ts`）：颜色映射到 VS Code 主题变量，复用规则写成 shortcut，`webview/src/styles/main.css` 只保留 reset、`:where(a)`、共享表面 token 与主题覆盖。
-- 索引列表页与加载/空态页按周番页的设计语言重写：三页共用 `board` / `surface` / `chip` 表面与卡片样式，索引卡片改为自适应网格、整卡可点击，封面比例与周番条目一致。
-- 周番页在「今天」那一列标出当前时间：`▶ 你在这里~ 还有 38 分钟`（金色、无虚线）插在已开播与未开播的时间组之间；后缀是**距下一场更新的倒计时**（不足一小时用分钟，更长用小时+分钟，全天播完显示`今日已播完`，无更新显示`今日没有更新`），无障碍标签仍播报当前墙钟。标记按 UTC+8 墙钟定位（`minuteOfDay()`），每 30 秒刷新一次，面板重新可见时立即校正，其余日期列不参与重渲染。
-- `pnpm build` 改为依次构建扩展与 Webview；`pnpm typecheck` 同时检查 `webview/tsconfig.json`。
-- 重写更新提醒：整个周番表收敛为**一个**常驻定时器（原实现为每部番剧 + 每个时间组各一个，约 20 个），每次唤醒后重新计算下一个截止时间，已触发的句柄不再累积。
-- 状态栏文案改为 `$(clock) 19:30 2部番` 形式：时间前置保证宽度稳定，`update at` 换成 codicon，单个标题去掉书名号并按显示列宽截断，跨天时补 `明日`；完整标题与后续场次仍保留在 tooltip 与无障碍标签中。
-- 提醒改为按 `pub_ts` 单趟分组，同一更新时间的多部番剧聚合为**一条**通知，标题超过 3 个时折叠为数量。
-- 新增每日 00:05（UTC+8）的自动续排：跨天后重新拉取周番表，长时间开着的窗口不再展示昨天的「update」。
-- 单次睡眠上限 30 分钟，休眠唤醒或系统时钟跳变后最多半小时内校正；超过 5 分钟才错过的更新不再补发。
-- 提醒改为可注入数据源与时钟的 `Reminder` 类，实现 `Disposable` 并注册进 `context.subscriptions`；`StatusBarItem` 懒创建并在销毁时释放。
-- 新增 `workspace.onDidChangeConfiguration` 监听：开关提醒、调整提前时间、切换状态栏都无需重载窗口即可生效。
-- 提醒请求失败后按 30s / 2m / 10m 指数退避重试，并用 generation 计数丢弃过期响应，`start()` / `refresh()` 变为幂等。
-- `getWeekBangumi()` 捕获网络异常并返回 `undefined`，不再向调用方抛出未处理的 Promise 拒绝。
-- 今日判定改用接口的 `is_today` 与 `date_ts`（UTC+8 日界），替代按本地时区拼接 `M-D` 字符串；周番页与提醒共用同一套 `utils/clock`。
-- 面向用户的文案统一为中文：命令标题改为 `番剧时间表：…`，面板标题改为`番剧列表` / `周番表`，通知按钮改为`打开周番表`，配置项说明、加载/空态页、翻页提示与索引标签提示一并中文化；未提供 `l10n` 多语言包，不再保留英文界面。
-
-### Test
-
-- 测试目录重组为 `src/test/unit/`，按被测模块镜像分层（`utils`、`request`、`html`、`match`、`views`），替代原先含义模糊的 `test/suite/`。
-- 新增 `src/test/setup.ts` 与 `src/test/mocks/vscode.ts`，把 `vscode` 模块桩集中到一处并由 `setupFiles` 全局注入，测试文件不再逐个 `vi.mock`。
-- 新增 `src/test/mocks/fixtures/` 响应夹具，替换原先直接请求 B 站线上 API 的测试。
-- 断言统一为 Vitest 原生 matcher，移除 chai 风格（`to.be.equal`、`to.be.exist`）与随之而来的 `no-unused-expressions` 全局豁免。
-- 时间、定时器与随机数相关用例改用假时钟与 `Math.random` 桩，消除跨零点、跨时区的偶发失败。
-- 新增 `pnpm test:coverage` 与 v8 覆盖率阈值（行/函数 90%、分支 85%），覆盖率从 0 提升到约 98%。
-- 新增 `src/commands.ts` 与 `src/test/unit/manifest.test.ts`，校验 `package.json` 的命令声明、`activationEvents`、`@types/vscode` 与 `engines.vscode` 的一致性。
-- 删除从未被 Vitest 收集的 `src/test/suite/request.ts`（线上 API 测试），请求层改为 mock axios 的确定性用例。
-
-- Vitest 改为双 project：`extension`（node 环境，`src/test/unit`）与 `webview`（happy-dom 环境，`webview/src/**/*.test.tsx`）。
-- 新增 `src/test/mocks/panel.ts` 与 `src/test/unit/webview/`，覆盖消息通道、CSP/nonce 与数据映射。
-- 提醒拆分出独立用例：`src/test/unit/reminder/schedule.test.ts`（分组 / 提前量 clamp / 今日判定）、`scheduler.test.ts`（单定时器、宽限窗口、跨天续排）、`statusBar.test.ts`、`index.test.ts`（重试、配置变更、dispose），并新增 `src/test/unit/utils/clock.test.ts`。
-- Webview 用例新增「你在这里」标记：位置计算（`pubTimeMinute` / `markerIndex`）、倒计时（`nextGapMinutes` / `describeGap` / `describeNow`）、边界（首个时间组之前、最后一个之后、空日程、无法解析的时间、当天播完）、随时钟移动与面板重新可见时的校正。
-- `src/test/mocks/vscode.ts` 补上 `workspace.onDidChangeConfiguration` 桩。
-
-### Fix
-
-- 修复 `Cache.set` 覆盖同一 key 时旧计时器未取消，导致新值被提前清除的问题；新增 `Cache.clear()`。
-- 修复标签页与周番页共用 `viewType` 为 `html` 导致的 Webview 面板类型冲突。
-- 修复 `Reminder` 在今日索引为 0 时误判为"没有找到今日的索引"而跳过提醒的问题。
-- 修复今日为周番表最后一天时，提醒越界访问 `bangumisData[i]` 抛出异常的问题。
-- 修复 `ReminderAheadTime` 大于剩余时间时产生负延时、提前通知立即弹出的问题。
-- 修复状态栏在最后一组番剧触发后被写成「番剧暂时没有了诶」，而不是隐藏或指向次日首场的问题。
-- 修复全是拖更番剧的时间组被当成空组、导致后续正常番剧被跳过的问题。
-- 修复提醒重复启用时定时器叠加、已触发句柄常驻数组导致的内存增长。
-- 修复非东八区本地时区下 `isToday` 判定失败、提醒整天不工作的问题。
+- 宿主侧代码从 class 与继承链改写为函数式：状态集中在单一会话状态容器，视图、索引菜单、提醒、缓存与接口调用都由 `use*()` 工厂创建，所有装配集中在 `src/extension.ts` 的 `createSession()`。
+- 用户配置、消息提示与命令调用改为依赖注入，模块不再直接读取编辑器环境。
+- Webview 从字符串拼接的 HTML 换成独立构建的 Preact 应用（Vite + UnoCSS），产物在 `webview-dist/`；宿主与前端通过 `src/webview/protocol.ts` 通信。
+- 构建工具链换代：TypeScript 7、Vite 8、Vitest 5、oxlint + oxfmt、pnpm 10、Node.js 22。
+- 单元测试由 VS Code 集成测试改为可在纯 Node.js 运行的 Vitest 用例，覆盖率纳入 CI。
+- CI 拆成格式/检查/类型、测试与打包三个 job，标签触发时复用同一份 VSIX 发布到 VS Code Marketplace、Open VSX 与 GitHub Release。
+- 许可证由 Unlicense 改为 **Zero-Clause BSD (0BSD)**，新增 `THIRD-PARTY-NOTICES.txt` 声明随扩展分发的 preact。
