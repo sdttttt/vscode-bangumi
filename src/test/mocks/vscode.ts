@@ -76,6 +76,7 @@ export function createVSCodeMock() {
         window,
         workspace: {
             getConfiguration: vi.fn(() => configuration),
+            onDidChangeConfiguration: vi.fn(() => new Disposable()),
             workspaceFolders: undefined,
         },
         ViewColumn: { Active: -1, Beside: -2, One: 1, Two: 2, Three: 3 },

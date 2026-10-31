@@ -44,8 +44,8 @@
 - `webview/` —— 独立的前端工程（Preact + TypeScript + UnoCSS），源码在 `webview/src/`，样式配置在 `webview/uno.config.ts`，产物由 `vite.webview.mts` 输出到 `webview-dist/`。
 - `src/request/` —— axios 实例、URL 构造器、响应类型定义以及内存缓存（`cache.ts`）。
 - `src/match/` —— 索引视图（年份 / 季度 / 标签 / 地区筛选），由若干静态列表模块组合而成。
-- `src/reminder.ts` —— 状态栏条目，以及基于周番数据的更新提醒。
-- `src/utils/` —— 纯函数工具（`strings`、`type`、`file`、`display`）。
+- `src/reminder/` —— 更新提醒：`schedule.ts`（周番数据 → 触发事件，纯函数）、`scheduler.ts`（单定时器重新调度器，可注入时钟）、`statusBar.ts`（状态栏条目封装）、`index.ts`（配置、数据源与生命周期编排）。
+- `src/utils/` —— 纯函数工具（`strings`、`type`、`file`、`display`、`clock`（UTC+8 日界）、`titles`（通知文案））。
 - `src/test/` —— 单元测试目录，布局见下方「测试约定」。
 - `resources/` —— 占位图片，由宿主通过 `asWebviewUri` 注入给 Webview，不参与打包。
 
@@ -121,6 +121,7 @@ Vitest 配置了两个 project，互不干扰：
 - 模块级单例（视图、`Reminder`、`Tagger`）状态会跨用例泄漏，用例里用 `vi.resetModules()` 后重新 `import()`；重新导入后需要重新 `setContext()`，因为 `@/constants` 也是新实例。
 - 断言统一用 Vitest 原生 matcher（`toBe`/`toEqual`/`toBeUndefined`/`toBeGreaterThanOrEqual`），**不要**用 chai 风格（`to.be.equal`、`to.be.exist`）——后者是裸表达式，会迫使 oxlint 关掉 `no-unused-expressions`。
 - 涉及时间、定时器、随机数的用例必须用假时钟（`vi.useFakeTimers()` + `vi.setSystemTime`）或 `vi.spyOn(Math, "random")`，不要依赖真实时钟。
+- 提醒相关的用例用 `new Reminder(source, now)` 注入假数据源与时钟，不要 `import()` 模块单例；`src/reminder/*` 的纯函数与调度器各自有独立用例，改动其中一处时同步补对应断言。
 - 请求层测试 `vi.mock("@/request/instance")`，用夹具构造响应；`Cache` 每例前调用 `clear()` 重置。
 - `src/test/unit/manifest.test.ts` 校验 `package.json` 的 commands 与 `src/commands.ts` 的 `COMMAND_IDS` 一致、`@types/vscode` 不高于 `engines.vscode`。新增命令时先改 `src/commands.ts`，TypeScript 会强制 `extension.ts` 补上处理函数。
 - Webview 用例需要在 `acquireVsCodeApi` 存在的前提下运行；`webview/src/test/setup.ts` 已注入桩，断言消息用其中的 `vsCodeApi`。Preact 的 effect 清理是异步刷新的，涉及卸载的断言要先 `await new Promise(r => setTimeout(r, 0))`，否则会读到未清理的监听器。
@@ -136,7 +137,8 @@ Vitest 配置了两个 project，互不干扰：
 - 三个页面（索引列表、周番、加载/空态）共用同一套 shortcut：`board`（滚动根）、`surface`（卡片表面）、`chip`（小标签）、`row-link`（整行链接）、`focus-ring`。新增页面优先复用它们，不要另造一套色值。
 - `.today` / `.delay` 用 `!` 前缀（如 `!border-accent`）压过同一元素的其它颜色工具类：UnoCSS 的输出顺序不按 class 书写顺序，不加 `!` 时结果不可预测。
 - `@unocss/vite` 会自动扫描 `.tsx`，但也会把源码里的普通英文单词当成候选类名（例如注释里的 `tab stop` 会生成 `.tab`）。这些多出来的规则无害，不要为了消除它们而下调 `content` 的扫描范围：关掉 pipeline 会让 Vite 引入的虚拟样式表解析失败。
-- 视图类与提醒模块沿用 `export default new (class ...)` 的模块级单例写法，状态放在实例上，不要新增游离的模块级变量。
+- 视图类沿用 `export default new (class ...)` 的模块级单例写法，状态放在实例上，不要新增游离的模块级变量。
+- `Reminder` 是显式 `new Reminder()` 的类实例：可注入数据源与时钟，实现 `Disposable` 并在 `context.subscriptions` 中注册，不要在模块求值时创建 `StatusBarItem`。
 - 新增命令需同时修改 `contributes.commands`、`src/commands.ts` 的 `COMMAND_IDS` 与 `src/extension.ts` 的 `handlers`。`handlers` 是 `Record<CommandId, …>`，漏写会编译失败；注册时统一 push 进 `context.subscriptions`。
 - 用户配置统一通过 `src/configuration.ts` 的 `ConfigKey` 读取，不要直接调用 `workspace.getConfiguration`。
 - 宿主引用 `resources/` 下的图片必须走 `getResourceFile(webview, name)`（内部调用 `webview.asWebviewUri`），不要再用已废弃的 `vscode-resource` scheme。

@@ -1,4 +1,3 @@
-import { WBangumi, WeekBangumiData } from "../request/structure";
 import { toNumber } from "./type";
 
 /**
@@ -27,85 +26,6 @@ export function toWeekDay(day: number): string {
         default:
             return "";
     }
-}
-
-/**
- * To judge whether it is today or not.
- *
- * @return {string}
- * @export
- * @author sdttttt
- */
-export function isToday(day: string): boolean {
-    const currentTime: Date = new Date();
-    const today = `${currentTime.getMonth() + 1}-${currentTime.getDate()}`;
-    return today === day;
-}
-
-/**
- * Currents timestamp
- *
- * @returns timestamp
- * @export
- * @author sdttttt
- */
-export function currentTimestamp(): number {
-    return Number(new Date());
-}
-
-/**
- * Gets today index in week bangumi
- *
- * @param bangumis
- * @returns today index in week bangumi
- * @export
- * @author sdttttt
- */
-export function getTodayIndexInWeekBangumi(
-    bangumis: Array<WeekBangumiData>
-): number | undefined {
-    for (let i = 0; i < bangumis.length; i++) {
-        if (isToday(bangumis[i].date)) {
-            return i;
-        }
-    }
-}
-
-/**
- * Gets Form Index start Same time update Bangumi.
- *
- * @param bangumis
- * @param index
- * @returns
- */
-export function getFromIndexSameUpdateBangumi(
-    bangumis: WBangumi[],
-    index: number
-): WBangumi[] {
-    const currentDate = bangumis[index].pub_time;
-    const result: WBangumi[] = [];
-
-    for (let i = index; i < bangumis.length; i++) {
-        if (bangumis[i].pub_time === currentDate) {
-            result.push(bangumis[i]);
-        } else {
-            break;
-        }
-    }
-
-    // 最后过滤拖更的番剧
-    return result;
-}
-
-/**
- * To minute from secode
- *
- * @param {number} time
- * @returns {number} minute from secode
- * @author sdttttt
- */
-export function toMinuteFromSecode(time: number): number {
-    return Math.ceil(time / 60);
 }
 
 /**

@@ -2,7 +2,6 @@ import * as vscode from "vscode";
 import BangumiView from "./views/bangumi";
 import WeekBangumiView from "./views/weekBangumi";
 import { setContext } from "./constants";
-import { ConfigKey, getConfig } from "./configuration";
 import MainIndexList from "./match/index";
 import Reminder from "./reminder";
 import { CommandId } from "./commands";
@@ -49,11 +48,9 @@ const handlers: Record<CommandId, () => unknown> = {
 export function activate(context: vscode.ExtensionContext): void {
     initializer(context);
 
-    const useReminder: unknown = getConfig(ConfigKey.EnableReminder);
-
-    if (useReminder as boolean) {
-        Reminder.enableBangumiUpdateReminder();
-    }
+    /* The reminder registers its own settings listener, so it owns a disposable. */
+    context.subscriptions.push(Reminder);
+    void Reminder.start();
 
     /*
      * The command has been defined in the package.json file
@@ -74,5 +71,5 @@ export function activate(context: vscode.ExtensionContext): void {
  * @author sdttttt
  */
 export function deactivate(): void {
-    Reminder.destroyReminder();
+    Reminder.dispose();
 }

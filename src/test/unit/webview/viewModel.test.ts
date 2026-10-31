@@ -68,20 +68,34 @@ describe("toWeekDayPayloads", () => {
         expect(toWeekDayPayloads([], true)).toHaveLength(0);
     });
 
-    it("flags the current day", () => {
-        const now = new Date();
-        const today = `${now.getMonth() + 1}-${now.getDate()}`;
-
+    it("flags the day the API marked as today", () => {
         const days = toWeekDayPayloads(
             [
-                weekBangumiData({ date: today }),
-                weekBangumiData({ date: "13-32" }),
+                weekBangumiData({ is_today: 1 }),
+                weekBangumiData({ is_today: 0, date_ts: 0, date: "13-32" }),
             ],
             true
         );
 
         expect(days[0].isToday).toBe(true);
         expect(days[1].isToday).toBe(false);
+    });
+
+    it("resolves today through date_ts, not the local time zone", () => {
+        const now = Date.UTC(2026, 9, 31, 4, 0);
+
+        const days = toWeekDayPayloads(
+            [
+                weekBangumiData({
+                    is_today: 0,
+                    date_ts: Math.floor(Date.UTC(2026, 9, 31) / 1000),
+                }),
+            ],
+            true,
+            now
+        );
+
+        expect(days[0].isToday).toBe(true);
     });
 
     it("localises the weekday label", () => {

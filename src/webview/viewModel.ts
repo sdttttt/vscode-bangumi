@@ -1,5 +1,6 @@
 import type { Bangumi, WeekBangumiData, WBangumi } from "../request/structure";
-import { isToday, toWeekDay } from "../utils/strings";
+import { isCurrentDay } from "../utils/clock";
+import { toWeekDay } from "../utils/strings";
 import type { BangumiPayload, SeasonPayload, WeekDayPayload } from "./protocol";
 
 /**
@@ -39,7 +40,8 @@ export function toSeasonPayload(season: WBangumi): SeasonPayload {
  */
 export function toWeekDayPayloads(
     data: Array<WeekBangumiData>,
-    displayHistory: boolean
+    displayHistory: boolean,
+    now: number = Date.now()
 ): Array<WeekDayPayload> {
     const days = displayHistory ? data : data.slice(HIDDEN_DAYS);
 
@@ -47,7 +49,7 @@ export function toWeekDayPayloads(
         date: day.date,
         dayOfWeek: day.day_of_week,
         label: toWeekDay(day.day_of_week),
-        isToday: isToday(day.date),
+        isToday: isCurrentDay(day, now),
         seasons: day.seasons.map(toSeasonPayload),
     }));
 }

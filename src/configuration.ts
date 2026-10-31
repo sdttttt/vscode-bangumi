@@ -37,6 +37,32 @@ export function getReminderAheadTime(): number {
 }
 
 /**
+ * Whether the update reminder is enabled.
+ *
+ * @returns true if the reminder may schedule notifications
+ * @author sdttttt
+ */
+export function isReminderEnabled(): boolean {
+    const enabled: unknown = getConfig(ConfigKey.EnableReminder);
+    return false !== enabled;
+}
+
+/**
+ * Whether the settings that shape the reminder changed.
+ *
+ * @author sdttttt
+ */
+export function affectsReminder(
+    affected: (section: string) => boolean
+): boolean {
+    return (
+        affected(ConfigKey.EnableReminder) ||
+        affected(ConfigKey.ReminderAheadTime) ||
+        affected(ConfigKey.DisplayStatusBar)
+    );
+}
+
+/**
  * Gets display index tags
  *
  * @returns true if display index tags

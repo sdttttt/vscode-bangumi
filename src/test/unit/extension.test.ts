@@ -5,8 +5,8 @@ import { COMMAND_IDS } from "@/commands";
 
 vi.mock("@/reminder", () => ({
     default: {
-        enableBangumiUpdateReminder: vi.fn(() => Promise.resolve()),
-        destroyReminder: vi.fn(),
+        start: vi.fn(() => Promise.resolve()),
+        dispose: vi.fn(),
     },
 }));
 
@@ -79,14 +79,14 @@ describe("activate", () => {
         expect(registered.sort()).toEqual([...COMMAND_IDS].sort());
     });
 
-    it("pushes every disposable into the extension subscriptions", async () => {
+    it("pushes every disposable, including the reminder, into the subscriptions", async () => {
         stubReminderSetting(false);
         const { activate } = await loadExtension();
         const context = makeContext();
 
         activate(context);
 
-        expect(context.subscriptions).toHaveLength(COMMAND_IDS.length);
+        expect(context.subscriptions).toHaveLength(COMMAND_IDS.length + 1);
     });
 
     it("passes a callable handler for each command", async () => {
@@ -116,14 +116,14 @@ describe("activate", () => {
         expect(BangumisView.openBangumi).toHaveBeenCalledTimes(1);
     });
 
-    it("schedules the reminder when the setting is enabled", async () => {
+    it("starts the reminder, which owns its own settings check", async () => {
         stubReminderSetting(true);
         const { activate } = await loadExtension();
         const Reminder = (await import("@/reminder")).default;
 
         activate(makeContext());
 
-        expect(Reminder.enableBangumiUpdateReminder).toHaveBeenCalledTimes(1);
+        expect(Reminder.start).toHaveBeenCalledTimes(1);
     });
 
     it("initialises the extension context only once", async () => {
@@ -138,25 +138,26 @@ describe("activate", () => {
         expect(getContext()).toBe(first);
     });
 
-    it("skips the reminder when the setting is disabled", async () => {
+    it("keeps following the setting even when it starts disabled", async () => {
+        /* The reminder has to stay subscribed so enabling it later works. */
         stubReminderSetting(false);
         const { activate } = await loadExtension();
         const Reminder = (await import("@/reminder")).default;
 
         activate(makeContext());
 
-        expect(Reminder.enableBangumiUpdateReminder).not.toHaveBeenCalled();
+        expect(Reminder.start).toHaveBeenCalledTimes(1);
     });
 });
 
 describe("deactivate", () => {
-    it("releases the reminder timers", async () => {
+    it("releases the reminder", async () => {
         stubReminderSetting(false);
         const { deactivate } = await loadExtension();
         const Reminder = (await import("@/reminder")).default;
 
         deactivate();
 
-        expect(Reminder.destroyReminder).toHaveBeenCalledTimes(1);
+        expect(Reminder.dispose).toHaveBeenCalledTimes(1);
     });
 });

@@ -61,12 +61,21 @@ export async function getWeekBangumi(): Promise<
     let result: Array<WeekBangumiData> | undefined = cacheData;
 
     if (!cacheData) {
-        const res: AxiosResponse<WeekBangumiResponse> = await Axios.get<
-            unknown,
-            AxiosResponse<WeekBangumiResponse>
-        >(BANGUMI_WEEK);
-
-        const weekBangumiResponse = res.data;
+        let weekBangumiResponse: WeekBangumiResponse;
+        try {
+            const res: AxiosResponse<WeekBangumiResponse> = await Axios.get<
+                unknown,
+                AxiosResponse<WeekBangumiResponse>
+            >(BANGUMI_WEEK);
+            weekBangumiResponse = res.data;
+        } catch {
+            /*
+             * A network failure is reported like an empty schedule: the view
+             * falls back to "not found" and the reminder retries on its own.
+             */
+            window.showInformationMessage("诶?!没有找到番剧时间表诶...");
+            return;
+        }
 
         if (
             !isSuccess(weekBangumiResponse) ||

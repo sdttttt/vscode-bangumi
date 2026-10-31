@@ -143,6 +143,17 @@ describe("getWeekBangumi", () => {
         expect(Axios.get).toHaveBeenCalledTimes(2);
     });
 
+    it("reports a network failure instead of rejecting", async () => {
+        vi.mocked(Axios.get).mockRejectedValue(
+            new AxiosError("timeout", "ECONNABORTED")
+        );
+
+        await expect(getWeekBangumi()).resolves.toBeUndefined();
+        expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
+            "诶?!没有找到番剧时间表诶..."
+        );
+    });
+
     it("returns undefined for an unsuccessful response", async () => {
         vi.mocked(Axios.get).mockResolvedValue({
             data: { code: -500, message: "boom", result: weekBangumi() },

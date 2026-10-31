@@ -1,12 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as vscode from "vscode";
 import {
+    affectsReminder,
     ConfigKey,
     getConfig,
     getReminderAheadTime,
     isDisplayHistory,
     isDisplayIndexTags,
     isDisplayStatusBar,
+    isReminderEnabled,
 } from "@/configuration";
 
 /**
@@ -69,5 +71,33 @@ describe("boolean flags", () => {
         stubConfig({ [ConfigKey.DisplayHistory]: false });
 
         expect(isDisplayHistory()).toBe(false);
+    });
+});
+
+describe("isReminderEnabled", () => {
+    it("is on by default", () => {
+        stubConfig({});
+
+        expect(isReminderEnabled()).toBe(true);
+    });
+
+    it("is off when the setting is disabled", () => {
+        stubConfig({ [ConfigKey.EnableReminder]: false });
+
+        expect(isReminderEnabled()).toBe(false);
+    });
+});
+
+describe("affectsReminder", () => {
+    it.each([
+        ConfigKey.EnableReminder,
+        ConfigKey.ReminderAheadTime,
+        ConfigKey.DisplayStatusBar,
+    ])("reacts to %s", key => {
+        expect(affectsReminder(section => section === key)).toBe(true);
+    });
+
+    it("ignores unrelated settings", () => {
+        expect(affectsReminder(() => false)).toBe(false);
     });
 });

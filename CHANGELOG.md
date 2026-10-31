@@ -271,6 +271,15 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 - Webview 样式迁移到 UnoCSS（`webview/uno.config.ts`）：颜色映射到 VS Code 主题变量，复用规则写成 shortcut，`webview/src/styles/main.css` 只保留 reset、`:where(a)`、共享表面 token 与主题覆盖。
 - 索引列表页与加载/空态页按周番页的设计语言重写：三页共用 `board` / `surface` / `chip` 表面与卡片样式，索引卡片改为自适应网格、整卡可点击，封面比例与周番条目一致。
 - `pnpm build` 改为依次构建扩展与 Webview；`pnpm typecheck` 同时检查 `webview/tsconfig.json`。
+- 重写更新提醒：整个周番表收敛为**一个**常驻定时器（原实现为每部番剧 + 每个时间组各一个，约 20 个），每次唤醒后重新计算下一个截止时间，已触发的句柄不再累积。
+- 提醒改为按 `pub_ts` 单趟分组，同一更新时间的多部番剧聚合为**一条**通知，标题超过 3 个时折叠为数量。
+- 新增每日 00:05（UTC+8）的自动续排：跨天后重新拉取周番表，长时间开着的窗口不再展示昨天的「update」。
+- 单次睡眠上限 30 分钟，休眠唤醒或系统时钟跳变后最多半小时内校正；超过 5 分钟才错过的更新不再补发。
+- 提醒改为可注入数据源与时钟的 `Reminder` 类，实现 `Disposable` 并注册进 `context.subscriptions`；`StatusBarItem` 懒创建并在销毁时释放。
+- 新增 `workspace.onDidChangeConfiguration` 监听：开关提醒、调整提前时间、切换状态栏都无需重载窗口即可生效。
+- 提醒请求失败后按 30s / 2m / 10m 指数退避重试，并用 generation 计数丢弃过期响应，`start()` / `refresh()` 变为幂等。
+- `getWeekBangumi()` 捕获网络异常并返回 `undefined`，不再向调用方抛出未处理的 Promise 拒绝。
+- 今日判定改用接口的 `is_today` 与 `date_ts`（UTC+8 日界），替代按本地时区拼接 `M-D` 字符串；周番页与提醒共用同一套 `utils/clock`。
 
 ### Test
 
@@ -285,9 +294,17 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 
 - Vitest 改为双 project：`extension`（node 环境，`src/test/unit`）与 `webview`（happy-dom 环境，`webview/src/**/*.test.tsx`）。
 - 新增 `src/test/mocks/panel.ts` 与 `src/test/unit/webview/`，覆盖消息通道、CSP/nonce 与数据映射。
+- 提醒拆分出独立用例：`src/test/unit/reminder/schedule.test.ts`（分组 / 提前量 clamp / 今日判定）、`scheduler.test.ts`（单定时器、宽限窗口、跨天续排）、`statusBar.test.ts`、`index.test.ts`（重试、配置变更、dispose），并新增 `src/test/unit/utils/clock.test.ts`。
+- `src/test/mocks/vscode.ts` 补上 `workspace.onDidChangeConfiguration` 桩。
 
 ### Fix
 
 - 修复 `Cache.set` 覆盖同一 key 时旧计时器未取消，导致新值被提前清除的问题；新增 `Cache.clear()`。
 - 修复标签页与周番页共用 `viewType` 为 `html` 导致的 Webview 面板类型冲突。
 - 修复 `Reminder` 在今日索引为 0 时误判为"没有找到今日的索引"而跳过提醒的问题。
+- 修复今日为周番表最后一天时，提醒越界访问 `bangumisData[i]` 抛出异常的问题。
+- 修复 `ReminderAheadTime` 大于剩余时间时产生负延时、提前通知立即弹出的问题。
+- 修复状态栏在最后一组番剧触发后被写成「番剧暂时没有了诶」，而不是隐藏或指向次日首场的问题。
+- 修复全是拖更番剧的时间组被当成空组、导致后续正常番剧被跳过的问题。
+- 修复提醒重复启用时定时器叠加、已触发句柄常驻数组导致的内存增长。
+- 修复非东八区本地时区下 `isToday` 判定失败、提醒整天不工作的问题。
