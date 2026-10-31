@@ -10,7 +10,7 @@
 | --- | --- |
 | 构建 | `pnpm build`（`vite build`） |
 | 监听构建 | `pnpm watch`（`vite build --sourcemap inline --watch`） |
-| 类型检查 | `pnpm test-compile`（`tsc -p ./ --noEmit`，strict 模式） |
+| 类型检查 | `pnpm test-compile`（`tsc -p ./ --noEmit`，strict 模式，TypeScript 7） |
 | 单元测试 | `pnpm test`（Vitest 单次运行，监听模式用 `pnpm test:watch`） |
 | 代码检查 | `pnpm eslint` |
 | 格式化 + 自动修复 | `pnpm format`（先 prettier 再 `eslint --fix`） |
@@ -39,6 +39,25 @@
 - `vscode` 与全部 Node 内置模块保持 external（`build.rolldownOptions.external`）。绝不要把 `vscode` 打进产物，也不要引入扩展宿主环境中不存在的运行时依赖。
 - `resolve.mainFields: ["module", "main"]` 与 `resolve.conditions: ["node"]` 是必需的。缺少它们时 Vite 会解析到 axios 的浏览器版本，把 http 适配器替换成空实现，导致所有网络请求失效。验证方法是检查产物中仍存在 `isHttpAdapterSupported` 且不含 `browser-external` 桩。
 - `build.target` 为 `node20`，对应 VS Code 1.100 起自带的 Node.js 运行时。
+
+## TypeScript 版本约定
+
+TypeScript 7 是 Go 原生实现，**不提供 JS 编译器 API**，而 typescript-eslint 等工具仍依赖该 API。因此 `package.json` 用 npm alias 并存两套：
+
+```json
+{
+    "devDependencies": {
+        "@typescript/native": "npm:typescript@^7.0.2",
+        "typescript": "npm:@typescript/typescript6@^6.0.2"
+    }
+}
+```
+
+- `npx tsc` → TypeScript 7（原生，`pnpm test-compile` 用的就是它）
+- `npx tsc6` → TypeScript 6
+- `require("typescript")` → TypeScript 6 API，typescript-eslint 靠它工作
+
+改版本时务必保持这个别名关系。一旦 `typescript` 指向 TS 7，ESLint 会直接报 `typescript-eslint does not support TS 7.0` 并退出。TS 7.1 之后官方会提供新 API，届时可移除 `@typescript/typescript6` 别名。
 
 ## 编码约定
 

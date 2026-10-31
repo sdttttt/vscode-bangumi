@@ -229,7 +229,8 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 ### Feat
 
 -   构建工具链迁移到 Vite 8（Rolldown），移除 tsup 与 Babel 配置.
--   依赖全面升级: TypeScript 6, ESLint 10（Flat Config）, Vitest 5, Prettier 3, axios 1.21.
+-   依赖全面升级: TypeScript 7, ESLint 10（Flat Config）, Vitest 5, Prettier 3, axios 1.21.
+-   类型检查切换到 TypeScript 7 原生编译器, 本项目类型检查耗时下降约 2.7 倍. 通过 npm alias 与 TypeScript 6 并存, 兼容 typescript-eslint 依赖的旧版 API.
 -   包管理器升级到 pnpm 10, CI 使用 Node.js 22.
 -   最低 VS Code 版本提升到 1.100, 构建目标对齐扩展宿主自带的 Node.js 20.
 -   Webview 资源改用 `webview.asWebviewUri`, 移除已废弃的 `vscode-resource` scheme.
