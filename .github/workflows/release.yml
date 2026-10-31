@@ -6,10 +6,12 @@ on:
         tags: ["v*"]
 
 # `contents: write` is for the GitHub release, `actions: read` for downloading
-# the VSIX that `build.yml` produced in this same run.
+# the VSIX that `build.yml` produced in this same run, and `id-token: write`
+# for the OpenID Connect token `vsce` exchanges for a Marketplace credential.
 permissions:
     contents: write
     actions: read
+    id-token: write
 
 env:
     CI: true
@@ -27,6 +29,9 @@ jobs:
         needs: verify
         runs-on: ubuntu-latest
         timeout-minutes: 10
+        # Trusted publishing is bound to this environment, so the OIDC token is
+        # only issued to a run that entered it.
+        environment: production
         steps:
             - uses: actions/checkout@v7
             - uses: ./.github/actions/setup
@@ -67,19 +72,20 @@ jobs:
                       echo "prerelease=true" >> "$GITHUB_OUTPUT"
                   fi
 
-            # The tokens travel through the environment: `vsce` and `ovsx` both
-            # read them from there, which keeps them out of the process list.
+            # No token: `vsce` asks GitHub for a short lived OIDC token and
+            # exchanges it for a Marketplace credential, which is what the
+            # publisher's trusted publishing configuration allows.
             - name: publish to the Visual Studio Marketplace
               run: |
                   set -eu
-                  args="--packagePath artifacts/bangumiopen.vsix"
+                  args="--oidc --packagePath artifacts/bangumiopen.vsix"
                   if [ "${{ steps.version.outputs.prerelease }}" = "true" ]; then
                       args="$args --pre-release"
                   fi
                   pnpm publish:vsce $args
-              env:
-                  VSCE_PAT: ${{ secrets.VSCE_TOKEN }}
 
+            # `ovsx` enables trusted publishing on its own once a CI system
+            # hands it an OIDC token and no access token is present.
             - name: publish to Open VSX
               run: |
                   set -eu
@@ -88,8 +94,6 @@ jobs:
                       args="$args --pre-release"
                   fi
                   pnpm publish:ovsx $args
-              env:
-                  OVSX_PAT: ${{ secrets.OVSX_ACCESS_KEY }}
 
             - name: publish the GitHub release
               uses: softprops/action-gh-release@v3
