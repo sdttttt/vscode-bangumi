@@ -142,75 +142,282 @@ img {
 
 /* ------------------------------------------------------------ week bangumi */
 
-.week {
-    display: flex;
-    align-items: flex-start;
-    gap: 24px;
+/*
+ * The board is themed from the VS Code tokens only. Surfaces and borders use
+ * the real widget tokens; the derived tints go through `color-mix` so light and
+ * dark themes share one stylesheet.
+ */
+.week-board {
+    --week-surface: var(
+        --vscode-editorWidget-background,
+        var(--vscode-editor-background)
+    );
+    --week-border: var(--vscode-widget-border, var(--vscode-panel-border));
+    --week-tint: color-mix(in srgb, var(--vscode-foreground) 8%, transparent);
+    --week-hover: var(
+        --vscode-list-hoverBackground,
+        color-mix(in srgb, var(--vscode-foreground) 6%, transparent)
+    );
+    --week-accent: var(--vscode-textLink-foreground, var(--vscode-focusBorder));
+    --week-accent-soft: color-mix(in srgb, var(--week-accent) 12%, transparent);
+    --week-muted: var(--vscode-descriptionForeground);
+    --week-warning: var(--vscode-editorWarning-foreground, #cca700);
+    /* Blended with the foreground so the label stays readable on light themes. */
+    --week-warning-text: color-mix(
+        in srgb,
+        var(--week-warning) 55%,
+        var(--vscode-foreground)
+    );
+    --week-shadow: 0 1px 2px rgb(0 0 0 / 5%), 0 8px 20px rgb(0 0 0 / 4%);
+
+    box-sizing: border-box;
+    height: 100vh;
     padding: 20px;
-    overflow-x: auto;
+    overflow: auto;
+    scroll-padding-inline: 20px;
+}
+
+body.vscode-dark .week-board {
+    --week-shadow: 0 1px 2px rgb(0 0 0 / 45%), 0 8px 20px rgb(0 0 0 / 25%);
+}
+
+body.vscode-high-contrast .week-board {
+    --week-shadow: none;
+}
+
+/* Scrollbars are themed by VS Code itself; only the horizontal strip needs size. */
+.week-board::-webkit-scrollbar {
+    height: 10px;
+}
+
+.week {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 252px;
+    align-items: stretch;
+    gap: 16px;
+    width: max-content;
+    margin: 0;
+    padding: 0;
 }
 
 .week .item {
-    flex: 0 0 222px;
-    width: 222px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    min-width: 0;
+    background: var(--week-surface);
+    border: 1px solid var(--week-border);
+    border-radius: 12px;
+    box-shadow: var(--week-shadow);
+}
+
+.week .item.today {
+    border-color: var(--week-accent);
+    box-shadow:
+        var(--week-shadow),
+        0 0 0 1px var(--week-accent);
 }
 
 .week .item .day {
-    width: 100%;
-    margin-bottom: 10px;
-    border-bottom: 2px solid var(--vscode-panel-border, rgb(128 128 128 / 35%));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--week-border);
+}
+
+.week .item.today .day {
+    background: linear-gradient(180deg, var(--week-accent-soft), transparent);
 }
 
 .week .item .day h2 {
     display: flex;
     align-items: center;
     gap: 6px;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    white-space: nowrap;
+}
+
+.week .item.today .day h2 {
+    color: var(--week-accent);
+}
+
+.week .day-date {
+    flex: none;
+    padding: 2px 8px;
+    color: var(--vscode-foreground);
+    background: var(--week-tint);
+    border-radius: 999px;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.5;
 }
 
 .today-badge {
-    display: inline-block;
-    width: 25px;
-    height: 25px;
+    display: inline-flex;
+    flex: none;
+    width: 22px;
+    height: 22px;
+}
+
+.today-badge img {
+    border-radius: 4px;
+}
+
+.week .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 14px;
 }
 
 .week .time-group {
-    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .week .time-point {
-    color: var(--vscode-descriptionForeground);
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 4px;
+    align-self: flex-start;
+    padding: 2px 8px;
+    color: var(--vscode-foreground);
+    background: var(--week-tint);
+    border-radius: 999px;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.5;
 }
 
 .week .bangumi {
-    display: flex;
-    gap: 8px;
-    padding: 10px 0 10px 16px;
-    border-left: 1px dashed var(--vscode-panel-border, rgb(128 128 128 / 45%));
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    color: inherit;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    text-decoration: none;
+    transition:
+        background-color 120ms ease,
+        border-color 120ms ease;
 }
 
-.week .bangumi.delay {
-    opacity: 0.5;
+.week .bangumi:hover {
+    background: var(--week-hover);
+    border-color: var(--week-border);
+    text-decoration: none;
+}
+
+.week .bangumi:focus-visible {
+    outline: 1px solid var(--vscode-focusBorder, var(--week-accent));
+    outline-offset: 1px;
+}
+
+.week .bangumi:hover .title {
+    color: var(--week-accent);
 }
 
 .week .bangumi .cover {
-    flex: 0 0 40%;
-    height: 70px;
+    display: block;
+    width: 56px;
+    height: 56px;
+    overflow: hidden;
+    background: var(--week-tint);
+    border-radius: 6px;
+}
+
+.week .bangumi .cover img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    object-fit: cover;
 }
 
 .week .bangumi .info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
     min-width: 0;
 }
 
 .week .bangumi .title {
-    font-size: 11px;
+    display: -webkit-box;
+    overflow: hidden;
+    color: var(--vscode-foreground);
+    font-size: 12px;
+    font-weight: 500;
     line-height: 1.4;
     overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
 }
 
 .week .bangumi .part-number {
-    color: var(--vscode-textLink-foreground);
-    font-size: 10px;
+    overflow: hidden;
+    color: var(--week-accent);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/*
+ * Delayed seasons are marked with a coloured border and a tinted cover instead
+ * of a blanket `opacity`, which would drag the title below the contrast floor.
+ */
+.week .bangumi.delay {
+    border-color: color-mix(in srgb, var(--week-warning) 35%, transparent);
+    background: color-mix(in srgb, var(--week-warning) 8%, transparent);
+}
+
+.week .bangumi.delay .cover img {
+    filter: grayscale(1);
+    opacity: 0.85;
+}
+
+.week .bangumi.delay .title {
+    color: var(--week-muted);
+}
+
+.week .bangumi.delay .part-number {
+    color: var(--week-warning-text);
+    white-space: normal;
+}
+
+body.vscode-high-contrast .week .item,
+body.vscode-high-contrast .week .bangumi:hover {
+    border-color: var(--vscode-contrastBorder, var(--vscode-foreground));
+}
+
+body.vscode-reduce-motion .week .bangumi,
+body.vscode-reduce-motion .week .item {
+    transition: none;
+}
+
+@media (width < 600px) {
+    .week-board {
+        padding: 12px;
+        scroll-padding-inline: 12px;
+    }
+
+    .week {
+        grid-auto-columns: 232px;
+        gap: 12px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .week .bangumi {
+        transition: none;
+    }
 }

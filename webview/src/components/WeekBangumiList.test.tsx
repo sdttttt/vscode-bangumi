@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/preact";
 import {
     groupByPubTime,
@@ -171,5 +171,90 @@ describe("WeekBangumiList", () => {
         );
 
         expect(container.querySelectorAll(".item")).toHaveLength(0);
+    });
+
+    it("uses section elements for each day", () => {
+        const { container } = render(
+            <WeekBangumiList
+                days={[day({ date: "1-1" }), day({ date: "1-2" })]}
+                assets={assets}
+            />
+        );
+
+        expect(container.querySelectorAll("section.item")).toHaveLength(2);
+    });
+
+    it("makes the whole season row a single link", () => {
+        const { container } = render(
+            <WeekBangumiList
+                days={[day({ seasons: [season({ url: "https://a.test/1" })] })]}
+                assets={assets}
+            />
+        );
+
+        const row = container.querySelector(".bangumi");
+        expect(row?.tagName).toBe("A");
+        expect(row?.getAttribute("href")).toBe("https://a.test/1");
+        expect(row?.querySelectorAll("a")).toHaveLength(0);
+    });
+
+    it("keeps the delay marker on the row for styling", () => {
+        const { container } = render(
+            <WeekBangumiList
+                days={[
+                    day({
+                        seasons: [season({ delay: true, delayReason: "延期" })],
+                    }),
+                ]}
+                assets={assets}
+            />
+        );
+
+        const row = container.querySelector(".bangumi.delay");
+        expect(row).toBeTruthy();
+        expect(row?.classList.contains("bangumi")).toBe(true);
+    });
+
+    it("scrolls the current day into view", () => {
+        const scrollIntoView = vi.fn();
+        const original = Element.prototype.scrollIntoView;
+        Element.prototype.scrollIntoView = scrollIntoView;
+
+        try {
+            render(
+                <WeekBangumiList
+                    days={[
+                        day({ date: "1-1" }),
+                        day({ date: "1-2", isToday: true }),
+                    ]}
+                    assets={assets}
+                />
+            );
+
+            expect(scrollIntoView).toHaveBeenCalledTimes(1);
+            const self = scrollIntoView.mock.instances[0] as Element;
+            expect(self.classList.contains("today")).toBe(true);
+        } finally {
+            Element.prototype.scrollIntoView = original;
+        }
+    });
+
+    it("does not scroll when the schedule has no today", () => {
+        const scrollIntoView = vi.fn();
+        const original = Element.prototype.scrollIntoView;
+        Element.prototype.scrollIntoView = scrollIntoView;
+
+        try {
+            render(
+                <WeekBangumiList
+                    days={[day({ date: "1-1" })]}
+                    assets={assets}
+                />
+            );
+
+            expect(scrollIntoView).not.toHaveBeenCalled();
+        } finally {
+            Element.prototype.scrollIntoView = original;
+        }
     });
 });
