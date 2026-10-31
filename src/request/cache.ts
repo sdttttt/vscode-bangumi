@@ -1,73 +1,66 @@
-"use strict";
-
-import { BangumisData, WeekBangumiData } from "./structure";
+import type { BangumisData, WeekBangumiData } from "./structure";
 
 /**
- * Cache
+ * A time limited key value store.
  *
- * @class
- * @template T
  * @author sdttttt
  */
-export class Cache<T = unknown> {
-    private readonly caches: Map<string, T>;
-
-    private readonly timers: Map<string, NodeJS.Timeout>;
-
-    private readonly timeoutTime: number;
-
-    constructor(timeoutTime: number) {
-        this.timeoutTime = timeoutTime * 1000;
-        this.caches = new Map<string, T>();
-        this.timers = new Map<string, NodeJS.Timeout>();
-    }
-
-    /**
-     * Get cache
-     *
-     * @param key
-     * @author sdttttt
-     */
-    get(key: string): T | undefined {
-        return this.caches.get(key);
-    }
-
-    /**
-     * Sets cache
-     *
-     * @param key
-     * @param value
-     * @author sdttttt
-     */
-    set(key: string, value: T): void {
-        const previous: NodeJS.Timeout | undefined = this.timers.get(key);
-        if (previous) {
-            clearTimeout(previous);
-        }
-
-        this.caches.set(key, value);
-        /* 覆盖写入时必须重建计时器，否则旧计时器会提前删掉新值 */
-        const timer: NodeJS.Timeout = setTimeout(() => {
-            this.caches.delete(key);
-            this.timers.delete(key);
-        }, this.timeoutTime);
-        this.timers.set(key, timer);
-    }
-
-    /**
-     * Drops every entry and pending expiry timer.
-     *
-     * @author sdttttt
-     */
-    clear(): void {
-        for (const timer of this.timers.values()) {
-            clearTimeout(timer);
-        }
-        this.timers.clear();
-        this.caches.clear();
-    }
+export interface Cache<T> {
+    get(key: string): T | undefined;
+    set(key: string, value: T): void;
+    /** Drops every entry and pending expiry timer. */
+    clear(): void;
 }
 
-export const BangumiCache: Cache<BangumisData> = new Cache(600);
+/**
+ * Creates a cache whose entries expire on their own.
+ *
+ * Every write arms its own timer, so overwriting a key also resets its lifetime
+ * instead of letting the previous timer delete the fresh value.
+ *
+ * @param timeoutSeconds lifetime of an entry
+ * @author sdttttt
+ */
+export function useCache<T>(timeoutSeconds: number): Cache<T> {
+    const timeout = timeoutSeconds * 1000;
+    const values = new Map<string, T>();
+    const timers = new Map<string, ReturnType<typeof setTimeout>>();
 
-export const WeekBangumiCache: Cache<Array<WeekBangumiData>> = new Cache(60);
+    return {
+        get: key => values.get(key),
+        set: (key, value) => {
+            const previous = timers.get(key);
+            if (previous) {
+                clearTimeout(previous);
+            }
+
+            values.set(key, value);
+            timers.set(
+                key,
+                setTimeout(() => {
+                    values.delete(key);
+                    timers.delete(key);
+                }, timeout)
+            );
+        },
+        clear: () => {
+            for (const timer of timers.values()) {
+                clearTimeout(timer);
+            }
+            timers.clear();
+            values.clear();
+        },
+    };
+}
+
+/**
+ * The caches of one extension session.
+ *
+ * @author sdttttt
+ */
+export interface RequestCaches {
+    /** Ten minutes of bangumi index pages. */
+    readonly bangumi: Cache<BangumisData>;
+    /** One minute of weekly schedules. */
+    readonly week: Cache<Array<WeekBangumiData>>;
+}

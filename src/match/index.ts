@@ -1,72 +1,99 @@
-import * as vscode from "vscode";
-import { AbstractIndexList, Hooks } from "./indexList";
-import YearList from "./yearList";
+import type { FilterSpec } from "./filterSpec";
+import type { Notifier } from "../notifier";
+import type { AppStore } from "../state/app";
+import type { FilterMenu } from "./indexList";
 import SeasonVersionList from "./seasonVersionList";
 import AreaList from "./areaList";
 import FinishList from "./finishList";
 import CopyRightList from "./copyRightList";
 import SeasonStatusList from "./seasonStatusList";
 import SeasonMonthList from "./seasonMonthList";
-import BangumisView from "../views/bangumi";
+import YearList from "./yearList";
 import StyleList from "./styleList";
-import Tagger from "./tagger";
 
 /**
- *	Main List
+ * Label that clears every filter.
  *
- *	@author sdttttt
+ * @author sdttttt
  */
-export default new (class MainIndexList extends AbstractIndexList {
-    protected readonly openIndexListAfter: Hooks = [];
+export const RESTORE_LABEL = "(恢复默认)";
 
-    protected readonly openIndexListBefore: Hooks = [];
+/**
+ * Every filter of the menu, in the order it is offered.
+ *
+ * @author sdttttt
+ */
+export const FILTERS: ReadonlyArray<FilterSpec> = [
+    SeasonVersionList,
+    AreaList,
+    FinishList,
+    CopyRightList,
+    SeasonStatusList,
+    SeasonMonthList,
+    YearList,
+    StyleList,
+];
 
-    protected readonly list: Array<string> = [
-        "类型",
-        "地区",
-        "状态",
-        "版权",
-        "付费",
-        "季度",
-        "时间",
-        "风格",
-        "(恢复默认)",
-    ];
+/**
+ * Menu labels, with the restore entry last.
+ *
+ * @author sdttttt
+ */
+export const MENU_LABELS: ReadonlyArray<string> = [
+    ...FILTERS.map(filter => filter.label),
+    RESTORE_LABEL,
+];
 
-    protected conditionHandler(index: string): void {
-        switch (index) {
-            case "类型":
-                SeasonVersionList.openIndexList();
-                break;
-            case "地区":
-                AreaList.openIndexList();
-                break;
-            case "状态":
-                FinishList.openIndexList();
-                break;
-            case "版权":
-                CopyRightList.openIndexList();
-                break;
-            case "付费":
-                SeasonStatusList.openIndexList();
-                break;
-            case "季度":
-                SeasonMonthList.openIndexList();
-                break;
-            case "时间":
-                YearList.openIndexList();
-                break;
-            case "风格":
-                StyleList.openIndexList();
-                break;
-            case "(恢复默认)":
-                BangumisView.bangumiUrl.restoreDefault();
-                Tagger.clear();
-                break;
-            default:
-                vscode.window.showInformationMessage(
-                    "抱歉，这个选项还在施工中"
-                );
+/**
+ * Dependencies of the index menu command.
+ *
+ * @author sdttttt
+ */
+export interface IndexCommandOptions {
+    readonly state: AppStore;
+    readonly menu: FilterMenu;
+    /** User facing output. */
+    readonly notifier: Notifier;
+    readonly filters?: ReadonlyArray<FilterSpec>;
+}
+
+/**
+ * Builds the filter menu command of one extension session.
+ *
+ * @author sdttttt
+ */
+export function useIndexCommand(options: IndexCommandOptions): {
+    openIndex(): void;
+} {
+    const filters = options.filters ?? FILTERS;
+    const menu = options.menu;
+    const byLabel = new Map(filters.map(filter => [filter.label, filter]));
+
+    const choose = (label: string): void => {
+        if (RESTORE_LABEL === label) {
+            options.state.resetQuery();
+            options.state.clearTags();
+            return;
         }
-    }
-})();
+
+        const filter = byLabel.get(label);
+        if (undefined === filter) {
+            options.notifier.info("抱歉，这个选项还在施工中");
+            return;
+        }
+
+        menu.open(filter);
+    };
+
+    return {
+        openIndex: () => {
+            void options.notifier
+                .pick([...byLabel.keys(), RESTORE_LABEL])
+                .then((label: string | undefined) => {
+                    if (label) {
+                        choose(label);
+                    }
+                });
+        },
+    };
+}

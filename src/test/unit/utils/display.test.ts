@@ -1,59 +1,32 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import * as vscode from "vscode";
-import {
-    showBangumiUpdateRemind,
-    showBeforeBangumiUpdateRemind,
-} from "@/utils/display";
+import { describe, expect, it } from "vitest";
+import { updatedMessage, upcomingMessage } from "@/utils/display";
 
-describe("showBangumiUpdateRemind", () => {
-    beforeEach(() => {
-        vi.mocked(vscode.window.showInformationMessage).mockResolvedValue(
-            undefined
-        );
-        vi.mocked(vscode.commands.executeCommand).mockClear();
-    });
-
+describe("updatedMessage", () => {
     it("tells the user the bangumi is updated", () => {
-        showBangumiUpdateRemind("咒术回战");
-
-        expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-            "《咒术回战》 更新啦！",
-            "打开周番表"
-        );
+        expect(updatedMessage("咒术回战")).toBe("《咒术回战》 更新啦！");
     });
 
-    it("opens the weekly view when the action is chosen", async () => {
-        vi.mocked(vscode.window.showInformationMessage).mockResolvedValue(
-            "打开周番表" as never
-        );
-
-        showBangumiUpdateRemind("咒术回战");
-        await vi.waitFor(() => {
-            expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-                "weekBangumi"
-            );
-        });
+    it("lists every title of a group", () => {
+        expect(updatedMessage(["甲", "乙"])).toBe("《甲》、《乙》 更新啦！");
     });
 
-    it("stays silent when the notification is dismissed", async () => {
-        vi.mocked(vscode.window.showInformationMessage).mockResolvedValue(
-            undefined
+    it("collapses a large group into a count", () => {
+        expect(updatedMessage(["甲", "乙", "丙", "丁"])).toBe(
+            "《甲》、《乙》、《丙》等 4 部 更新啦！"
         );
-
-        showBangumiUpdateRemind("咒术回战");
-        await Promise.resolve();
-
-        expect(vscode.commands.executeCommand).not.toHaveBeenCalled();
     });
 });
 
-describe("showBeforeBangumiUpdateRemind", () => {
+describe("upcomingMessage", () => {
     it("mentions how many minutes are left", () => {
-        showBeforeBangumiUpdateRemind("咒术回战", 5);
+        expect(upcomingMessage("咒术回战", 5)).toBe(
+            "《咒术回战》 还有5分钟就更新啦！"
+        );
+    });
 
-        expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-            "《咒术回战》 还有5分钟就更新啦！",
-            "打开周番表"
+    it("lists every title of a group", () => {
+        expect(upcomingMessage(["甲", "乙"], 10)).toBe(
+            "《甲》、《乙》 还有10分钟就更新啦！"
         );
     });
 });

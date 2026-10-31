@@ -1,26 +1,17 @@
-"use strict";
-
-import * as vscode from "vscode";
 import { isEmptyArray, isEmptyObject } from "../utils/type";
 
 /**
  * Determines whether success is
+ *
+ * Reporting the failure is the job of the caller, which owns the user facing
+ * message; this predicate stays pure so it can be tested without an editor.
  *
  * @param {BiliResponse} res
  * @returns true if success
  * @author sdttttt
  */
 export function isSuccess(res: BiliResponse): boolean {
-    if (0 === res.code && "success" === res.message) {
-        return true;
-    }
-
-    vscode.window.showInformationMessage(`
-        出错了！可能是 B 站服务异常，也可能是接口地址变了。/(ㄒoㄒ)/~~
-        如果确认不是 B 站的问题，请尽快在 GitHub 上联系我！
-    `);
-
-    return false;
+    return 0 === res.code && "success" === res.message;
 }
 
 /**

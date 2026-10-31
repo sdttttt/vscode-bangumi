@@ -1,3 +1,5 @@
+import * as vscode from "vscode";
+
 /**
  * Command ids registered by the extension.
  *
@@ -17,3 +19,29 @@ export const COMMAND_IDS = [
 ] as const;
 
 export type CommandId = (typeof COMMAND_IDS)[number];
+
+/**
+ * Runs an extension command.
+ *
+ * Injected wherever a module has to open another view, so the module never
+ * reaches for the command registry itself.
+ *
+ * @author sdttttt
+ */
+export interface Commands {
+    execute(id: CommandId): void;
+}
+
+/**
+ * Creates the command runner backed by the editor.
+ *
+ * @author sdttttt
+ */
+export function useCommands(): Commands {
+    return {
+        /* A failure is not actionable for the caller, so it is swallowed. */
+        execute: id => {
+            vscode.commands.executeCommand(id).then(undefined, () => undefined);
+        },
+    };
+}

@@ -38,7 +38,6 @@ export function createVSCodeMock() {
         activeTextEditor: undefined,
         showInformationMessage: vi.fn(() => Promise.resolve(undefined)),
         showErrorMessage: vi.fn(() => Promise.resolve(undefined)),
-        showQuickPick: vi.fn(() => Promise.resolve(undefined)),
         showInputBox: vi.fn(() => Promise.resolve(undefined)),
         createWebviewPanel: vi.fn(),
         createStatusBarItem: vi.fn(() => ({

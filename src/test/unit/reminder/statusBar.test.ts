@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as vscode from "vscode";
 import type { ScheduleEvent } from "@/reminder/schedule";
-import { ReminderStatusBar } from "@/reminder/statusBar";
+import { useStatusBar } from "@/reminder/statusBar";
 
 /**
  * 2026-11-01 12:00 UTC+8, the instant the status bar is rendered at.
@@ -39,7 +39,7 @@ function stubItem() {
     return item;
 }
 
-describe("ReminderStatusBar", () => {
+describe("useStatusBar", () => {
     let item: ReturnType<typeof stubItem>;
 
     beforeEach(() => {
@@ -47,14 +47,14 @@ describe("ReminderStatusBar", () => {
     });
 
     it("creates the entry lazily", () => {
-        const statusBar = new ReminderStatusBar("weekBangumi");
+        const statusBar = useStatusBar("weekBangumi");
 
         expect(vscode.window.createStatusBarItem).not.toHaveBeenCalled();
         statusBar.dispose();
     });
 
     it("renders the next event and shows the entry once", () => {
-        const statusBar = new ReminderStatusBar("weekBangumi");
+        const statusBar = useStatusBar("weekBangumi");
         const next = event("20:00", ["甲"]);
 
         statusBar.show([next], NOW);
@@ -67,7 +67,7 @@ describe("ReminderStatusBar", () => {
     });
 
     it("lists the following events in the tooltip", () => {
-        const statusBar = new ReminderStatusBar("weekBangumi");
+        const statusBar = useStatusBar("weekBangumi");
         const next = event("20:00", ["甲"]);
 
         statusBar.show(
@@ -80,7 +80,7 @@ describe("ReminderStatusBar", () => {
     });
 
     it("hides the entry when nothing is coming up", () => {
-        const statusBar = new ReminderStatusBar("weekBangumi");
+        const statusBar = useStatusBar("weekBangumi");
 
         statusBar.show([event("20:00", ["甲"])], NOW);
         statusBar.show([], NOW);
@@ -90,13 +90,13 @@ describe("ReminderStatusBar", () => {
     });
 
     it("survives hiding before the entry exists", () => {
-        const statusBar = new ReminderStatusBar("weekBangumi");
+        const statusBar = useStatusBar("weekBangumi");
 
         expect(() => statusBar.hide()).not.toThrow();
     });
 
     it("releases the entry on dispose", () => {
-        const statusBar = new ReminderStatusBar("weekBangumi");
+        const statusBar = useStatusBar("weekBangumi");
         const next = event("20:00", ["甲"]);
 
         statusBar.show([next], NOW);
@@ -106,10 +106,10 @@ describe("ReminderStatusBar", () => {
     });
 });
 
-describe("ReminderStatusBar tooltip", () => {
+describe("useStatusBar tooltip", () => {
     it("lists every title of a group, unlike the entry", () => {
         const item = stubItem();
-        const statusBar = new ReminderStatusBar("weekBangumi");
+        const statusBar = useStatusBar("weekBangumi");
         const next = event("20:00", ["甲", "乙"]);
 
         statusBar.show([next], NOW);
@@ -121,7 +121,7 @@ describe("ReminderStatusBar tooltip", () => {
 
     it("marks the events that happen tomorrow", () => {
         const item = stubItem();
-        const statusBar = new ReminderStatusBar("weekBangumi");
+        const statusBar = useStatusBar("weekBangumi");
         const tomorrow = {
             at: 1,
             pubTs: NOW + 24 * 60 * 60 * 1000,

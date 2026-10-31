@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { GRACE_MS, MAX_SLEEP_MS, Scheduler } from "@/reminder/scheduler";
+import { useScheduler, GRACE_MS, MAX_SLEEP_MS } from "@/reminder/scheduler";
 import type { Schedule, ScheduleEvent } from "@/reminder/schedule";
 
 /**
@@ -23,7 +23,7 @@ function schedule(
     return { events, rolloverAt };
 }
 
-describe("Scheduler", () => {
+describe("useScheduler", () => {
     beforeEach(() => {
         vi.useFakeTimers();
         vi.setSystemTime(new Date(2026, 9, 31, 12, 0));
@@ -35,7 +35,10 @@ describe("Scheduler", () => {
 
     it("fires an event at its instant", () => {
         const onEvent = vi.fn();
-        const scheduler = new Scheduler({ onEvent, onRollover: vi.fn() });
+        const scheduler = useScheduler(
+            { onEvent, onRollover: vi.fn() },
+            Date.now
+        );
         const at = Date.now() + 5_000;
 
         scheduler.arm(schedule([event(at)]));
@@ -49,10 +52,13 @@ describe("Scheduler", () => {
 
     it("fires every due event once, in order", () => {
         const fired: Array<string> = [];
-        const scheduler = new Scheduler({
-            onEvent: incoming => fired.push(incoming.titles[0]),
-            onRollover: vi.fn(),
-        });
+        const scheduler = useScheduler(
+            {
+                onEvent: incoming => fired.push(incoming.titles[0]),
+                onRollover: vi.fn(),
+            },
+            Date.now
+        );
         const now = Date.now();
 
         scheduler.arm(
@@ -72,7 +78,10 @@ describe("Scheduler", () => {
 
     it("skips an event missed beyond the grace window", () => {
         const onEvent = vi.fn();
-        const scheduler = new Scheduler({ onEvent, onRollover: vi.fn() });
+        const scheduler = useScheduler(
+            { onEvent, onRollover: vi.fn() },
+            Date.now
+        );
         const at = Date.now() + 1_000;
 
         scheduler.arm(schedule([event(at)]));
@@ -85,7 +94,10 @@ describe("Scheduler", () => {
 
     it("still fires an event inside the grace window", () => {
         const onEvent = vi.fn();
-        const scheduler = new Scheduler({ onEvent, onRollover: vi.fn() });
+        const scheduler = useScheduler(
+            { onEvent, onRollover: vi.fn() },
+            Date.now
+        );
         const at = Date.now() + 1_000;
 
         scheduler.arm(schedule([event(at)]));
@@ -98,34 +110,43 @@ describe("Scheduler", () => {
 
     it("never sleeps longer than the maximum span", () => {
         const onEvent = vi.fn();
-        const scheduler = new Scheduler({ onEvent, onRollover: vi.fn() });
+        const scheduler = useScheduler(
+            { onEvent, onRollover: vi.fn() },
+            Date.now
+        );
 
         scheduler.arm(schedule([event(Date.now() + 4 * 60 * 60 * 1000)]));
 
         vi.advanceTimersByTime(MAX_SLEEP_MS - 1);
         expect(onEvent).not.toHaveBeenCalled();
-        expect(scheduler.armed).toBe(true);
+        expect(scheduler.isArmed()).toBe(true);
     });
 
     it("asks for a refresh once the day rolled over", () => {
         const onRollover = vi.fn();
-        const scheduler = new Scheduler({ onEvent: vi.fn(), onRollover });
+        const scheduler = useScheduler(
+            { onEvent: vi.fn(), onRollover },
+            Date.now
+        );
         const rolloverAt = Date.now() + 30_000;
 
         scheduler.arm(schedule([], rolloverAt));
         vi.advanceTimersByTime(30_000);
 
         expect(onRollover).toHaveBeenCalledTimes(1);
-        expect(scheduler.armed).toBe(false);
+        expect(scheduler.isArmed()).toBe(false);
     });
 
     it("fires the due events before the rollover callback", () => {
         const order: Array<string> = [];
         const rolloverAt = Date.now() + 30_000;
-        const scheduler = new Scheduler({
-            onEvent: incoming => order.push(incoming.titles[0]),
-            onRollover: () => order.push("rollover"),
-        });
+        const scheduler = useScheduler(
+            {
+                onEvent: incoming => order.push(incoming.titles[0]),
+                onRollover: () => order.push("rollover"),
+            },
+            Date.now
+        );
 
         scheduler.arm(schedule([event(rolloverAt, "甲")], rolloverAt));
         vi.advanceTimersByTime(30_000);
@@ -135,19 +156,25 @@ describe("Scheduler", () => {
 
     it("stops firing after disarm", () => {
         const onEvent = vi.fn();
-        const scheduler = new Scheduler({ onEvent, onRollover: vi.fn() });
+        const scheduler = useScheduler(
+            { onEvent, onRollover: vi.fn() },
+            Date.now
+        );
 
         scheduler.arm(schedule([event(Date.now() + 1_000)]));
         scheduler.disarm();
         vi.advanceTimersByTime(60_000);
 
         expect(onEvent).not.toHaveBeenCalled();
-        expect(scheduler.armed).toBe(false);
+        expect(scheduler.isArmed()).toBe(false);
     });
 
     it("replaces the previous schedule when armed twice", () => {
         const onEvent = vi.fn();
-        const scheduler = new Scheduler({ onEvent, onRollover: vi.fn() });
+        const scheduler = useScheduler(
+            { onEvent, onRollover: vi.fn() },
+            Date.now
+        );
         const now = Date.now();
 
         scheduler.arm(schedule([event(now + 1_000, "旧")]));
@@ -162,10 +189,13 @@ describe("Scheduler", () => {
     });
 
     it("keeps a single timer while events are pending", () => {
-        const scheduler = new Scheduler({
-            onEvent: vi.fn(),
-            onRollover: vi.fn(),
-        });
+        const scheduler = useScheduler(
+            {
+                onEvent: vi.fn(),
+                onRollover: vi.fn(),
+            },
+            Date.now
+        );
         const now = Date.now();
 
         scheduler.arm(
@@ -183,19 +213,25 @@ describe("Scheduler", () => {
     });
 
     it("arms nothing when the schedule has no deadline", () => {
-        const scheduler = new Scheduler({
-            onEvent: vi.fn(),
-            onRollover: vi.fn(),
-        });
+        const scheduler = useScheduler(
+            {
+                onEvent: vi.fn(),
+                onRollover: vi.fn(),
+            },
+            Date.now
+        );
 
         scheduler.arm({ events: [], rolloverAt: Number.POSITIVE_INFINITY });
 
-        expect(scheduler.armed).toBe(false);
+        expect(scheduler.isArmed()).toBe(false);
     });
 
     it("re-arms a schedule whose next event is already due", () => {
         const onEvent = vi.fn();
-        const scheduler = new Scheduler({ onEvent, onRollover: vi.fn() });
+        const scheduler = useScheduler(
+            { onEvent, onRollover: vi.fn() },
+            Date.now
+        );
         const now = Date.now();
 
         scheduler.arm(schedule([event(now), event(now + 1_000)]));

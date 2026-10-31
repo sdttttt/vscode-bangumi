@@ -1,4 +1,3 @@
-import { window, commands } from "vscode";
 import { describeTitles } from "./titles";
 
 /**
@@ -7,6 +6,13 @@ import { describeTitles } from "./titles";
  * @author sdttttt
  */
 export type RemindTitles = string | ReadonlyArray<string>;
+
+/**
+ * Label of the action button of a reminder.
+ *
+ * @author sdttttt
+ */
+export const REMIND_ACTION = "打开周番表";
 
 /**
  * Renders the titles through the shared notification formatter.
@@ -20,31 +26,22 @@ function formatTitles(titles: RemindTitles): string {
 }
 
 /**
- * show Remind.
+ * Message of a reminder that an episode is out.
  *
- * @param {string} content
  * @author sdttttt
  */
-function showRemind(content: string): void {
-    window
-        .showInformationMessage(content, "打开周番表")
-        .then((result: string | undefined) => {
-            if (result) {
-                /* The host owns the command, so a failure is not actionable. */
-                commands
-                    .executeCommand("weekBangumi")
-                    .then(undefined, () => undefined);
-            }
-        });
+export function updatedMessage(titles: RemindTitles): string {
+    return `${formatTitles(titles)} 更新啦！`;
 }
 
-export function showBeforeBangumiUpdateRemind(
-    content: RemindTitles,
+/**
+ * Message of a reminder that an episode is about to be out.
+ *
+ * @author sdttttt
+ */
+export function upcomingMessage(
+    titles: RemindTitles,
     minuteTime: string | number
-): void {
-    showRemind(`${formatTitles(content)} 还有${minuteTime}分钟就更新啦！`);
-}
-
-export function showBangumiUpdateRemind(content: RemindTitles): void {
-    showRemind(`${formatTitles(content)} 更新啦！`);
+): string {
+    return `${formatTitles(titles)} 还有${minuteTime}分钟就更新啦！`;
 }

@@ -1,120 +1,80 @@
-"use strict";
-
-import * as vscode from "vscode";
-
-export type Hook = (args?: string) => void;
-export type Hooks = Array<Hook>;
+import type { Settings } from "../configuration";
+import type { Commands } from "../commands";
+import type { AppStore } from "../state/app";
+import type { Notifier } from "../notifier";
+import type { FilterSpec } from "./filterSpec";
 
 /**
- * Abstract index list
+ * Dependencies of the filter menu.
  *
- * @abstract
- * @class
  * @author sdttttt
  */
-export abstract class AbstractIndexList {
-    /**
-     * List  of abstract index list
-     *
-     * @readonly
-     * @type {Array<string>}
-     */
-    protected abstract readonly list: Array<string>;
+export interface FilterMenuOptions {
+    /** State the picked filters are written to. */
+    readonly state: AppStore;
+    /** Settings of the session. */
+    readonly settings: Settings;
+    /** User facing output. */
+    readonly notifier: Notifier;
+    /** Runs the extension commands. */
+    readonly commands: Commands;
+}
+
+/**
+ * The filter menu of one extension session.
+ *
+ * @author sdttttt
+ */
+export interface FilterMenu {
+    /** Shows the choices of a filter and applies the picked one. */
+    open(filter: FilterSpec): void;
+}
+
+/**
+ * Creates the filter menu of one extension session.
+ *
+ * The tag is recorded before the query changes, and the bangumi list is only
+ * opened once the query changed, matching the previous hook pipeline.
+ *
+ * @author sdttttt
+ */
+export function useFilterMenu(options: FilterMenuOptions): FilterMenu {
+    const { state, settings, notifier, commands } = options;
 
     /**
-     * Conditions handler
-     * Running at After openIndexList
-     *
-     * @abstract
-     * @param {string} index
-     * @author sdttttt
+     * Shows the labels of the tags picked so far.
      */
-    protected abstract conditionHandler(index: string): void;
-
-    /**
-     * Hook of Open index list after
-     *
-     * @abstract
-     * @readonly
-     * @type {Hooks}
-     * @author sdttttt
-     */
-    protected abstract readonly openIndexListAfter: Hooks;
-
-    /**
-     * Hook of Open index list before
-     *
-     * @abstract
-     * @readonly
-     * @type {Hooks}
-     * @author sdttttt
-     */
-    protected abstract readonly openIndexListBefore: Hooks;
-
-    /**
-     * Opens bangumi hook
-     *
-     * @author sdttttt
-     */
-    protected openBangumiHook(): void {
-        vscode.commands.executeCommand("openBangumi");
-    }
-
-    /**
-     * Run All Hook of List.
-     *
-     * @private
-     * @param {Hooks} hooks
-     * @param {string} [index]
-     * @memberof AbstractIndexList
-     * @author sdttttt
-     */
-    private runHooks(hooks: Hooks, index?: string): void {
-        if (0 < hooks.length) {
-            for (const callback of hooks) {
-                callback(index);
-            }
+    const showTags = (): void => {
+        if (!settings.isDisplayIndexTags()) {
+            return;
         }
-    }
 
-    /**
-     * run OpenIndex Hook List.
-     *
-     * @memberof AbstractIndexList
-     * @author sdttttt
-     */
-    private runBeforeOpenIndexListHook(index?: string): void {
-        this.runHooks(this.openIndexListBefore, index);
-    }
+        const tags = state.getTags();
+        if (0 === tags.size) {
+            notifier.error("标签：默认");
+            return;
+        }
 
-    /**
-     * run OpenIndex Hook List
-     *
-     * @memberof AbstractIndexList
-     * @author sdttttt
-     */
-    private runAfterOpenIndexListHook(index?: string): void {
-        this.runHooks(this.openIndexListAfter, index);
-    }
+        notifier.info(`已选标签：${[...tags.values()].join("、")}`);
+    };
 
-    /**
-     * Opens index list
-     *
-     * @author sdttttt
-     */
-    openIndexList(): void {
-        vscode.window
-            .showQuickPick(this.list)
-            .then((index: string | undefined) => {
-                if (index) {
-                    // Run Before Hook.
-                    this.runBeforeOpenIndexListHook(index);
-                    // Core
-                    this.conditionHandler(index);
-                    // Run After Hook.
-                    this.runAfterOpenIndexListHook(index);
-                }
-                return;
-            });
-    }
+    return {
+        open: filter => {
+            void notifier
+                .pick(filter.choices)
+                .then((label: string | undefined) => {
+                    if (!label) {
+                        return;
+                    }
+
+                    if (settings.isDisplayIndexTags()) {
+                        state.recordTag(filter.tag, label);
+                    }
+
+                    state.setQuery(filter.query(label));
+                    commands.execute("openBangumi");
+                    showTags();
+                });
+        },
+    };
 }

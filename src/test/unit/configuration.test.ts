@@ -3,12 +3,8 @@ import * as vscode from "vscode";
 import {
     affectsReminder,
     ConfigKey,
-    getConfig,
-    getReminderAheadTime,
-    isDisplayHistory,
-    isDisplayIndexTags,
-    isDisplayStatusBar,
-    isReminderEnabled,
+    useSettings,
+    type Settings,
 } from "@/configuration";
 
 /**
@@ -22,82 +18,86 @@ function stubConfig(values: Record<string, unknown>): void {
     } as unknown as ReturnType<typeof vscode.workspace.getConfiguration>);
 }
 
-describe("getConfig", () => {
+describe("useSettings", () => {
+    let settings: Settings;
+
     beforeEach(() => {
+        settings = useSettings();
         vi.mocked(vscode.workspace.getConfiguration).mockClear();
     });
 
-    it("reads the value under the given key", () => {
-        stubConfig({ [ConfigKey.DisplayHistory]: true });
-
-        expect(getConfig(ConfigKey.DisplayHistory)).toBe(true);
-    });
-});
-
-describe("getReminderAheadTime", () => {
-    it("returns a positive configured value", () => {
+    it("reads the reminder lead time", () => {
         stubConfig({ [ConfigKey.ReminderAheadTime]: 30 });
 
-        expect(getReminderAheadTime()).toBe(30);
+        expect(settings.reminderAheadTime()).toBe(30);
     });
 
-    it("falls back to zero for a negative value", () => {
+    it("falls back to zero for a negative lead time", () => {
         stubConfig({ [ConfigKey.ReminderAheadTime]: -5 });
 
-        expect(getReminderAheadTime()).toBe(0);
+        expect(settings.reminderAheadTime()).toBe(0);
     });
 
-    it("falls back to zero when the setting is missing", () => {
+    it("falls back to zero when the lead time is missing", () => {
         stubConfig({});
 
-        expect(getReminderAheadTime()).toBe(0);
-    });
-});
-
-describe("boolean flags", () => {
-    it("read the display index tags setting", () => {
-        stubConfig({ [ConfigKey.DisplayIndexTags]: false });
-
-        expect(isDisplayIndexTags()).toBe(false);
+        expect(settings.reminderAheadTime()).toBe(0);
     });
 
-    it("read the display status bar setting", () => {
-        stubConfig({ [ConfigKey.DisplayStatusBar]: true });
-
-        expect(isDisplayStatusBar()).toBe(true);
-    });
-
-    it("read the display history setting", () => {
-        stubConfig({ [ConfigKey.DisplayHistory]: false });
-
-        expect(isDisplayHistory()).toBe(false);
-    });
-});
-
-describe("isReminderEnabled", () => {
-    it("is on by default", () => {
+    it("treats the reminder as enabled unless explicitly disabled", () => {
         stubConfig({});
 
-        expect(isReminderEnabled()).toBe(true);
+        expect(settings.isReminderEnabled()).toBe(true);
     });
 
-    it("is off when the setting is disabled", () => {
+    it("reads the reminder enabled flag", () => {
         stubConfig({ [ConfigKey.EnableReminder]: false });
 
-        expect(isReminderEnabled()).toBe(false);
+        expect(settings.isReminderEnabled()).toBe(false);
+    });
+
+    it("reads the display index tags flag", () => {
+        stubConfig({ [ConfigKey.DisplayIndexTags]: false });
+
+        expect(settings.isDisplayIndexTags()).toBe(false);
+    });
+
+    it("reads the display status bar flag", () => {
+        stubConfig({ [ConfigKey.DisplayStatusBar]: false });
+
+        expect(settings.isDisplayStatusBar()).toBe(false);
+    });
+
+    it("reads the display history flag", () => {
+        stubConfig({ [ConfigKey.DisplayHistory]: true });
+
+        expect(settings.isDisplayHistory()).toBe(true);
+    });
+
+    it("reads the live setting on every call", () => {
+        stubConfig({ [ConfigKey.DisplayHistory]: true });
+        expect(settings.isDisplayHistory()).toBe(true);
+
+        stubConfig({ [ConfigKey.DisplayHistory]: false });
+
+        expect(settings.isDisplayHistory()).toBe(false);
     });
 });
 
 describe("affectsReminder", () => {
-    it.each([
-        ConfigKey.EnableReminder,
-        ConfigKey.ReminderAheadTime,
-        ConfigKey.DisplayStatusBar,
-    ])("reacts to %s", key => {
-        expect(affectsReminder(section => section === key)).toBe(true);
+    it("is true for every reminder setting", () => {
+        for (const key of [
+            ConfigKey.EnableReminder,
+            ConfigKey.ReminderAheadTime,
+            ConfigKey.DisplayStatusBar,
+        ]) {
+            expect(affectsReminder(section => section === key)).toBe(true);
+        }
     });
 
-    it("ignores unrelated settings", () => {
-        expect(affectsReminder(() => false)).toBe(false);
+    it("is false for an unrelated setting", () => {
+        expect(
+            affectsReminder(section => section === ConfigKey.DisplayHistory)
+        ).toBe(false);
     });
 });

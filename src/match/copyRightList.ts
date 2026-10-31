@@ -1,21 +1,17 @@
-import { SimpleFinalIndexList } from "./finalIndexList";
-import { BangumiUrl } from "../request/bangumiUrl";
+import { valueFilter } from "./filterSpec";
 
-export default new (class CopyRightList extends SimpleFinalIndexList {
-    protected readonly tag: string = "CopyRight";
-
-    protected readonly map: Map<string, string> = new Map([
+/**
+ * Copyright filter.
+ *
+ * @author sdttttt
+ */
+export default valueFilter(
+    "版权",
+    "CopyRight",
+    [
         ["全部", "-1"],
         ["独家", "3"],
         ["其他", "1"],
-    ]);
-
-    protected updateUrlParams(url: BangumiUrl, index: string): void {
-        url.setCopyright(index);
-    }
-
-    constructor() {
-        super();
-        this.init();
-    }
-})();
+    ],
+    "copyright"
+);

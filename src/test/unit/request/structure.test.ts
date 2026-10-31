@@ -1,16 +1,10 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-import * as vscode from "vscode";
+import { describe, expect, it } from "vitest";
 import { isSuccess, isValidBangumisRequest } from "@/request/structure";
 import { bangumisData } from "@/test/mocks/fixtures/bangumi";
 
 describe("isSuccess", () => {
-    afterEach(() => {
-        vi.mocked(vscode.window.showInformationMessage).mockClear();
-    });
-
     it("accepts code 0 with the success message", () => {
         expect(isSuccess({ code: 0, message: "success" })).toBe(true);
-        expect(vscode.window.showInformationMessage).not.toHaveBeenCalled();
     });
 
     it.each([
@@ -19,12 +13,6 @@ describe("isSuccess", () => {
         [1, "success"],
     ])("rejects code %i with message %j", (code, message) => {
         expect(isSuccess({ code, message })).toBe(false);
-    });
-
-    it("surfaces a message when the response is unsuccessful", () => {
-        isSuccess({ code: -404, message: "boom" });
-
-        expect(vscode.window.showInformationMessage).toHaveBeenCalledTimes(1);
     });
 });
 

@@ -1,9 +1,4 @@
-import {
-    StatusBarAlignment,
-    StatusBarItem,
-    window,
-    type Disposable,
-} from "vscode";
+import { StatusBarAlignment, window, type StatusBarItem } from "vscode";
 import { dayMarker, describeEvent } from "./schedule";
 import type { ScheduleEvent } from "./schedule";
 import { listTitles } from "../utils/titles";
@@ -16,97 +11,90 @@ import { listTitles } from "../utils/titles";
 const TOOLTIP_EVENTS = 3;
 
 /**
- * Owns the status bar entry of the reminder.
- *
- * The item is created lazily, so importing this module never touches the
- * editor UI, and it is released together with the reminder.
+ * The status bar entry of the reminder.
  *
  * @author sdttttt
  */
-export class ReminderStatusBar implements Disposable {
-    private item: StatusBarItem | undefined;
+export interface StatusBar {
+    /** Shows the first upcoming event, or hides the entry when none is left. */
+    show(upcoming: ReadonlyArray<ScheduleEvent>, now: number): void;
+    /** Hides the entry, keeping it for the next schedule. */
+    hide(): void;
+    /** Releases the entry. */
+    dispose(): void;
+}
 
-    private visible = false;
+/**
+ * Creates the status bar entry of the reminder.
+ *
+ * The item is created lazily, so creating the reminder never touches the editor
+ * UI, and it is released together with the reminder.
+ *
+ * @param command command run when the entry is clicked
+ * @author sdttttt
+ */
+export function useStatusBar(command: string): StatusBar {
+    let item: StatusBarItem | undefined;
+    let visible = false;
 
-    public constructor(private readonly command: string) {}
+    const ensureItem = (): StatusBarItem => {
+        if (!item) {
+            item = window.createStatusBarItem(StatusBarAlignment.Right, 100);
+            item.name = "Bangumi Open";
+            item.command = command;
+        }
+        return item;
+    };
 
-    /**
-     * Shows the first upcoming event, or hides the entry when none is left.
-     *
-     * @author sdttttt
-     */
-    public show(upcoming: ReadonlyArray<ScheduleEvent>, now: number): void {
-        const next = upcoming[0];
-        if (!next) {
-            this.hide();
+    const hide = (): void => {
+        if (!item) {
             return;
         }
-
-        const item = this.ensureItem();
-        item.text = describeEvent(next, now);
-        item.tooltip = this.buildTooltip(next, upcoming.slice(1), now);
-        item.accessibilityInformation = {
-            label: `${listTitles(next.titles)} 将于 ${dayMarker(next, now)}${next.pubTime} 更新`,
-        };
-
-        if (!this.visible) {
-            item.show();
-            this.visible = true;
-        }
-    }
-
-    /**
-     * Hides the entry, keeping the instance for the next schedule.
-     *
-     * @author sdttttt
-     */
-    public hide(): void {
-        if (!this.item) {
-            return;
-        }
-        this.item.hide();
-        this.visible = false;
-    }
-
-    /**
-     * Releases the entry.
-     *
-     * @author sdttttt
-     */
-    public dispose(): void {
-        this.item?.dispose();
-        this.item = undefined;
-        this.visible = false;
-    }
-
-    private ensureItem(): StatusBarItem {
-        if (!this.item) {
-            this.item = window.createStatusBarItem(
-                StatusBarAlignment.Right,
-                100
-            );
-            this.item.name = "Bangumi Open";
-            this.item.command = this.command;
-        }
-        return this.item;
-    }
+        item.hide();
+        visible = false;
+    };
 
     /**
      * Full titles and times of the next events. The status bar truncates, the
      * tooltip never does.
-     *
-     * @author sdttttt
      */
-    private buildTooltip(
+    const buildTooltip = (
         next: ScheduleEvent,
         rest: ReadonlyArray<ScheduleEvent>,
         now: number
-    ): string {
-        return [next, ...rest.slice(0, TOOLTIP_EVENTS - 1)]
+    ): string =>
+        [next, ...rest.slice(0, TOOLTIP_EVENTS - 1)]
             .map(
                 event =>
                     `${dayMarker(event, now)}${event.pubTime} ${listTitles(event.titles)}`
             )
             .join("\n");
-    }
+
+    return {
+        show: (upcoming, now) => {
+            const next = upcoming[0];
+            if (!next) {
+                hide();
+                return;
+            }
+
+            const bar = ensureItem();
+            bar.text = describeEvent(next, now);
+            bar.tooltip = buildTooltip(next, upcoming.slice(1), now);
+            bar.accessibilityInformation = {
+                label: `${listTitles(next.titles)} 将于 ${dayMarker(next, now)}${next.pubTime} 更新`,
+            };
+
+            if (!visible) {
+                bar.show();
+                visible = true;
+            }
+        },
+        hide,
+        dispose: () => {
+            item?.dispose();
+            item = undefined;
+            visible = false;
+        },
+    };
 }

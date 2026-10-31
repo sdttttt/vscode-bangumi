@@ -1,19 +1,29 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getJson } from "@/request/http";
-import { BangumiUrl } from "@/request/bangumiUrl";
-import { getAllBangumi, getWeekBangumi } from "@/request/bangumi";
-import { BangumiCache, WeekBangumiCache } from "@/request/cache";
+import { buildBangumiUrl, DEFAULT_QUERY } from "@/request/query";
+import { useBangumiApi, type BangumiApi } from "@/request/bangumi";
+import { useCache } from "@/request/cache";
+import { createNotifierStub, type NotifierStub } from "@/test/mocks/ports";
 import { bangumisData } from "@/test/mocks/fixtures/bangumi";
 import { weekBangumi } from "@/test/mocks/fixtures/weekBangumi";
-import * as vscode from "vscode";
 
 vi.mock("@/request/http", () => ({
     getJson: vi.fn(),
 }));
 
 describe("getAllBangumi", () => {
+    let api: BangumiApi;
+    let notifier: NotifierStub;
+
     beforeEach(() => {
-        BangumiCache.clear();
+        notifier = createNotifierStub();
+        api = useBangumiApi(
+            {
+                bangumi: useCache(600),
+                week: useCache(60),
+            },
+            notifier.notifier
+        );
     });
 
     afterEach(() => {
@@ -28,7 +38,9 @@ describe("getAllBangumi", () => {
             data: payload,
         });
 
-        await expect(getAllBangumi(new BangumiUrl())).resolves.toEqual(payload);
+        await expect(
+            api.getAllBangumi(buildBangumiUrl(DEFAULT_QUERY, 1))
+        ).resolves.toEqual(payload);
     });
 
     it("requests the url produced by the builder", async () => {
@@ -38,10 +50,10 @@ describe("getAllBangumi", () => {
             data: bangumisData(),
         });
 
-        const url = new BangumiUrl().setPage(2);
-        await getAllBangumi(url);
+        const url = buildBangumiUrl(DEFAULT_QUERY, 2);
+        await api.getAllBangumi(url);
 
-        expect(getJson).toHaveBeenCalledWith(url.build().finalUrl);
+        expect(getJson).toHaveBeenCalledWith(url);
     });
 
     it("serves the second identical call from the cache", async () => {
@@ -51,9 +63,9 @@ describe("getAllBangumi", () => {
             data: bangumisData(),
         });
 
-        const url = new BangumiUrl();
-        await getAllBangumi(url);
-        await getAllBangumi(url);
+        const url = buildBangumiUrl(DEFAULT_QUERY, 1);
+        await api.getAllBangumi(url);
+        await api.getAllBangumi(url);
 
         expect(getJson).toHaveBeenCalledTimes(1);
     });
@@ -65,8 +77,8 @@ describe("getAllBangumi", () => {
             data: bangumisData(),
         });
 
-        await getAllBangumi(new BangumiUrl().setPage(1));
-        await getAllBangumi(new BangumiUrl().setPage(2));
+        await api.getAllBangumi(buildBangumiUrl(DEFAULT_QUERY, 1));
+        await api.getAllBangumi(buildBangumiUrl(DEFAULT_QUERY, 2));
 
         expect(getJson).toHaveBeenCalledTimes(2);
     });
@@ -78,29 +90,41 @@ describe("getAllBangumi", () => {
             data: { has_next: 0, list: [] },
         });
 
-        await expect(getAllBangumi(new BangumiUrl())).resolves.toBeUndefined();
+        await expect(
+            api.getAllBangumi(buildBangumiUrl(DEFAULT_QUERY, 1))
+        ).resolves.toBeUndefined();
 
-        await getAllBangumi(new BangumiUrl());
+        await api.getAllBangumi(buildBangumiUrl(DEFAULT_QUERY, 1));
         expect(getJson).toHaveBeenCalledTimes(2);
     });
 
     it("propagates a network failure", async () => {
         vi.mocked(getJson).mockRejectedValue(new Error("timeout"));
 
-        await expect(getAllBangumi(new BangumiUrl())).rejects.toThrow(
-            "timeout"
-        );
+        await expect(
+            api.getAllBangumi(buildBangumiUrl(DEFAULT_QUERY, 1))
+        ).rejects.toThrow("timeout");
     });
 });
 
 describe("getWeekBangumi", () => {
+    let api: BangumiApi;
+    let notifier: NotifierStub;
+
     beforeEach(() => {
-        WeekBangumiCache.clear();
+        notifier = createNotifierStub();
+        api = useBangumiApi(
+            {
+                bangumi: useCache(600),
+                week: useCache(60),
+            },
+            notifier.notifier
+        );
     });
 
     afterEach(() => {
         vi.mocked(getJson).mockReset();
-        vi.mocked(vscode.window.showInformationMessage).mockClear();
+        notifier.info.mockClear();
     });
 
     it("returns the schedule of a valid response", async () => {
@@ -111,7 +135,7 @@ describe("getWeekBangumi", () => {
             result: payload,
         });
 
-        await expect(getWeekBangumi()).resolves.toEqual(payload);
+        await expect(api.getWeekBangumi()).resolves.toEqual(payload);
     });
 
     it("serves the second call from the cache", async () => {
@@ -121,8 +145,8 @@ describe("getWeekBangumi", () => {
             result: weekBangumi(),
         });
 
-        await getWeekBangumi();
-        await getWeekBangumi();
+        await api.getWeekBangumi();
+        await api.getWeekBangumi();
 
         expect(getJson).toHaveBeenCalledTimes(1);
     });
@@ -134,11 +158,9 @@ describe("getWeekBangumi", () => {
             result: [],
         });
 
-        await expect(getWeekBangumi()).resolves.toBeUndefined();
+        await expect(api.getWeekBangumi()).resolves.toBeUndefined();
 
-        expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-            "咦？没有找到番剧时间表……"
-        );
+        expect(notifier.info).toHaveBeenCalledWith("咦？没有找到番剧时间表……");
     });
 
     it("does not cache an empty schedule", async () => {
@@ -148,8 +170,8 @@ describe("getWeekBangumi", () => {
             result: [],
         });
 
-        await getWeekBangumi();
-        await getWeekBangumi();
+        await api.getWeekBangumi();
+        await api.getWeekBangumi();
 
         expect(getJson).toHaveBeenCalledTimes(2);
     });
@@ -157,10 +179,8 @@ describe("getWeekBangumi", () => {
     it("reports a network failure instead of rejecting", async () => {
         vi.mocked(getJson).mockRejectedValue(new Error("timeout"));
 
-        await expect(getWeekBangumi()).resolves.toBeUndefined();
-        expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-            "咦？没有找到番剧时间表……"
-        );
+        await expect(api.getWeekBangumi()).resolves.toBeUndefined();
+        expect(notifier.info).toHaveBeenCalledWith("咦？没有找到番剧时间表……");
     });
 
     it("returns undefined for an unsuccessful response", async () => {
@@ -170,6 +190,6 @@ describe("getWeekBangumi", () => {
             result: weekBangumi(),
         });
 
-        await expect(getWeekBangumi()).resolves.toBeUndefined();
+        await expect(api.getWeekBangumi()).resolves.toBeUndefined();
     });
 });

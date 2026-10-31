@@ -1,61 +1,54 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import * as vscode from "vscode";
 
-vi.mock("@/request/bangumi", () => ({
-    getAllBangumi: vi.fn(),
-    getWeekBangumi: vi.fn(),
-}));
-
-import { getWeekBangumi } from "@/request/bangumi";
-import { ConfigKey } from "@/configuration";
+import type { BangumiApi } from "@/request/bangumi";
+import { createSettingsStub, type SettingsStub } from "@/test/mocks/settings";
 import { weekBangumi } from "@/test/mocks/fixtures/weekBangumi";
 import { createPanelStub, PanelStub } from "@/test/mocks/panel";
+import { useWebviewHost } from "@/webview/host";
+import { usePanel } from "@/views/panel";
+import { useWeekBangumiView, type WeekBangumiView } from "@/views/weekBangumi";
 
 /**
- * Makes the configuration read answer with the given values.
+ * Builds a view of its own, so every case starts with a closed panel.
  *
  * @author sdttttt
  */
-function stubConfig(values: Record<string, unknown>): void {
-    vi.mocked(vscode.workspace.getConfiguration).mockReturnValue({
-        get: vi.fn((key: string) => values[key]),
-    } as never);
-}
-
-/**
- * Reloads the view module so its singleton state starts clean, wiring the
- * extension context into the same module registry.
- *
- * @author sdttttt
- */
-async function loadView(): Promise<
-    (typeof import("@/views/weekBangumi"))["default"]
-> {
-    vi.resetModules();
-    const constants = await import("@/constants");
-    constants.setContext({
-        extensionPath: "/extension",
+function loadView(
+    settings: SettingsStub,
+    stub: PanelStub
+): { view: WeekBangumiView; api: BangumiApi } {
+    const api: BangumiApi = {
+        getAllBangumi: vi.fn(),
+        getWeekBangumi: vi.fn(),
+    };
+    const panel = usePanel({
+        viewType: "bangumiOpen.week",
+        title: "周番表",
+        host: useWebviewHost("/extension"),
         subscriptions: [],
-    } as never);
+        createPanel: () => stub.panel,
+    });
+    const view = useWeekBangumiView({ api, panel, settings });
+    panel.onCommand(view.handleCommand);
 
-    return (await import("@/views/weekBangumi")).default;
+    return { view, api };
 }
 
-describe("WeekBangumiView", () => {
-    let view: (typeof import("@/views/weekBangumi"))["default"];
+describe("Week bangumi view", () => {
+    let view: WeekBangumiView;
+    let api: BangumiApi;
+    let settings: SettingsStub;
     let stub: PanelStub;
 
-    beforeEach(async () => {
-        stubConfig({ [ConfigKey.DisplayHistory]: true });
+    beforeEach(() => {
+        settings = createSettingsStub({ "bangumiOpen.DisplayHistory": true });
 
         stub = createPanelStub();
-        vi.mocked(vscode.window.createWebviewPanel).mockReturnValue(stub.panel);
-
-        view = await loadView();
+        ({ view, api } = loadView(settings, stub));
     });
 
     it("posts the loading state before the schedule arrives", () => {
-        vi.mocked(getWeekBangumi).mockReturnValue(new Promise(() => {}));
+        vi.mocked(api.getWeekBangumi).mockReturnValue(new Promise(() => {}));
 
         view.openWeekBangumi();
 
@@ -63,7 +56,7 @@ describe("WeekBangumiView", () => {
     });
 
     it("renders every day when history is enabled", async () => {
-        vi.mocked(getWeekBangumi).mockResolvedValue(weekBangumi());
+        vi.mocked(api.getWeekBangumi).mockResolvedValue(weekBangumi());
 
         view.openWeekBangumi();
 
@@ -76,8 +69,8 @@ describe("WeekBangumiView", () => {
     });
 
     it("hides the past days when history is disabled", async () => {
-        stubConfig({ [ConfigKey.DisplayHistory]: false });
-        vi.mocked(getWeekBangumi).mockResolvedValue(weekBangumi());
+        settings.values["bangumiOpen.DisplayHistory"] = false;
+        vi.mocked(api.getWeekBangumi).mockResolvedValue(weekBangumi());
 
         view.openWeekBangumi();
 
@@ -89,7 +82,7 @@ describe("WeekBangumiView", () => {
     });
 
     it("converts the season fields into render payloads", async () => {
-        vi.mocked(getWeekBangumi).mockResolvedValue(weekBangumi());
+        vi.mocked(api.getWeekBangumi).mockResolvedValue(weekBangumi());
 
         view.openWeekBangumi();
 
@@ -104,7 +97,7 @@ describe("WeekBangumiView", () => {
     });
 
     it("keeps the loading state when the request fails", async () => {
-        vi.mocked(getWeekBangumi).mockResolvedValue(undefined);
+        vi.mocked(api.getWeekBangumi).mockResolvedValue(undefined);
 
         view.openWeekBangumi();
         await Promise.resolve();
@@ -113,20 +106,20 @@ describe("WeekBangumiView", () => {
     });
 
     it("reloads the schedule when the webview asks to refresh", async () => {
-        vi.mocked(getWeekBangumi).mockResolvedValue(weekBangumi());
+        vi.mocked(api.getWeekBangumi).mockResolvedValue(weekBangumi());
         view.openWeekBangumi();
         await vi.waitFor(() => {
             expect(stub.posted().at(-1)?.kind).toBe("weekBangumi");
         });
-        vi.mocked(getWeekBangumi).mockClear();
+        vi.mocked(api.getWeekBangumi).mockClear();
 
         stub.receive({ type: "weekBangumi:refresh" });
 
-        expect(getWeekBangumi).toHaveBeenCalledTimes(1);
+        expect(api.getWeekBangumi).toHaveBeenCalledTimes(1);
     });
 
     it("replays the last state when the webview asks to be ready", async () => {
-        vi.mocked(getWeekBangumi).mockResolvedValue(weekBangumi());
+        vi.mocked(api.getWeekBangumi).mockResolvedValue(weekBangumi());
         view.openWeekBangumi();
         await vi.waitFor(() => {
             expect(stub.posted().at(-1)?.kind).toBe("weekBangumi");

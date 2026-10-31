@@ -1,21 +1,17 @@
-import { SimpleFinalIndexList } from "./finalIndexList";
-import { BangumiUrl } from "../request/bangumiUrl";
+import { valueFilter } from "./filterSpec";
 
-export default new (class FinishList extends SimpleFinalIndexList {
-    protected readonly tag: string = "FinishList";
-
-    protected readonly map: Map<string, string> = new Map([
+/**
+ * Whether the season has finished.
+ *
+ * @author sdttttt
+ */
+export default valueFilter(
+    "状态",
+    "FinishList",
+    [
         ["全部", "-1"],
         ["完结", "1"],
         ["连载", "0"],
-    ]);
-
-    constructor() {
-        super();
-        this.init();
-    }
-
-    protected updateUrlParams(url: BangumiUrl, param: string): void {
-        url.setIsFinish(param);
-    }
-})();
+    ],
+    "isFinish"
+);

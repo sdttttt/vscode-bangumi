@@ -39,12 +39,17 @@
 ## 目录结构与职责
 
 - `src/extension.ts` —— 激活入口，注册 `package.json` 中声明的所有命令。
-- `src/views/` —— `AbstractView` 封装 Webview 面板生命周期与消息通道，另有番剧列表视图、周番视图及翻页状态。
-- `src/webview/` —— 宿主侧 Webview 基础设施：`protocol.ts`（双向消息类型，两段共享）、`host.ts`（CSP、nonce、`localResourceRoots`、资源 URI）、`viewModel.ts`（API 原始数据 → 渲染载荷）。
+- `src/state/` —— 会话状态的唯一归宿：`store.ts`（`createStore`）、`app.ts`（`AppState`、纯变换、`useAppState`）。
+- `src/configuration.ts` —— `ConfigKey` 与 `useSettings()`：设置以 `Settings` 接口（端口）对外暴露，消费者接收注入而不是自己读 workspace。
+- `src/notifier.ts` —— `Notifier` 端口（`info` / `error` / `ask` / `pick` / `action`）与 `useNotifier()`，所有面向用户的消息与选择框都经由它。
+- `src/commands.ts` —— `COMMAND_IDS`、`Commands` 端口与 `useCommands()`，跨视图跳转通过它而不是直接调 `vscode.commands`。
+- `src/views/` —— `panel.ts` 的 `usePanel` 用闭包承载 Webview 面板生命周期与消息通道；`bangumi.ts` / `weekBangumi.ts` 导出 `useBangumiView` / `useWeekBangumiView`。
+- `src/extension.ts` —— 组合根：`activate()` 里用 `use*` 建好一个会话的 state、host、视图与提醒，再把它们拼成命令表。
+- `src/webview/` —— 宿主侧 Webview 基础设施：`protocol.ts`（双向消息类型，两段共享）、`host.ts`（`useWebviewHost`：CSP、nonce、`localResourceRoots`、资源 URI）、`viewModel.ts`（API 原始数据 → 渲染载荷）。
 - `webview/` —— 独立的前端工程（Preact + TypeScript + UnoCSS），源码在 `webview/src/`，样式配置在 `webview/uno.config.ts`，产物由 `vite.webview.mts` 输出到 `webview-dist/`。
-- `src/request/` —— `http.ts`（`fetch` 封装与超时）、URL 构造器、响应类型定义以及内存缓存（`cache.ts`）。
-- `src/match/` —— 索引视图（年份 / 季度 / 标签 / 地区筛选），由若干静态列表模块组合而成。
-- `src/reminder/` —— 更新提醒：`schedule.ts`（周番数据 → 触发事件，纯函数）、`scheduler.ts`（单定时器重新调度器，可注入时钟）、`statusBar.ts`（状态栏条目封装）、`index.ts`（配置、数据源与生命周期编排）。
+- `src/request/` —— `http.ts`（`fetch` 封装与超时）、`query.ts`（`BangumiQuery`、`DEFAULT_QUERY`、纯函数 `buildBangumiUrl`）、响应类型与纯谓词（`structure.ts`）、会话缓存（`cache.ts` 的 `useCaches`）与接口调用（`bangumi.ts` 的 `useBangumiApi`）。
+- `src/match/` —— 索引菜单：`filterSpec.ts`（`FilterSpec` 类型与 `valueFilter` 工厂）、`indexList.ts`（`useFilterMenu`，负责 quick pick、标签与提示）、`index.ts`（`FILTERS` 表与 `useIndexCommand`）、其余模块是纯数据描述对象。
+- `src/reminder/` —— 更新提醒：`schedule.ts`（周番数据 → 触发事件，纯函数）、`notice.ts`（事件 → 通知形态，纯函数）、`scheduler.ts`（`useScheduler`，单定时器，可注入时钟）、`statusBar.ts`（`useStatusBar`）、`index.ts`（`useReminder`）。
 - `src/utils/` —— 纯函数工具（`strings`、`type`、`file`、`display`、`clock`（UTC+8 日界）、`titles`（通知文案））。
 - `src/test/` —— 单元测试目录，布局见下方「测试约定」。
 - `resources/` —— 占位图片，由宿主通过 `asWebviewUri` 注入给 Webview，不参与打包。
@@ -75,9 +80,9 @@
 
 Webview 不再是字符串拼接出来的静态 HTML，而是一个独立构建的前端应用。两段之间的契约是 `src/webview/protocol.ts`。
 
-- 宿主只负责取数、生命周期与消息转发：`AbstractView.render(state)` 把 `ViewState` 通过 `postMessage` 推给 Webview，视图类不再拼 HTML。
+- 宿主只负责取数、生命周期与消息转发：`usePanel(...)` 返回的 `show(state)` 把 `ViewState` 通过 `postMessage` 推给 Webview，视图模块不拼 HTML。
 - Webview 启动后先 `postMessage({ type: "ready" })`，宿主收到后重放最后一份 state。因为 `retainContextWhenHidden: false`，面板每次显示都会重建文档，重放是让内容不丢的唯一手段。
-- Webview 侧的交互（翻页、跳页、刷新）通过 `WebviewCommand` 回传给宿主，宿主仍在 `src/views/` 里维持页码等业务状态，Webview 保持无状态。
+- Webview 侧的交互（翻页、跳页、刷新）通过 `WebviewCommand` 回传给宿主，宿主把页码等业务状态放在 `src/state/app.ts` 的会话实例里，Webview 保持无状态。
 - 不要再往 Webview 里加直连 HTTP 的代码：Webview 没有 Node.js、受 CORS 限制，请求、缓存、错误提示都留在宿主侧的 `src/request/`。
 - 文档由 `createWebviewHtml()` 生成，必须是完整 HTML（`<!DOCTYPE html>` + `charset` + `viewport`），并带 CSP 与 nonce。禁止引入 inline `<script>`。
 - 需要新增本地图片时，走 `createAssetUris()` 放进 `ViewState.assets`，由 Webview 从 props 取用；不要硬编码 `vscode-resource` 或绝对路径。
@@ -112,17 +117,17 @@ Vitest 配置了两个 project，互不干扰：
 
 `pnpm test` 会跑两者；只跑一侧用 `vitest run --project webview`。
 
-- `src/test/unit/` —— 宿主侧用例，按被测目录镜像分层（`utils/`、`request/`、`match/`、`views/`、`webview/`）。
+- `src/test/unit/` —— 宿主侧用例，按被测目录镜像分层（`utils/`、`request/`、`state/`、`match/`、`views/`、`webview/`、`reminder/`）。
 - `webview/src/**/*.test.tsx` —— 组件用例，与被测组件同目录。渲染用 `@testing-library/preact` 的 `render`/`screen`，查询用语义选择器（`getByText`），不要断言完整 HTML 字符串。
 - `src/test/setup.ts` —— 全局 `setupFiles`，负责把 `vscode` 模块替换成桩，测试文件里不要再写 `vi.mock("vscode")`。
 - `src/test/mocks/vscode.ts` —— `vscode` 桩工厂。新增用到的 API 时在这里补，不要在各用例里就地 mock。
 - `src/test/mocks/fixtures/` —— 响应夹具（`bangumi.ts`、`weekBangumi.ts`），用带 `overrides` 的工厂函数构造，不要在用例里手写完整对象。
 - `src/test/mocks/panel.ts` —— `WebviewPanel` 桩，记录 `postMessage` 的每一份 state，并支持 `receive()` 模拟 Webview 发来的命令。视图测试一律用它，不要再手工拼 `webview` 对象。
-- 模块级单例（视图、`Reminder`、`Tagger`）状态会跨用例泄漏，用例里用 `vi.resetModules()` 后重新 `import()`；重新导入后需要重新 `setContext()`，因为 `@/constants` 也是新实例。
+- 每个用例自己装配依赖（`useAppState`、`usePanel`、`useBangumiApi` …），状态互不共享，不需要 `vi.resetModules()`，也不需要任何全局上下文；`vi.resetModules()` 只留在 `extension.test.ts`，用于验证 `activate()` 只建一个会话。
 - 断言统一用 Vitest 原生 matcher（`toBe`/`toEqual`/`toBeUndefined`/`toBeGreaterThanOrEqual`），**不要**用 chai 风格（`to.be.equal`、`to.be.exist`）——后者是裸表达式，会迫使 oxlint 关掉 `no-unused-expressions`。
 - 涉及时间、定时器、随机数的用例必须用假时钟（`vi.useFakeTimers()` + `vi.setSystemTime`）或 `vi.spyOn(Math, "random")`，不要依赖真实时钟。
-- 提醒相关的用例用 `new Reminder(source, now)` 注入假数据源与时钟，不要 `import()` 模块单例；`src/reminder/*` 的纯函数与调度器各自有独立用例，改动其中一处时同步补对应断言。
-- 请求层测试 `vi.mock("@/request/instance")`，用夹具构造响应；`Cache` 每例前调用 `clear()` 重置。
+- 提醒相关的用例用 `useReminder({ source, now })` 注入假数据源与时钟，不要共享实例；`src/reminder/*` 的纯函数（`schedule`、`notice`）与调度器各自有独立用例，改动其中一处时同步补对应断言。
+- 请求层测试 `vi.mock("@/request/http")`，每个用例传入自己 `useCache(...)` 组出的缓存，不要共享实例；缓存的 TTL 行为单独用 `useCache(...)` 覆盖。
 - `src/test/unit/manifest.test.ts` 校验 `package.json` 的 commands 与 `src/commands.ts` 的 `COMMAND_IDS` 一致、`@types/vscode` 不高于 `engines.vscode`。新增命令时先改 `src/commands.ts`，TypeScript 会强制 `extension.ts` 补上处理函数。
 - Webview 用例需要在 `acquireVsCodeApi` 存在的前提下运行；`webview/src/test/setup.ts` 已注入桩，断言消息用其中的 `vsCodeApi`。Preact 的 effect 清理是异步刷新的，涉及卸载的断言要先 `await new Promise(r => setTimeout(r, 0))`，否则会读到未清理的监听器。
 
@@ -139,9 +144,15 @@ Vitest 配置了两个 project，互不干扰：
 - 周番页的「你在这里」标记（`now-marker`）只画在 `isToday` 的那一列，位置由 `markerIndex()` 按 `HH:MM` 计算；时间来源是 `@shared/utils/clock` 的 `minuteOfDay()`（UTC+8，与接口一致），不要改用本地时区或新的 Date 计算。时钟只在当天那一列订阅（`useNow`），其余六列保持静态；`now` prop 用于测试冻结时间。标记用 `--gold`（`main.css` 中由警告色与前景色混合，保证明暗主题下都够对比度），高对比主题下回退到前景色。标记后缀是倒计时而不是墙钟：`nextGapMinutes()` 从 `markerIndex()` 的位置向后找第一场，`describeGap()` 负责文案（<60 分钟用分钟，否则小时+分钟），`describeNow()` 处理「今日已播完」与「今日没有更新」；墙钟只保留在 `aria-label` 里。
 - `.today` / `.delay` 用 `!` 前缀（如 `!border-accent`）压过同一元素的其它颜色工具类：UnoCSS 的输出顺序不按 class 书写顺序，不加 `!` 时结果不可预测。
 - `@unocss/vite` 会自动扫描 `.tsx`，但也会把源码里的普通英文单词当成候选类名（例如注释里的 `tab stop` 会生成 `.tab`）。这些多出来的规则无害，不要为了消除它们而下调 `content` 的扫描范围：关掉 pipeline 会让 Vite 引入的虚拟样式表解析失败。
-- 视图类沿用 `export default new (class ...)` 的模块级单例写法，状态放在实例上，不要新增游离的模块级变量。
-- `Reminder` 是显式 `new Reminder()` 的类实例：可注入数据源与时钟，实现 `Disposable` 并在 `context.subscriptions` 中注册，不要在模块求值时创建 `StatusBarItem`。
-- 新增命令需同时修改 `contributes.commands`、`src/commands.ts` 的 `COMMAND_IDS` 与 `src/extension.ts` 的 `handlers`。`handlers` 是 `Record<CommandId, …>`，漏写会编译失败；注册时统一 push 进 `context.subscriptions`。
+- **`src/` 下不写 class，也不用 `this`。** 可变状态只有两个去处：`src/state/` 的 store，或 `use*()` 工厂的闭包。
+- **状态与方法一律封装进 `use*()` 工厂，不要写成模块级单例。** 现有工厂：`useAppState`、`useCache`、`useBangumiApi`、`useWebviewHost`、`usePanel`、`useBangumiView`、`useWeekBangumiView`、`useFilterMenu`、`useIndexCommand`、`useScheduler`、`useStatusBar`、`useReminder`。模块顶层只允许放不可变的纯数据（`FILTERS`、`DEFAULT_QUERY`、`MENU_LABELS` 之类）和纯函数。
+- **`use*()` 工厂里不许再调用别的 `use*()`。** 工厂只创建自己那份状态，需要别的模块的实例（面板、调度器、状态栏、缓存、API）时一律通过参数从外部注入，由组合根 `createSession()` 负责装配。同理，`onCommand` 之类把两个对象连起来的接线也只能在组合根里做。
+- **状态一律通过端口注入，不许在工厂里读环境。** 依赖方向是「组合根 → 工厂 → 端口接口」：`Settings`（用户配置）、`Notifier`（消息与选择框）、`Commands`（命令调用）、`Commands`/`Panel`/`WebviewHost`（宿主能力）都由 `src/extension.ts` 建好后传入。工厂只依赖这些接口，测试传 double 即可，不需要 `vi.mock("vscode")` 去改环境状态。
+- **控制反转的边界在 `src/extension.ts`。** 谁创建、谁持有、谁释放（`context.subscriptions`、`deactivate()`）都写在组合根；工厂只接收并使用，不自己注册监听、不自己读配置、不自己弹窗。
+- 组合根在 `src/extension.ts` 的 `createSession()`：只有它能同时拿到 state、缓存、api、host、面板、视图、菜单与提醒，负责把它们装配起来；其他模块通过参数接收依赖，不许自己去取，也不许自己 new。
+- 扩展宿主的东西（`ExtensionContext`、`extensionPath`、`subscriptions`）只能从 `activate()` 往下传，不要再引入 `setContext` / `getContext` 这类全局取用点。
+- 不要在模块求值时创建 `StatusBarItem` 或面板：状态栏条目在首次 `show()` 时创建，面板在首次 `show(state)` 时创建。
+- 新增命令需同时修改 `contributes.commands`、`src/commands.ts` 的 `COMMAND_IDS` 与 `src/extension.ts` 的 `createSession()` 返回值。它返回 `Record<CommandId, …>`，漏写会编译失败；注册时统一 push 进 `context.subscriptions`。
 - 用户配置统一通过 `src/configuration.ts` 的 `ConfigKey` 读取，不要直接调用 `workspace.getConfiguration`。
 - 宿主引用 `resources/` 下的图片必须走 `getResourceFile(webview, name)`（内部调用 `webview.asWebviewUri`），不要再用已废弃的 `vscode-resource` scheme。
 - Vitest 只收集 `src/test/unit/**/*.test.ts` 与 `webview/src/**/*.test.tsx`。放在别处的测试文件不会被执行，新增目录时记得同步 `vitest.config.mts` 的 `include`。

@@ -1,60 +1,72 @@
-import { getWeekBangumi } from "../request/bangumi";
-import { WeekBangumiData } from "../request/structure";
-import { isDisplayHistory } from "../configuration";
+import type { BangumiApi } from "../request/bangumi";
+import type { WeekBangumiData } from "../request/structure";
+import type { Settings } from "../configuration";
 import { toWeekDayPayloads } from "../webview/viewModel";
 import type { WebviewCommand } from "../webview/protocol";
-import AbstractView from "./view";
+import type { Panel } from "./panel";
 
 /**
- * Week Bangumi View
+ * Dependencies of the weekly schedule view.
  *
- * @class
- * @export
  * @author sdttttt
  */
-export default new (class WeekBangumisView extends AbstractView {
-    protected readonly viewType = "bangumiOpen.week";
-    protected readonly title = "周番表";
+export interface WeekBangumiViewOptions {
+    readonly api: BangumiApi;
+    readonly panel: Panel;
+    readonly settings: Settings;
+}
 
-    constructor() {
-        super();
-    }
+/**
+ * The commands of the weekly schedule view.
+ *
+ * @author sdttttt
+ */
+export interface WeekBangumiView {
+    /** Opens the schedule, or refreshes the open panel. */
+    openWeekBangumi(): void;
+    /** Routes a command sent by the webview. */
+    handleCommand(command: WebviewCommand): void;
+}
+
+/**
+ * Creates the weekly schedule view of one extension session.
+ *
+ * @author sdttttt
+ */
+export function useWeekBangumiView(
+    options: WeekBangumiViewOptions
+): WeekBangumiView {
+    const { api, panel, settings } = options;
 
     /**
      * Renders the schedule sent by the API.
-     *
-     * @author sdttttt
      */
-    private createWeekBangumiView(data: Array<WeekBangumiData>): void {
-        this.render({
+    const createWeekBangumiView = (data: Array<WeekBangumiData>): void => {
+        panel.show({
             kind: "weekBangumi",
-            days: toWeekDayPayloads(data, isDisplayHistory()),
+            days: toWeekDayPayloads(data, settings.isDisplayHistory()),
         });
-    }
+    };
 
-    /**
-     * Opens week bangumi
-     *
-     * @author sdttttt
-     */
-    openWeekBangumi(): void {
-        this.showLoadingView();
+    const view: WeekBangumiView = {
+        openWeekBangumi: () => {
+            panel.showLoading();
 
-        getWeekBangumi().then((result: Array<WeekBangumiData> | undefined) => {
-            if (result) {
-                this.createWeekBangumiView(result);
+            api.getWeekBangumi().then(
+                (result: Array<WeekBangumiData> | undefined) => {
+                    if (result) {
+                        createWeekBangumiView(result);
+                    }
+                }
+            );
+        },
+
+        handleCommand: command => {
+            if ("weekBangumi:refresh" === command.type) {
+                view.openWeekBangumi();
             }
-        });
-    }
+        },
+    };
 
-    /**
-     * Routes the refresh command sent by the webview.
-     *
-     * @author sdttttt
-     */
-    protected handleWebviewCommand(command: WebviewCommand): void {
-        if ("weekBangumi:refresh" === command.type) {
-            this.openWeekBangumi();
-        }
-    }
-})();
+    return view;
+}

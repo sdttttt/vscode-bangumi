@@ -1,10 +1,14 @@
-import { SimpleFinalIndexList } from "./finalIndexList";
-import { BangumiUrl } from "../request/bangumiUrl";
+import { valueFilter } from "./filterSpec";
 
-export default new (class StyleList extends SimpleFinalIndexList {
-    protected readonly tag: string = "Style";
-
-    protected readonly map: Map<string, string> = new Map([
+/**
+ * Style filter.
+ *
+ * @author sdttttt
+ */
+export default valueFilter(
+    "风格",
+    "Style",
+    [
         ["全部", "-1"],
         ["原创", "10010"],
         ["漫画改", "10011"],
@@ -43,14 +47,6 @@ export default new (class StyleList extends SimpleFinalIndexList {
         ["偶像", "10046"],
         ["乙女", "10047"],
         ["职场", "10048"],
-    ]);
-
-    protected updateUrlParams(url: BangumiUrl, index: string): void {
-        url.setStyleId(index);
-    }
-
-    constructor() {
-        super();
-        this.init();
-    }
-})();
+    ],
+    "styleId"
+);

@@ -41,70 +41,44 @@ export interface SchedulerHooks {
  *
  * @author sdttttt
  */
-export class Scheduler {
-    private timer: ReturnType<typeof setTimeout> | undefined;
+export interface Scheduler {
+    /** Replaces the armed schedule and arms its next deadline. */
+    arm(schedule: Schedule): void;
+    /** Cancels the pending timer. Safe to call at any time. */
+    disarm(): void;
+    /** Whether a timer is currently armed. */
+    isArmed(): boolean;
+}
 
-    private schedule: Schedule | undefined;
+/**
+ * Creates a scheduler around the given clock.
+ *
+ * @param hooks callbacks fired by the timer
+ * @param now clock, injectable so tests never depend on the wall clock
+ * @author sdttttt
+ */
+export function useScheduler(
+    hooks: SchedulerHooks,
+    now: () => number
+): Scheduler {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let schedule: Schedule | undefined;
+    /* How many leading events of the armed schedule already fired. */
+    let consumed = 0;
 
-    /** How many leading events of the armed schedule already fired. */
-    private consumed = 0;
-
-    public constructor(
-        private readonly hooks: SchedulerHooks,
-        private readonly now: () => number = Date.now
-    ) {}
-
-    /**
-     * Replaces the armed schedule and arms its next deadline.
-     *
-     * @author sdttttt
-     */
-    public arm(schedule: Schedule): void {
-        this.clearTimer();
-        this.schedule = schedule;
-        this.consumed = 0;
-        this.armNext();
-    }
-
-    /**
-     * Cancels the pending timer. Safe to call at any time.
-     *
-     * @author sdttttt
-     */
-    public disarm(): void {
-        this.clearTimer();
-        this.schedule = undefined;
-        this.consumed = 0;
-    }
-
-    /**
-     * Whether a timer is currently armed.
-     *
-     * @author sdttttt
-     */
-    public get armed(): boolean {
-        return undefined !== this.timer;
-    }
-
-    private clearTimer(): void {
-        if (undefined !== this.timer) {
-            clearTimeout(this.timer);
-            this.timer = undefined;
+    const clearTimer = (): void => {
+        if (undefined !== timer) {
+            clearTimeout(timer);
+            timer = undefined;
         }
-    }
+    };
 
-    private pending(): ScheduleEvent | undefined {
-        return this.schedule?.events[this.consumed];
-    }
-
-    private armNext(): void {
-        const schedule = this.schedule;
+    const armNext = (): void => {
         if (!schedule) {
             return;
         }
 
-        const now = this.now();
-        const event = this.pending();
+        const event = schedule.events[consumed];
         const deadline = Math.min(
             event ? event.at : Number.POSITIVE_INFINITY,
             schedule.rolloverAt
@@ -114,47 +88,61 @@ export class Scheduler {
             return;
         }
 
-        const sleep = Math.max(0, Math.min(deadline - now, MAX_SLEEP_MS));
-        this.timer = setTimeout(() => this.tick(), sleep);
-    }
+        const sleep = Math.max(0, Math.min(deadline - now(), MAX_SLEEP_MS));
+        timer = setTimeout(tick, sleep);
+    };
 
-    private tick(): void {
-        this.timer = undefined;
+    const tick = (): void => {
+        timer = undefined;
 
-        const schedule = this.schedule;
         if (!schedule) {
             return;
         }
 
-        const now = this.now();
+        const at = now();
 
         /*
          * Events the machine slept through are consumed without a word: the
          * reminder is only useful while the episode is still fresh.
          */
-        while (this.consumed < schedule.events.length) {
-            const event = schedule.events[this.consumed];
-            if (event.at > now) {
+        while (consumed < schedule.events.length) {
+            const event = schedule.events[consumed];
+            if (event.at > at) {
                 break;
             }
-            this.consumed += 1;
-            if (GRACE_MS >= now - event.at) {
-                this.hooks.onEvent(event);
+            consumed += 1;
+            if (GRACE_MS >= at - event.at) {
+                hooks.onEvent(event);
             }
         }
 
-        if (schedule.rolloverAt <= now) {
+        if (schedule.rolloverAt <= at) {
             /*
              * Drop the schedule before calling out: the callback is expected to
              * pull fresh data and arm a new schedule, and keeping the stale one
              * would make the next tick fire its leftovers again.
              */
-            this.schedule = undefined;
-            this.consumed = 0;
-            this.hooks.onRollover();
+            schedule = undefined;
+            consumed = 0;
+            hooks.onRollover();
             return;
         }
 
-        this.armNext();
-    }
+        armNext();
+    };
+
+    return {
+        arm: next => {
+            clearTimer();
+            schedule = next;
+            consumed = 0;
+            armNext();
+        },
+        disarm: () => {
+            clearTimer();
+            schedule = undefined;
+            consumed = 0;
+        },
+        isArmed: () => undefined !== timer,
+    };
 }

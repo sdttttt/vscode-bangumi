@@ -1,57 +1,75 @@
-import BangumisView from "../views/bangumi";
+import type { FilterSpec } from "./filterSpec";
 import { numberOfStringPlus } from "../utils/strings";
-import { FinalIndexList } from "./finalIndexList";
 
-export default new (class YearList extends FinalIndexList {
-    protected readonly tag: string = "Year";
+/**
+ * Labels offered by the year filter.
+ *
+ * @author sdttttt
+ */
+const CHOICES: ReadonlyArray<string> = [
+    "2020",
+    "2019",
+    "2018",
+    "2017",
+    "2016",
+    "2015",
+    "2010-2014",
+    "2005-2009",
+    "2000-2004",
+    "90年代",
+    "80年代",
+    "很久很久以前",
+];
 
-    protected readonly list: Array<string> = [
-        "2020",
-        "2019",
-        "2018",
-        "2017",
-        "2016",
-        "2015",
-        "2010-2014",
-        "2005-2009",
-        "2000-2004",
-        "90年代",
-        "80年代",
-        "很久很久以前",
-    ];
+/**
+ * Encodes a half open year range the way the API expects it.
+ *
+ * @author sdttttt
+ */
+function encodeYear(min: string, max: string): string {
+    return encodeURI(`[${min},${max})`);
+}
 
-    private encodeYear(years: Array<string>): string {
-        return encodeURI(`[${years[0]},${years[1]})`);
+/**
+ * Decades that do not follow the `min-max` pattern of the menu.
+ *
+ * @author sdttttt
+ */
+const NAMED_RANGES: ReadonlyMap<string, readonly [string, string]> = new Map([
+    ["90年代", ["1990", "2000"]],
+    ["80年代", ["1980", "1990"]],
+    ["很久很久以前", ["", "1980"]],
+]);
+
+/**
+ * Turns a year menu label into the year parameter of the request.
+ *
+ * @author sdttttt
+ */
+export function decodeYear(label: string): string {
+    const named = NAMED_RANGES.get(label);
+    if (named) {
+        return encodeYear(named[0], named[1]);
     }
 
-    protected conditionHandler(index: string): void {
-        const url = BangumisView.bangumiUrl;
-
-        const years: Array<string> = index.split("-");
-        if (1 < years.length) {
-            years[1] = numberOfStringPlus(years[1], 1);
-            url.setYear(this.encodeYear(years));
-            return;
-        }
-
-        switch (index) {
-            case "90年代":
-                url.setYear(this.encodeYear(["1990", "2000"]));
-                return;
-            case "80年代":
-                url.setYear(this.encodeYear(["1980", "1990"]));
-                return;
-            case "很久很久以前":
-                url.setYear(this.encodeYear(["", "1980"]));
-                return;
-        }
-
-        const min: string = index;
-        const max: string = numberOfStringPlus(index, 1);
-        url.setYear(this.encodeYear([min, max]));
+    const years = label.split("-");
+    if (1 < years.length) {
+        return encodeYear(years[0], numberOfStringPlus(years[1], 1));
     }
 
-    openIndexList(): void {
-        super.openIndexList();
-    }
-})();
+    return encodeYear(label, numberOfStringPlus(label, 1));
+}
+
+/**
+ * Year filter.
+ *
+ * @author sdttttt
+ */
+const yearList: FilterSpec = {
+    label: "时间",
+    tag: "Year",
+    choices: CHOICES,
+    query: label => ({ year: decodeYear(label) }),
+};
+
+export default yearList;

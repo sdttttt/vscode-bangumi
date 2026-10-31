@@ -1,40 +1,80 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import * as vscode from "vscode";
 
-vi.mock("@/views/bangumi", () => ({
-    default: {
-        bangumiUrl: {
-            setYear: vi.fn(),
-        },
-    },
-}));
-
-vi.mock("@/configuration", () => ({
-    isDisplayIndexTags: vi.fn(() => false),
-}));
-
-import BangumisView from "@/views/bangumi";
+import { decodeYear } from "@/match/yearList";
 import YearList from "@/match/yearList";
-
-const setYear = vi.mocked(BangumisView.bangumiUrl.setYear);
+import { useFilterMenu } from "@/match/indexList";
+import { useAppState, type AppStore } from "@/state/app";
+import { createSettingsStub, type SettingsStub } from "@/test/mocks/settings";
+import {
+    createCommandsStub,
+    createNotifierStub,
+    type CommandsStub,
+    type NotifierStub,
+} from "@/test/mocks/ports";
 
 /**
- * Runs `openIndexList` and waits for the quick pick resolution.
+ * Runs the year filter with the given quick pick answer.
  *
  * @author sdttttt
  */
-async function pick(choice: string): Promise<void> {
-    vi.mocked(vscode.window.showQuickPick).mockResolvedValue(choice as never);
-    YearList.openIndexList();
+interface Harness {
+    readonly state: AppStore;
+    readonly settings: SettingsStub;
+    readonly notifier: NotifierStub;
+    readonly commands: CommandsStub;
+    readonly menu: ReturnType<typeof useFilterMenu>;
+}
+
+function harness(): Harness {
+    const state = useAppState();
+    const settings = createSettingsStub({
+        "bangumiOpen.DisplayIndexTags": true,
+    });
+    const notifier = createNotifierStub();
+    const commands = createCommandsStub();
+    const menu = useFilterMenu({
+        state,
+        settings,
+        notifier: notifier.notifier,
+        commands: commands.commands,
+    });
+
+    return { state, settings, notifier, commands, menu };
+}
+
+async function pick(h: Harness, choice: string): Promise<void> {
+    h.notifier.pick.mockResolvedValue(choice);
+
+    h.menu.open(YearList);
+
     await vi.waitFor(() => {
-        expect(setYear).toHaveBeenCalled();
+        expect(h.commands.execute).toHaveBeenCalled();
     });
 }
 
-describe("YearList", () => {
+describe("decodeYear", () => {
+    it.each([
+        ["2020", "[2020,2021)"],
+        ["90年代", "[1990,2000)"],
+        ["80年代", "[1980,1990)"],
+        ["很久很久以前", "[,1980)"],
+        ["2010-2014", "[2010,2015)"],
+        ["2005-2009", "[2005,2010)"],
+        ["2000-2004", "[2000,2005)"],
+    ])("encodes %s as the year range %s", (choice, expected) => {
+        expect(decodeYear(choice)).toBe(encodeURI(expected));
+    });
+
+    it("is pure", () => {
+        expect(decodeYear("2020")).toBe(decodeYear("2020"));
+    });
+});
+
+describe("year filter", () => {
+    let h: Harness;
+
     beforeEach(() => {
-        setYear.mockClear();
-        vi.mocked(vscode.commands.executeCommand).mockClear();
+        h = harness();
     });
 
     it.each([
@@ -44,27 +84,36 @@ describe("YearList", () => {
         ["很久很久以前", "[,1980)"],
         ["2010-2014", "[2010,2015)"],
         ["2005-2009", "[2005,2010)"],
-    ])("encodes %s as the year range %s", async (choice, expected) => {
-        await pick(choice);
+    ])("writes %s into the year parameter", async (choice, expected) => {
+        await pick(h, choice);
 
-        expect(setYear).toHaveBeenCalledWith(encodeURI(expected));
+        expect(h.state.getQuery().year).toBe(encodeURI(expected));
+    });
+
+    it("keeps the other filters untouched", async () => {
+        h.state.setQuery({ area: "2" });
+
+        await pick(h, "2020");
+
+        expect(h.state.getQuery().area).toBe("2");
     });
 
     it("opens the bangumi view after a choice is made", async () => {
-        await pick("2020");
+        await pick(h, "2020");
 
-        expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
-            "openBangumi"
-        );
+        expect(h.commands.execute).toHaveBeenCalledWith("openBangumi");
     });
 
     it("does nothing when the quick pick is dismissed", async () => {
-        vi.mocked(vscode.window.showQuickPick).mockResolvedValue(undefined);
+        h.notifier.pick.mockResolvedValue(undefined);
 
-        YearList.openIndexList();
+        h.menu.open(YearList);
+        await vi.waitFor(() => {
+            expect(h.notifier.pick).toHaveBeenCalled();
+        });
         await Promise.resolve();
 
-        expect(setYear).not.toHaveBeenCalled();
-        expect(vscode.commands.executeCommand).not.toHaveBeenCalled();
+        expect(h.state.getQuery().year).toBe("-1");
+        expect(h.commands.execute).not.toHaveBeenCalled();
     });
 });

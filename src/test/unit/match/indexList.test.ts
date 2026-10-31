@@ -1,156 +1,292 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import * as vscode from "vscode";
 
-vi.mock("@/configuration", () => ({
-    isDisplayIndexTags: vi.fn(() => true),
-}));
-
-import { isDisplayIndexTags } from "@/configuration";
-import { BangumiUrl } from "@/request/bangumiUrl";
-import BangumisView from "@/views/bangumi";
-import Tagger from "@/match/tagger";
-import MainIndexList from "@/match/index";
-import SeasonVersionList from "@/match/seasonVersionList";
+import { buildBangumiUrl, DEFAULT_QUERY } from "@/request/query";
+import { useAppState, type AppStore } from "@/state/app";
+import { useFilterMenu, type FilterMenu } from "@/match/indexList";
+import { MENU_LABELS, useIndexCommand } from "@/match/index";
+import { valueFilter } from "@/match/filterSpec";
 import AreaList from "@/match/areaList";
-import FinishList from "@/match/finishList";
-import CopyRightList from "@/match/copyRightList";
-import SeasonStatusList from "@/match/seasonStatusList";
-import SeasonMonthList from "@/match/seasonMonthList";
-import YearList from "@/match/yearList";
 import StyleList from "@/match/styleList";
+import SeasonVersionList from "@/match/seasonVersionList";
+import { createSettingsStub, type SettingsStub } from "@/test/mocks/settings";
+import {
+    createCommandsStub,
+    createNotifierStub,
+    type CommandsStub,
+    type NotifierStub,
+} from "@/test/mocks/ports";
 
 /**
- * Runs `openIndexList` with the given quick pick answer.
+ * Everything one case needs, wired the way the composition root does it.
  *
  * @author sdttttt
  */
-async function pick(
-    subject: { openIndexList: () => void },
-    choice: string
+interface Harness {
+    readonly state: AppStore;
+    readonly settings: SettingsStub;
+    readonly notifier: NotifierStub;
+    readonly commands: CommandsStub;
+    readonly menu: FilterMenu;
+}
+
+/**
+ * Builds a harness with its own state and doubles.
+ *
+ * @author sdttttt
+ */
+function harness(): Harness {
+    const state = useAppState();
+    const settings = createSettingsStub({
+        "bangumiOpen.DisplayIndexTags": true,
+    });
+    const notifier = createNotifierStub();
+    const commands = createCommandsStub();
+    const menu = useFilterMenu({
+        state,
+        settings,
+        notifier: notifier.notifier,
+        commands: commands.commands,
+    });
+
+    return { state, settings, notifier, commands, menu };
+}
+
+/**
+ * Runs the filter menu on a filter with the given answer.
+ *
+ * @author sdttttt
+ */
+async function pickFrom(
+    h: Harness,
+    filter: Parameters<FilterMenu["open"]>[0],
+    label: string
 ): Promise<void> {
-    vi.mocked(vscode.window.showQuickPick).mockResolvedValue(choice as never);
-    subject.openIndexList();
+    h.notifier.pick.mockResolvedValue(label);
+
+    h.menu.open(filter);
+
+    await vi.waitFor(() => {
+        expect(h.notifier.pick).toHaveBeenCalled();
+    });
     await Promise.resolve();
     await Promise.resolve();
 }
 
-describe("MainIndexList", () => {
+/**
+ * Runs the index menu with the given answer.
+ *
+ * @author sdttttt
+ */
+async function pickIndex(h: Harness, label: string): Promise<void> {
+    h.notifier.pick.mockResolvedValue(label);
+
+    useIndexCommand({
+        state: h.state,
+        menu: h.menu,
+        notifier: h.notifier.notifier,
+    }).openIndex();
+
+    await vi.waitFor(() => {
+        expect(h.notifier.pick).toHaveBeenCalledTimes(1);
+    });
+    await Promise.resolve();
+    await Promise.resolve();
+}
+
+/**
+ * Query parameter of the url produced by the given state.
+ *
+ * @author sdttttt
+ */
+function parameterOf(state: AppStore, name: string): string | null {
+    const url = buildBangumiUrl(state.getQuery(), state.getPage());
+
+    return new URLSearchParams(url.split("?")[1]).get(name);
+}
+
+describe("useIndexCommand", () => {
+    let h: Harness;
+
     beforeEach(() => {
-        vi.mocked(isDisplayIndexTags).mockReturnValue(true);
-        BangumisView.bangumiUrl.restoreDefault();
-        Tagger.clear();
-        vi.mocked(vscode.window.showInformationMessage).mockClear();
-        vi.mocked(vscode.window.showQuickPick).mockReset();
+        h = harness();
     });
 
-    it("opens the season version list for 类型", async () => {
-        const spy = vi.spyOn(SeasonVersionList, "openIndexList");
+    it("offers every filter in menu order, with the restore entry last", async () => {
+        h.notifier.pick.mockResolvedValue(undefined);
 
-        await pick(MainIndexList, "类型");
+        useIndexCommand({
+            state: h.state,
+            menu: h.menu,
+            notifier: h.notifier.notifier,
+        }).openIndex();
 
-        expect(spy).toHaveBeenCalled();
+        await vi.waitFor(() => {
+            expect(h.notifier.pick).toHaveBeenCalledWith(MENU_LABELS);
+        });
+        expect(MENU_LABELS.at(-1)).toBe("(恢复默认)");
     });
 
-    it.each([
-        ["地区", AreaList],
-        ["状态", FinishList],
-        ["版权", CopyRightList],
-        ["付费", SeasonStatusList],
-        ["季度", SeasonMonthList],
-        ["时间", YearList],
-        ["风格", StyleList],
-    ] as const)(
-        "opens the matching sub list for %s",
-        async (label, subList) => {
-            const spy = vi.spyOn(subList, "openIndexList");
+    it("opens the year filter for 时间", async () => {
+        h.notifier.pick
+            .mockResolvedValueOnce("时间")
+            .mockResolvedValueOnce("2020");
 
-            await pick(MainIndexList, label);
+        useIndexCommand({
+            state: h.state,
+            menu: h.menu,
+            notifier: h.notifier.notifier,
+        }).openIndex();
 
-            expect(spy).toHaveBeenCalled();
-        }
-    );
+        await vi.waitFor(() => {
+            expect(h.state.getQuery().year).toBe(encodeURI("[2020,2021)"));
+        });
+    });
 
-    it("restores the default url and clears tags on (恢复默认)", async () => {
-        const expected = new BangumiUrl().build().finalUrl;
-        BangumisView.bangumiUrl.setArea("2");
-        Tagger.tags = new Map([["Area", "2"]]);
+    it("opens the area filter for 地区", async () => {
+        h.notifier.pick
+            .mockResolvedValueOnce("地区")
+            .mockResolvedValueOnce("日本");
 
-        await pick(MainIndexList, "(恢复默认)");
+        useIndexCommand({
+            state: h.state,
+            menu: h.menu,
+            notifier: h.notifier.notifier,
+        }).openIndex();
 
-        expect(BangumisView.bangumiUrl.build().finalUrl).toBe(expected);
-        expect(Tagger.tags.size).toBe(0);
+        await vi.waitFor(() => {
+            expect(parameterOf(h.state, "area")).toBe("2");
+        });
+    });
+
+    it("restores the default query and clears tags, keeping the page", async () => {
+        h.state.setQuery({ area: "2" });
+        h.state.setPage(5);
+
+        await pickIndex(h, "(恢复默认)");
+
+        expect(h.state.getQuery()).toEqual(DEFAULT_QUERY);
+        expect(h.state.getPage()).toBe(5);
+        expect(h.state.getTags().size).toBe(0);
     });
 
     it("warns about an unfinished option", async () => {
-        await pick(MainIndexList, "未知选项");
+        await pickIndex(h, "未知选项");
 
-        expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
+        expect(h.notifier.info).toHaveBeenCalledWith(
             "抱歉，这个选项还在施工中"
         );
     });
+
+    it("does nothing when the menu is dismissed", async () => {
+        await pickIndex(h, undefined as never);
+
+        expect(h.commands.execute).not.toHaveBeenCalled();
+        expect(h.state.getQuery()).toEqual(DEFAULT_QUERY);
+    });
 });
 
-describe("SimpleFinalIndexList subclasses", () => {
+describe("useFilterMenu", () => {
+    let h: Harness;
+
     beforeEach(() => {
-        vi.mocked(isDisplayIndexTags).mockReturnValue(true);
-        BangumisView.bangumiUrl.restoreDefault();
-        Tagger.clear();
-        vi.mocked(vscode.commands.executeCommand).mockClear();
-        vi.mocked(vscode.window.showQuickPick).mockReset();
+        h = harness();
     });
 
     it.each([
         [SeasonVersionList, "电影", "season_version", "2"],
         [AreaList, "日本", "area", "2"],
-        [FinishList, "完结", "is_finish", "1"],
-        [CopyRightList, "独家", "copyright", "3"],
-        [SeasonStatusList, "免费", "season_status", "1"],
-        [SeasonMonthList, "一月", "season_month", "1"],
         [StyleList, "原创", "style_id", "10010"],
     ] as const)(
-        "writes the selected value into the url",
-        async (subject, choice, parameter, expected) => {
-            await pick(subject, choice);
+        "writes the selected value into the query",
+        async (filter, choice, parameter, expected) => {
+            await pickFrom(h, filter, choice);
 
-            const url = BangumisView.bangumiUrl.build().finalUrl;
-            expect(new URLSearchParams(url.split("?")[1]).get(parameter)).toBe(
-                expected
-            );
+            expect(parameterOf(h.state, parameter)).toBe(expected);
         }
     );
 
     it("records the chosen tag", async () => {
-        await pick(SeasonVersionList, "电影");
+        await pickFrom(h, SeasonVersionList, "电影");
 
-        expect([...Tagger.tags.values()]).toContain("电影");
+        expect([...h.state.getTags().values()]).toContain("电影");
+    });
+
+    it("opens the bangumi list after a choice", async () => {
+        await pickFrom(h, SeasonVersionList, "电影");
+
+        expect(h.commands.execute).toHaveBeenCalledWith("openBangumi");
     });
 
     it("shows the collected tags after a choice", async () => {
-        await pick(SeasonVersionList, "电影");
+        await pickFrom(h, SeasonVersionList, "电影");
 
-        expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
+        expect(h.notifier.info).toHaveBeenCalledWith(
             expect.stringContaining("已选标签")
         );
     });
 
     it("lists every collected tag in the notification", async () => {
-        await pick(StyleList, "原创");
-        await pick(SeasonVersionList, "电影");
+        await pickFrom(h, StyleList, "原创");
+        await pickFrom(h, SeasonVersionList, "电影");
 
-        expect(vscode.window.showInformationMessage).toHaveBeenLastCalledWith(
+        expect(h.notifier.info).toHaveBeenLastCalledWith(
             expect.stringContaining("原创")
         );
-        expect(vscode.window.showInformationMessage).toHaveBeenLastCalledWith(
+        expect(h.notifier.info).toHaveBeenLastCalledWith(
             expect.stringContaining("电影")
         );
     });
 
     it("skips tag collection when tag display is disabled", async () => {
-        vi.mocked(isDisplayIndexTags).mockReturnValue(false);
+        h.settings.values["bangumiOpen.DisplayIndexTags"] = false;
 
-        await pick(SeasonVersionList, "电影");
+        await pickFrom(h, SeasonVersionList, "电影");
 
-        expect(Tagger.tags.size).toBe(0);
-        expect(vscode.window.showInformationMessage).not.toHaveBeenCalled();
+        expect(h.state.getTags().size).toBe(0);
+        expect(h.notifier.info).not.toHaveBeenCalled();
+        expect(h.notifier.error).not.toHaveBeenCalled();
+    });
+
+    it("does nothing when the list is dismissed", async () => {
+        h.notifier.pick.mockResolvedValue(undefined);
+
+        h.menu.open(SeasonVersionList);
+        await vi.waitFor(() => {
+            expect(h.notifier.pick).toHaveBeenCalled();
+        });
+        await Promise.resolve();
+
+        expect(h.state.getQuery()).toEqual(DEFAULT_QUERY);
+        expect(h.commands.execute).not.toHaveBeenCalled();
+    });
+});
+
+describe("valueFilter", () => {
+    it("offers the labels in declaration order", () => {
+        const filter = valueFilter(
+            "标签",
+            "Tag",
+            [
+                ["甲", "1"],
+                ["乙", "2"],
+            ],
+            "area"
+        );
+
+        expect(filter.label).toBe("标签");
+        expect(filter.tag).toBe("Tag");
+        expect(filter.choices).toEqual(["甲", "乙"]);
+    });
+
+    it("maps a label onto its query patch", () => {
+        const filter = valueFilter("标签", "Tag", [["甲", "1"]], "area");
+
+        expect(filter.query("甲")).toEqual({ area: "1" });
+    });
+
+    it("returns an empty patch for an unknown label", () => {
+        const filter = valueFilter("标签", "Tag", [["甲", "1"]], "area");
+
+        expect(filter.query("丙")).toEqual({});
     });
 });

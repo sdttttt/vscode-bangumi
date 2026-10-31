@@ -3,28 +3,41 @@ import * as vscode from "vscode";
 import type { ExtensionContext } from "vscode";
 import { COMMAND_IDS } from "@/commands";
 
+const reminder = {
+    start: vi.fn(() => Promise.resolve()),
+    refresh: vi.fn(() => Promise.resolve()),
+    dispose: vi.fn(),
+};
+
+const bangumiView = {
+    openBangumi: vi.fn(),
+    nextPage: vi.fn(),
+    backPage: vi.fn(),
+    jumpPage: vi.fn(() => Promise.resolve()),
+};
+
+const weekBangumiView = {
+    openWeekBangumi: vi.fn(),
+};
+
+const indexCommand = {
+    openIndex: vi.fn(),
+};
+
 vi.mock("@/reminder", () => ({
-    default: {
-        start: vi.fn(() => Promise.resolve()),
-        dispose: vi.fn(),
-    },
+    useReminder: vi.fn(() => reminder),
 }));
 
 vi.mock("@/views/bangumi", () => ({
-    default: {
-        openBangumi: vi.fn(),
-        nextPage: vi.fn(),
-        backPage: vi.fn(),
-        jumpPage: vi.fn(),
-    },
+    useBangumiView: vi.fn(() => bangumiView),
 }));
 
 vi.mock("@/views/weekBangumi", () => ({
-    default: { openWeekBangumi: vi.fn() },
+    useWeekBangumiView: vi.fn(() => weekBangumiView),
 }));
 
 vi.mock("@/match/index", () => ({
-    default: { openIndexList: vi.fn() },
+    useIndexCommand: vi.fn(() => indexCommand),
 }));
 
 /**
@@ -40,7 +53,7 @@ function makeContext(): ExtensionContext {
 }
 
 /**
- * Loads a fresh copy of the extension entry so `isInit` starts as false.
+ * Loads a fresh copy of the extension entry so its session starts empty.
  *
  * @author sdttttt
  */
@@ -49,28 +62,18 @@ async function loadExtension(): Promise<typeof import("@/extension")> {
     return import("@/extension");
 }
 
-/**
- * Makes the config read answer with the given value for the reminder key.
- *
- * @author sdttttt
- */
-function stubReminderSetting(enabled: boolean): void {
-    vi.mocked(vscode.workspace.getConfiguration).mockReturnValue({
-        get: vi.fn(() => enabled),
-    } as never);
-}
-
 describe("activate", () => {
     beforeEach(() => {
         vi.mocked(vscode.commands.registerCommand).mockClear();
+        reminder.start.mockClear();
+        reminder.dispose.mockClear();
+        bangumiView.openBangumi.mockClear();
     });
 
     it("registers every command id", async () => {
-        stubReminderSetting(false);
         const { activate } = await loadExtension();
-        const context = makeContext();
 
-        activate(context);
+        activate(makeContext());
 
         const registered = vi
             .mocked(vscode.commands.registerCommand)
@@ -80,17 +83,16 @@ describe("activate", () => {
     });
 
     it("pushes every disposable, including the reminder, into the subscriptions", async () => {
-        stubReminderSetting(false);
         const { activate } = await loadExtension();
         const context = makeContext();
 
         activate(context);
 
         expect(context.subscriptions).toHaveLength(COMMAND_IDS.length + 1);
+        expect(context.subscriptions).toContain(reminder);
     });
 
     it("passes a callable handler for each command", async () => {
-        stubReminderSetting(false);
         const { activate } = await loadExtension();
 
         activate(makeContext());
@@ -102,9 +104,7 @@ describe("activate", () => {
     });
 
     it("forwards a command invocation to the matching view", async () => {
-        stubReminderSetting(false);
         const { activate } = await loadExtension();
-        const BangumisView = (await import("@/views/bangumi")).default;
 
         activate(makeContext());
         const entry = vi
@@ -113,51 +113,62 @@ describe("activate", () => {
 
         entry?.[1]();
 
-        expect(BangumisView.openBangumi).toHaveBeenCalledTimes(1);
+        expect(bangumiView.openBangumi).toHaveBeenCalledTimes(1);
+    });
+
+    it("forwards the index command", async () => {
+        const { activate } = await loadExtension();
+
+        activate(makeContext());
+        const entry = vi
+            .mocked(vscode.commands.registerCommand)
+            .mock.calls.find(([id]) => "index" === id);
+
+        entry?.[1]();
+
+        expect(indexCommand.openIndex).toHaveBeenCalledTimes(1);
     });
 
     it("starts the reminder, which owns its own settings check", async () => {
-        stubReminderSetting(true);
         const { activate } = await loadExtension();
-        const Reminder = (await import("@/reminder")).default;
 
         activate(makeContext());
 
-        expect(Reminder.start).toHaveBeenCalledTimes(1);
+        expect(reminder.start).toHaveBeenCalledTimes(1);
     });
 
-    it("initialises the extension context only once", async () => {
-        stubReminderSetting(false);
+    it("builds one session even when activated twice", async () => {
         const { activate } = await loadExtension();
-        const { getContext } = await import("@/constants");
 
-        const first = makeContext();
-        activate(first);
+        activate(makeContext());
         activate(makeContext());
 
-        expect(getContext()).toBe(first);
+        expect(reminder.start).toHaveBeenCalledTimes(1);
     });
 
     it("keeps following the setting even when it starts disabled", async () => {
         /* The reminder has to stay subscribed so enabling it later works. */
-        stubReminderSetting(false);
         const { activate } = await loadExtension();
-        const Reminder = (await import("@/reminder")).default;
 
         activate(makeContext());
 
-        expect(Reminder.start).toHaveBeenCalledTimes(1);
+        expect(reminder.start).toHaveBeenCalledTimes(1);
     });
 });
 
 describe("deactivate", () => {
     it("releases the reminder", async () => {
-        stubReminderSetting(false);
-        const { deactivate } = await loadExtension();
-        const Reminder = (await import("@/reminder")).default;
+        const { activate, deactivate } = await loadExtension();
 
+        activate(makeContext());
         deactivate();
 
-        expect(Reminder.dispose).toHaveBeenCalledTimes(1);
+        expect(reminder.dispose).toHaveBeenCalledTimes(1);
+    });
+
+    it("survives deactivation without an activation", async () => {
+        const { deactivate } = await loadExtension();
+
+        expect(() => deactivate()).not.toThrow();
     });
 });

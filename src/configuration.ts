@@ -1,5 +1,10 @@
 import * as vscode from "vscode";
 
+/**
+ * Keys of the settings this extension reads.
+ *
+ * @author sdttttt
+ */
 export enum ConfigKey {
     EnableReminder = "bangumiOpen.EnableReminder",
     ReminderAheadTime = "bangumiOpen.ReminderAheadTime",
@@ -9,46 +14,31 @@ export enum ConfigKey {
 }
 
 /**
- * Quick Gets config
+ * The user settings, read through the editor.
  *
- * @param {string} key
- * @returns {any}
- * @export
+ * Consumers take this as a dependency instead of reaching for the workspace
+ * themselves, so a caller can hand in a different implementation and the
+ * factory never reads ambient state.
  *
  * @author sdttttt
  */
-export function getConfig(key: ConfigKey): unknown {
-    return vscode.workspace.getConfiguration().get(key);
-}
-
-/**
- * Gets reminder ahead time
- *
- * @returns reminder ahead time
- * @author sdttttt
- */
-export function getReminderAheadTime(): number {
-    const aheadTime: unknown = getConfig(ConfigKey.ReminderAheadTime);
-    const result: number = aheadTime as number;
-    if (isNaN(result) || 0 > result) {
-        return 0;
-    }
-    return result;
-}
-
-/**
- * Whether the update reminder is enabled.
- *
- * @returns true if the reminder may schedule notifications
- * @author sdttttt
- */
-export function isReminderEnabled(): boolean {
-    const enabled: unknown = getConfig(ConfigKey.EnableReminder);
-    return false !== enabled;
+export interface Settings {
+    /** Lead time of the reminder, in seconds. */
+    reminderAheadTime(): number;
+    /** Whether the update reminder may schedule notifications. */
+    isReminderEnabled(): boolean;
+    /** Whether the picked index tags are collected and shown. */
+    isDisplayIndexTags(): boolean;
+    /** Whether the status bar entry is shown. */
+    isDisplayStatusBar(): boolean;
+    /** Whether the past days of the weekly schedule are shown. */
+    isDisplayHistory(): boolean;
 }
 
 /**
  * Whether the settings that shape the reminder changed.
+ *
+ * Pure: the caller passes the `affectsConfiguration` probe of the event.
  *
  * @author sdttttt
  */
@@ -63,34 +53,31 @@ export function affectsReminder(
 }
 
 /**
- * Gets display index tags
+ * Creates the settings reader of one extension session.
  *
- * @returns true if display index tags
+ * The workspace lookup happens per read, so a setting changed while the
+ * extension runs is picked up without rebuilding the session.
+ *
  * @author sdttttt
  */
-export function isDisplayIndexTags(): boolean {
-    const displayStatus: unknown = getConfig(ConfigKey.DisplayIndexTags);
-    return displayStatus as boolean;
-}
+export function useSettings(): Settings {
+    const read = (key: ConfigKey): unknown =>
+        vscode.workspace.getConfiguration().get(key);
 
-/**
- * Gets display statusbar
- *
- * @returns true if display status bar
- * @author sdttttt
- */
-export function isDisplayStatusBar(): boolean {
-    const displayStatus: unknown = getConfig(ConfigKey.DisplayStatusBar);
-    return displayStatus as boolean;
-}
+    return {
+        reminderAheadTime: () => {
+            const aheadTime = read(ConfigKey.ReminderAheadTime);
+            const result = aheadTime as number;
 
-/**
- * Gets display History
- *
- * @returns true if display history
- * @author sdttttt
- */
-export function isDisplayHistory(): boolean {
-    const displayStatus: unknown = getConfig(ConfigKey.DisplayHistory);
-    return displayStatus as boolean;
+            return isNaN(result) || 0 > result ? 0 : result;
+        },
+
+        isReminderEnabled: () => false !== read(ConfigKey.EnableReminder),
+
+        isDisplayIndexTags: () => read(ConfigKey.DisplayIndexTags) as boolean,
+
+        isDisplayStatusBar: () => read(ConfigKey.DisplayStatusBar) as boolean,
+
+        isDisplayHistory: () => read(ConfigKey.DisplayHistory) as boolean,
+    };
 }

@@ -1,43 +1,137 @@
 import * as vscode from "vscode";
-import BangumiView from "./views/bangumi";
-import WeekBangumiView from "./views/weekBangumi";
-import { setContext } from "./constants";
-import MainIndexList from "./match/index";
-import Reminder from "./reminder";
-import { CommandId } from "./commands";
-
-let isInit = false;
+import { useAppState } from "./state/app";
+import { useSettings } from "./configuration";
+import { useCache, type RequestCaches } from "./request/cache";
+import { useBangumiApi } from "./request/bangumi";
+import { useWebviewHost } from "./webview/host";
+import { usePanel } from "./views/panel";
+import { useIndexCommand } from "./match/index";
+import { useFilterMenu } from "./match/indexList";
+import { useBangumiView } from "./views/bangumi";
+import { useWeekBangumiView } from "./views/weekBangumi";
+import { useReminder, type Reminder } from "./reminder";
+import { useStatusBar } from "./reminder/statusBar";
+import { useScheduler } from "./reminder/scheduler";
+import { useCommands, type CommandId } from "./commands";
+import { useNotifier } from "./notifier";
 
 /**
- * init work
+ * Everything one activation created, so `deactivate()` can release it.
  *
- * @param {vscode.ExtensionContext} context
  * @author sdttttt
  */
-function initializer(context: vscode.ExtensionContext): void {
-    if (isInit) {
-        return;
-    }
-    setContext(context);
-    isInit = !isInit;
+interface Session {
+    readonly reminder: Reminder;
 }
 
+let session: Session | undefined;
+
 /**
- * Handlers keyed by command id.
+ * Composition root: builds every closure with the dependencies it needs.
  *
- * Typed as a total record so adding an id to `COMMAND_IDS` fails to compile
- * until the matching handler exists.
+ * Each module only declares what it needs, never what it owns, so this is the
+ * single place where a session is wired together. Nothing is created at module
+ * load, and a second `activate()` reuses the session of the first.
  *
+ * @param context activation context owned by the host
  * @author sdttttt
  */
-const handlers: Record<CommandId, () => unknown> = {
-    openBangumi: () => BangumiView.openBangumi(),
-    nextPage: () => BangumiView.nextPage(),
-    backPage: () => BangumiView.backPage(),
-    jumpPage: () => BangumiView.jumpPage(),
-    weekBangumi: () => WeekBangumiView.openWeekBangumi(),
-    index: () => MainIndexList.openIndexList(),
-};
+function createSession(
+    context: vscode.ExtensionContext
+): Record<CommandId, () => unknown> {
+    const subscriptions = context.subscriptions;
+
+    const state = useAppState();
+    const settings = useSettings();
+    const notifier = useNotifier();
+    const commands = useCommands();
+    const caches: RequestCaches = {
+        bangumi: useCache(600),
+        week: useCache(60),
+    };
+    const api = useBangumiApi(caches, notifier);
+    const host = useWebviewHost(context.extensionPath);
+
+    /**
+     * Opens a panel in the editor column the user was last active in.
+     */
+    const createViewPanel = (
+        viewType: string,
+        title: string
+    ): vscode.WebviewPanel =>
+        vscode.window.createWebviewPanel(
+            viewType,
+            title,
+            vscode.window.activeTextEditor?.viewColumn ?? vscode.ViewColumn.Two,
+            host.options()
+        );
+
+    const menu = useFilterMenu({ state, settings, notifier, commands });
+    const statusBar = useStatusBar("weekBangumi");
+
+    const bangumiPanel = usePanel({
+        viewType: "bangumiOpen.list",
+        title: "番剧列表",
+        host,
+        subscriptions,
+        createPanel: createViewPanel,
+    });
+    const weekPanel = usePanel({
+        viewType: "bangumiOpen.week",
+        title: "周番表",
+        host,
+        subscriptions,
+        createPanel: createViewPanel,
+    });
+
+    const bangumi = useBangumiView({
+        state,
+        api,
+        panel: bangumiPanel,
+        notifier,
+    });
+    const weekBangumi = useWeekBangumiView({
+        api,
+        panel: weekPanel,
+        settings,
+    });
+    const index = useIndexCommand({ state, menu, notifier });
+    const reminder = useReminder({
+        source: api.getWeekBangumi,
+        statusBar,
+        settings,
+        notifier,
+        commands,
+        onSettingsChanged: listener =>
+            vscode.workspace.onDidChangeConfiguration(event =>
+                listener(section => event.affectsConfiguration(section))
+            ),
+        scheduler: useScheduler(
+            {
+                onEvent: event => reminder.fire(event),
+                onRollover: () => void reminder.refresh(),
+            },
+            Date.now
+        ),
+    });
+
+    bangumiPanel.onCommand(bangumi.handleCommand);
+    weekPanel.onCommand(weekBangumi.handleCommand);
+
+    /* The reminder registers its own settings listener, so it owns a disposable. */
+    context.subscriptions.push(reminder);
+    void reminder.start();
+    session = { reminder };
+
+    return {
+        openBangumi: bangumi.openBangumi,
+        nextPage: bangumi.nextPage,
+        backPage: bangumi.backPage,
+        jumpPage: bangumi.jumpPage,
+        weekBangumi: weekBangumi.openWeekBangumi,
+        index: index.openIndex,
+    };
+}
 
 /**
  *  Main Function
@@ -46,11 +140,11 @@ const handlers: Record<CommandId, () => unknown> = {
  * @author sdttttt
  */
 export function activate(context: vscode.ExtensionContext): void {
-    initializer(context);
+    if (session) {
+        return;
+    }
 
-    /* The reminder registers its own settings listener, so it owns a disposable. */
-    context.subscriptions.push(Reminder);
-    void Reminder.start();
+    const handlers = createSession(context);
 
     /*
      * The command has been defined in the package.json file
@@ -71,5 +165,6 @@ export function activate(context: vscode.ExtensionContext): void {
  * @author sdttttt
  */
 export function deactivate(): void {
-    Reminder.dispose();
+    session?.reminder.dispose();
+    session = undefined;
 }
