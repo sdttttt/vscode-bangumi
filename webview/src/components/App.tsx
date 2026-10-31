@@ -22,7 +22,7 @@ export interface AppProps {
  */
 export function App({ state, onNextPage, onBackPage, onJumpPage }: AppProps) {
     if (!state) {
-        return <Placeholder image={undefined} message="Loading..." />;
+        return <Placeholder image={undefined} message="加载中..." />;
     }
 
     switch (state.kind) {
@@ -30,14 +30,14 @@ export function App({ state, onNextPage, onBackPage, onJumpPage }: AppProps) {
             return (
                 <Placeholder
                     image={state.assets?.loading}
-                    message="Loading..."
+                    message="加载中..."
                 />
             );
         case "notFound":
             return (
                 <Placeholder
                     image={state.assets?.enterprise}
-                    message="没有数据!"
+                    message="没有找到数据！"
                 />
             );
         case "bangumi":

@@ -16,8 +16,8 @@ export function isSuccess(res: BiliResponse): boolean {
     }
 
     vscode.window.showInformationMessage(`
-        Oops! 可能是B站炸了, 也或许是API地址更改了./(ㄒoㄒ)/~~d
-        如果确认不是B站炸了,请尽快在Github上联系我!
+        出错了！可能是 B 站服务异常，也可能是接口地址变了。/(ㄒoㄒ)/~~
+        如果确认不是 B 站的问题，请尽快在 GitHub 上联系我！
     `);
 
     return false;

@@ -27,7 +27,7 @@ function formatTitles(titles: RemindTitles): string {
  */
 function showRemind(content: string): void {
     window
-        .showInformationMessage(content, "Open WeekBangumi")
+        .showInformationMessage(content, "打开周番表")
         .then((result: string | undefined) => {
             if (result) {
                 /* The host owns the command, so a failure is not actionable. */

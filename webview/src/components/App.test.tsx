@@ -23,13 +23,13 @@ describe("App", () => {
     it("shows the loading screen before any state arrives", () => {
         renderApp(undefined);
 
-        expect(screen.getByText("Loading...")).toBeTruthy();
+        expect(screen.getByText("加载中...")).toBeTruthy();
     });
 
     it("shows the loading screen and its animation", () => {
         const { container } = renderApp(viewState({ kind: "loading" }));
 
-        expect(screen.getByText("Loading...")).toBeTruthy();
+        expect(screen.getByText("加载中...")).toBeTruthy();
         expect(
             container.querySelector(".load-image")?.getAttribute("src")
         ).toBe(assets.loading);
@@ -38,7 +38,7 @@ describe("App", () => {
     it("shows the not found screen with the placeholder image", () => {
         const { container } = renderApp(viewState({ kind: "notFound" }));
 
-        expect(screen.getByText("没有数据!")).toBeTruthy();
+        expect(screen.getByText("没有找到数据！")).toBeTruthy();
         expect(
             container.querySelector(".load-image")?.getAttribute("src")
         ).toBe(assets.enterprise);

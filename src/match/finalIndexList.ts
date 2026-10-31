@@ -52,17 +52,12 @@ export abstract class FinalIndexList extends AbstractIndexList {
         if (isDisplayIndexTags()) {
             const tags: Map<string, string> = Tagger.tags;
             if (0 < tags.size) {
-                let message = "";
-                message += "Tags: | ";
-                for (const tag of tags.values()) {
-                    message += tag;
-                    message += "|";
-                }
-                message = String(message);
-                vscode.window.showInformationMessage(message);
+                vscode.window.showInformationMessage(
+                    `已选标签：${[...tags.values()].join("、")}`
+                );
                 return;
             }
-            vscode.window.showErrorMessage("Tags: 默认");
+            vscode.window.showErrorMessage("标签：默认");
         }
     }
 }

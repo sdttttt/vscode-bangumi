@@ -128,13 +128,15 @@ Vitest 配置了两个 project，互不干扰：
 
 ## 编码约定
 
+- 所有面向用户的文案一律用中文，包括 `package.json` 的命令标题与配置项说明、面板标题、`showInformationMessage` / `showInputBox` 的文案、通知按钮、Webview 里的可见文本与 `aria-label`。项目不提供 `l10n` 多语言包，不要重新引入英文界面文案；代码注释与标识符仍用英文。
 - 4 空格缩进、双引号、行尾分号、K&R 花括号（`{` 与控制语句同行）。这些由 [.oxfmtrc.json](.oxfmtrc.json) 与 oxfmt 保证，不要手动写成相反风格。
 - 宿主侧跨目录引用使用 `@/*` 别名指向 `src/*`，该别名在 `vite.config.mts` 与 `vitest.config.mts` 中均已配置。
-- Webview 侧代码放在 `webview/src/`，用相对路径引用同目录模块；共享协议用 `@shared/webview/protocol`（映射到 `src/webview/protocol.ts`）。`protocol.ts` 必须保持零运行时依赖，两端都要能编译。
+- Webview 侧代码放在 `webview/src/`，用相对路径引用同目录模块；共享协议用 `@shared/webview/protocol`（映射到 `src/webview/protocol.ts`）。`protocol.ts` 必须保持零运行时依赖，两端都要能编译。共享的纯函数工具（如 `@shared/utils/clock`）同样可以跨端引用，但只能引入不依赖 `vscode` 与 Node.js 的模块。
 - Webview 组件一律写成函数组件 + Preact hooks，JSX 走 `jsx: "react-jsx"` + `jsxImportSource: "preact"`（`webview/tsconfig.json` 与 `vitest.config.mts` 的 `oxc.jsx.importSource` 各配一份，改一处就要同步另一处）。
 - 样式统一用 UnoCSS（`webview/uno.config.ts`）编写：单元素规则直接写原子类，多处复用的写成 shortcut。颜色只能来自 `theme.colors` 里映射的 `--vscode-*` 变量与 `--surface` / `--line` / `--accent` 等表面 token，不要硬编码色值，否则明暗主题下会看不清。
 - `webview/src/styles/main.css` 只保留原子类表达不了的部分：文档 reset、`:where(a)` 默认链接样式、共享表面 token（`--surface` / `--line` / `--tint` / `--hover` / `--accent` / `--muted` / `--warning-*` / `--card-shadow`），以及依赖祖先选择器的主题覆盖（`body.vscode-dark`、`vscode-high-contrast`、`vscode-reduce-motion`、滚动条）。它在 `uno.css` 之后导入，同权重时后者胜出，所以这里的规则可以放心覆盖工具类。
 - 三个页面（索引列表、周番、加载/空态）共用同一套 shortcut：`board`（滚动根）、`surface`（卡片表面）、`chip`（小标签）、`row-link`（整行链接）、`focus-ring`。新增页面优先复用它们，不要另造一套色值。
+- 周番页的「你在这里」标记（`now-marker`）只画在 `isToday` 的那一列，位置由 `markerIndex()` 按 `HH:MM` 计算；时间来源是 `@shared/utils/clock` 的 `minuteOfDay()`（UTC+8，与接口一致），不要改用本地时区或新的 Date 计算。时钟只在当天那一列订阅（`useNow`），其余六列保持静态；`now` prop 用于测试冻结时间。标记用 `--gold`（`main.css` 中由警告色与前景色混合，保证明暗主题下都够对比度），高对比主题下回退到前景色。标记后缀是倒计时而不是墙钟：`nextGapMinutes()` 从 `markerIndex()` 的位置向后找第一场，`describeGap()` 负责文案（<60 分钟用分钟，否则小时+分钟），`describeNow()` 处理「今日已播完」与「今日没有更新」；墙钟只保留在 `aria-label` 里。
 - `.today` / `.delay` 用 `!` 前缀（如 `!border-accent`）压过同一元素的其它颜色工具类：UnoCSS 的输出顺序不按 class 书写顺序，不加 `!` 时结果不可预测。
 - `@unocss/vite` 会自动扫描 `.tsx`，但也会把源码里的普通英文单词当成候选类名（例如注释里的 `tab stop` 会生成 `.tab`）。这些多出来的规则无害，不要为了消除它们而下调 `content` 的扫描范围：关掉 pipeline 会让 Vite 引入的虚拟样式表解析失败。
 - 视图类沿用 `export default new (class ...)` 的模块级单例写法，状态放在实例上，不要新增游离的模块级变量。

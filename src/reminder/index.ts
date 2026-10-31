@@ -153,7 +153,9 @@ export class Reminder implements vscode.Disposable {
 
         if (!this.warnedMissingToday && undefined === todayIndex(days, now)) {
             this.warnedMissingToday = true;
-            void vscode.window.showInformationMessage("没有找到今日的索引 ??");
+            void vscode.window.showInformationMessage(
+                "没有找到今日的番剧数据，提醒可能不准确。"
+            );
         }
 
         const schedule: Schedule = buildSchedule(

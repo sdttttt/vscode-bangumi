@@ -165,7 +165,7 @@ describe("BangumisView", () => {
         view.backPage();
 
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-            "真的一滴都没有了!"
+            "真的一滴都没有了！"
         );
     });
 
@@ -189,7 +189,7 @@ describe("BangumisView", () => {
 
         await vi.waitFor(() => {
             expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-                expect.stringContaining("不能是0或者非数字")
+                expect.stringContaining("页码必须是大于 0 的数字")
             );
         });
     });
@@ -234,7 +234,7 @@ describe("BangumisView", () => {
         stub.receive({ type: "bangumi:backPage" });
 
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-            "真的一滴都没有了!"
+            "真的一滴都没有了！"
         );
     });
 });

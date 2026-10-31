@@ -4,7 +4,7 @@
     "author": "SDTTTTT",
     "repository": "https://github.com/sdttttt/vscode-Bangumi",
     "displayName": "Bangumi Open",
-    "description": "Support bilibili bangumi for vscode.",
+    "description": "在 VS Code 中查看 B 站番剧时间表与番剧索引。",
     "preview": false,
     "version": "2.3.0",
     "license": "SEE LICENSE IN LICENSE",
@@ -29,27 +29,27 @@
         "commands": [
             {
                 "command": "openBangumi",
-                "title": "Open Bangumi"
+                "title": "番剧时间表：打开番剧列表"
             },
             {
                 "command": "nextPage",
-                "title": "Bangumi Open: Next Page"
+                "title": "番剧时间表：下一页"
             },
             {
                 "command": "backPage",
-                "title": "Bangumi Open: Back Page"
+                "title": "番剧时间表：上一页"
             },
             {
                 "command": "jumpPage",
-                "title": "Bangumi Open: Jump to number of Page"
+                "title": "番剧时间表：跳转到指定页"
             },
             {
                 "command": "weekBangumi",
-                "title": "Bangumi Open: Week Bangumi"
+                "title": "番剧时间表：打开周番表"
             },
             {
                 "command": "index",
-                "title": "Bangumi Open: Index"
+                "title": "番剧时间表：打开筛选索引"
             }
         ],
         "keybindings": [
@@ -71,27 +71,27 @@
                 "bangumiOpen.DisplayHistory": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Whether to show the Bangumi of the past 6 days?"
+                    "description": "是否显示过去六天的番剧更新。"
                 },
                 "bangumiOpen.EnableReminder": {
                     "type": "boolean",
                     "default": true,
-                    "description": "When enabled, BangumiOpen will remind you when the Bangumi is updated."
+                    "description": "开启后，番剧更新时会弹出提醒。"
                 },
                 "bangumiOpen.ReminderAheadTime": {
                     "type": "integer",
                     "default": 0,
-                    "description": "[Unit: seconds] Sometimes, you may need Reminder to remind you in advance."
+                    "description": "提醒提前的时间，单位为秒。"
                 },
                 "bangumiOpen.DisplayStatusBar": {
                     "type": "boolean",
                     "default": true,
-                    "description": "When enabled, StatusBar will shows the next bangumi to be updated."
+                    "description": "开启后，状态栏会显示下一部即将更新的番剧。"
                 },
                 "bangumiOpen.DisplayIndexTags": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Whether to display the tags that have been selected ?"
+                    "description": "使用索引时是否显示已经选中的标签。"
                 }
             }
         }

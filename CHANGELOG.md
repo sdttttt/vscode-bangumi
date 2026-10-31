@@ -1,6 +1,6 @@
-# Change Log
+# 变更日志
 
-All notable changes to the **Bangumi Open** extension will be documented in this file.
+本文件记录 **Bangumi Open** 扩展的所有重要改动。
 
 ## [1.0.0] - 2020-2-10
 
@@ -272,6 +272,7 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 - 样式改用 `--vscode-*` CSS 变量，跟随编辑器明暗主题；删除 `resources/css/` 下的三份静态样式表。
 - Webview 样式迁移到 UnoCSS（`webview/uno.config.ts`）：颜色映射到 VS Code 主题变量，复用规则写成 shortcut，`webview/src/styles/main.css` 只保留 reset、`:where(a)`、共享表面 token 与主题覆盖。
 - 索引列表页与加载/空态页按周番页的设计语言重写：三页共用 `board` / `surface` / `chip` 表面与卡片样式，索引卡片改为自适应网格、整卡可点击，封面比例与周番条目一致。
+- 周番页在「今天」那一列标出当前时间：`▶ 你在这里~ 还有 38 分钟`（金色、无虚线）插在已开播与未开播的时间组之间；后缀是**距下一场更新的倒计时**（不足一小时用分钟，更长用小时+分钟，全天播完显示`今日已播完`，无更新显示`今日没有更新`），无障碍标签仍播报当前墙钟。标记按 UTC+8 墙钟定位（`minuteOfDay()`），每 30 秒刷新一次，面板重新可见时立即校正，其余日期列不参与重渲染。
 - `pnpm build` 改为依次构建扩展与 Webview；`pnpm typecheck` 同时检查 `webview/tsconfig.json`。
 - 重写更新提醒：整个周番表收敛为**一个**常驻定时器（原实现为每部番剧 + 每个时间组各一个，约 20 个），每次唤醒后重新计算下一个截止时间，已触发的句柄不再累积。
 - 状态栏文案改为 `$(clock) 19:30 2部番` 形式：时间前置保证宽度稳定，`update at` 换成 codicon，单个标题去掉书名号并按显示列宽截断，跨天时补 `明日`；完整标题与后续场次仍保留在 tooltip 与无障碍标签中。
@@ -283,6 +284,7 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 - 提醒请求失败后按 30s / 2m / 10m 指数退避重试，并用 generation 计数丢弃过期响应，`start()` / `refresh()` 变为幂等。
 - `getWeekBangumi()` 捕获网络异常并返回 `undefined`，不再向调用方抛出未处理的 Promise 拒绝。
 - 今日判定改用接口的 `is_today` 与 `date_ts`（UTC+8 日界），替代按本地时区拼接 `M-D` 字符串；周番页与提醒共用同一套 `utils/clock`。
+- 面向用户的文案统一为中文：命令标题改为 `番剧时间表：…`，面板标题改为`番剧列表` / `周番表`，通知按钮改为`打开周番表`，配置项说明、加载/空态页、翻页提示与索引标签提示一并中文化；未提供 `l10n` 多语言包，不再保留英文界面。
 
 ### Test
 
@@ -298,6 +300,7 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 - Vitest 改为双 project：`extension`（node 环境，`src/test/unit`）与 `webview`（happy-dom 环境，`webview/src/**/*.test.tsx`）。
 - 新增 `src/test/mocks/panel.ts` 与 `src/test/unit/webview/`，覆盖消息通道、CSP/nonce 与数据映射。
 - 提醒拆分出独立用例：`src/test/unit/reminder/schedule.test.ts`（分组 / 提前量 clamp / 今日判定）、`scheduler.test.ts`（单定时器、宽限窗口、跨天续排）、`statusBar.test.ts`、`index.test.ts`（重试、配置变更、dispose），并新增 `src/test/unit/utils/clock.test.ts`。
+- Webview 用例新增「你在这里」标记：位置计算（`pubTimeMinute` / `markerIndex`）、倒计时（`nextGapMinutes` / `describeGap` / `describeNow`）、边界（首个时间组之前、最后一个之后、空日程、无法解析的时间、当天播完）、随时钟移动与面板重新可见时的校正。
 - `src/test/mocks/vscode.ts` 补上 `workspace.onDidChangeConfiguration` 桩。
 
 ### Fix

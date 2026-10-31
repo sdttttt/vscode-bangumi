@@ -137,7 +137,7 @@ describe("getWeekBangumi", () => {
         await expect(getWeekBangumi()).resolves.toBeUndefined();
 
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-            "诶?!没有找到番剧时间表诶..."
+            "咦？没有找到番剧时间表……"
         );
     });
 
@@ -159,7 +159,7 @@ describe("getWeekBangumi", () => {
 
         await expect(getWeekBangumi()).resolves.toBeUndefined();
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-            "诶?!没有找到番剧时间表诶..."
+            "咦？没有找到番剧时间表……"
         );
     });
 

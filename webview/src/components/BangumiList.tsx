@@ -63,7 +63,7 @@ function BangumiRow({ bangumi }: { bangumi: BangumiPayload }) {
                     <span class={bangumi.finish ? "chip" : "chip chip-accent"}>
                         {bangumi.finish ? "已完结" : "未完结"}
                     </span>
-                    <span class="btn">To Chase Bangumi</span>
+                    <span class="btn">去追番</span>
                 </div>
             </div>
         </a>

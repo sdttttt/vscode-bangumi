@@ -64,7 +64,7 @@ export async function getWeekBangumi(): Promise<
              * A network failure is reported like an empty schedule: the view
              * falls back to "not found" and the reminder retries on its own.
              */
-            window.showInformationMessage("诶?!没有找到番剧时间表诶...");
+            window.showInformationMessage("咦？没有找到番剧时间表……");
             return;
         }
 
@@ -72,7 +72,7 @@ export async function getWeekBangumi(): Promise<
             !isSuccess(weekBangumiResponse) ||
             isEmptyArray(weekBangumiResponse.result)
         ) {
-            window.showInformationMessage("诶?!没有找到番剧时间表诶...");
+            window.showInformationMessage("咦？没有找到番剧时间表……");
             return;
         }
         result = weekBangumiResponse.result;

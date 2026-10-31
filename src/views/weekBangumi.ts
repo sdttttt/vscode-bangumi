@@ -14,7 +14,7 @@ import AbstractView from "./view";
  */
 export default new (class WeekBangumisView extends AbstractView {
     protected readonly viewType = "bangumiOpen.week";
-    protected readonly title = "Week Bangumis";
+    protected readonly title = "周番表";
 
     constructor() {
         super();

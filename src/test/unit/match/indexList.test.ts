@@ -85,7 +85,7 @@ describe("MainIndexList", () => {
         await pick(MainIndexList, "未知选项");
 
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-            "果咩,还在施工中"
+            "抱歉，这个选项还在施工中"
         );
     });
 });
@@ -129,7 +129,7 @@ describe("SimpleFinalIndexList subclasses", () => {
         await pick(SeasonVersionList, "电影");
 
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-            expect.stringContaining("Tags:")
+            expect.stringContaining("已选标签")
         );
     });
 

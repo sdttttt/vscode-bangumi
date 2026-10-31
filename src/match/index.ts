@@ -64,7 +64,9 @@ export default new (class MainIndexList extends AbstractIndexList {
                 Tagger.clear();
                 break;
             default:
-                vscode.window.showInformationMessage("果咩,还在施工中");
+                vscode.window.showInformationMessage(
+                    "抱歉，这个选项还在施工中"
+                );
         }
     }
 })();

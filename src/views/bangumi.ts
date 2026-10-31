@@ -15,7 +15,7 @@ import AbstractView from "./view";
  */
 export default new (class BangumisView extends AbstractView {
     protected readonly viewType: string = "bangumiOpen.list";
-    protected readonly title: string = "bangumis";
+    protected readonly title: string = "番剧列表";
 
     private _pageNumber: number;
 
@@ -109,7 +109,7 @@ export default new (class BangumisView extends AbstractView {
             this.openBangumi();
         } else {
             this._pageNumber = 1;
-            vscode.window.showInformationMessage("真的一滴都没有了!");
+            vscode.window.showInformationMessage("真的一滴都没有了！");
             this.openBangumi();
         }
     }
@@ -123,7 +123,7 @@ export default new (class BangumisView extends AbstractView {
     jumpPage(): void {
         const inputOptions: vscode.InputBoxOptions = {
             value: "1",
-            prompt: "TIP: 如果一直在加载，那应该是没这一页了",
+            prompt: "提示：如果一直停留在加载中，通常是这一页没有数据了。",
         };
 
         vscode.window
@@ -131,10 +131,9 @@ export default new (class BangumisView extends AbstractView {
             .then((text: string | undefined) => {
                 const number = toNumber(text);
                 if (0 === number) {
-                    vscode.window.showInformationMessage(`
-        输入的内容,不能是0或者非数字
-        数字大小不做限制.
-      `);
+                    vscode.window.showInformationMessage(
+                        "页码必须是大于 0 的数字，大小不做限制。"
+                    );
                     return;
                 }
                 this._pageNumber = number;

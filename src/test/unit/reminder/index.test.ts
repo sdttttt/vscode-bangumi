@@ -154,7 +154,7 @@ describe("Reminder", () => {
 
         expect(vscode.window.showInformationMessage).toHaveBeenCalledTimes(1);
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
-            "没有找到今日的索引 ??"
+            "没有找到今日的番剧数据，提醒可能不准确。"
         );
         reminder.dispose();
     });
@@ -169,7 +169,7 @@ describe("Reminder", () => {
 
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
             "《今日番剧》 更新啦！",
-            "Open WeekBangumi"
+            "打开周番表"
         );
         reminder.dispose();
     });
@@ -189,7 +189,7 @@ describe("Reminder", () => {
 
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
             "《今日番剧》 还有10分钟就更新啦！",
-            "Open WeekBangumi"
+            "打开周番表"
         );
         reminder.dispose();
     });
@@ -221,7 +221,7 @@ describe("Reminder", () => {
         expect(vscode.window.showInformationMessage).toHaveBeenCalledTimes(1);
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
             "《甲》、《乙》 更新啦！",
-            "Open WeekBangumi"
+            "打开周番表"
         );
         reminder.dispose();
     });
@@ -244,7 +244,7 @@ describe("Reminder", () => {
 
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
             "《甲》、《乙》、《丙》等 4 部 更新啦！",
-            "Open WeekBangumi"
+            "打开周番表"
         );
         reminder.dispose();
     });

@@ -4,13 +4,13 @@
 
 > 一款基于 **Vscode** 的番剧插件, 数据来自 B 站.
 
-## Features
+## 功能
 
 提供的`番剧索引`. 以及`新番时间表` 的功能.
 
 ![b2](https://raw.githubusercontent.com/sdttttt/vscode-bangumi/master/resources/b2.png)
 
-### Reminder
+### 更新提醒
 
 > 该功能在配置文件中可以被关闭.
 
@@ -20,30 +20,32 @@
 
 提醒只在整个周番表上维持一个定时器, 并会在每天零点后自动刷新时间表, 因此长期开着的窗口不会停留在昨天的信息上. 修改相关配置后立即生效, 无需重载窗口.
 
-## Quick Usage
+## 快速上手
 
-`Ctrl+Shift+P` 调出命令栏后,输入`Open Bangumi`或 `Bangumi Open: Week Bangumi` 即可打开视图.
+`Ctrl+Shift+P` 调出命令栏后, 输入`番剧时间表：打开番剧列表`或 `番剧时间表：打开周番表` 即可打开视图.
 
-使用 `Bangumi Open: Index` 可打开索引. 选中索引后自动触发`Open Bangumi`命令.
+周番表会在「今天」那一列标出当前时间, 形如金色的 `▶ 你在这里~ 还有 38 分钟`, 插在已经开播与还没开播的时间组之间, 随时间自动下移. 后面的时间是**距下一场更新的倒计时**: 不足一小时按分钟显示, 更长则显示小时与分钟; 当天全部播完显示`今日已播完`, 没有更新显示`今日没有更新`.
 
-> 在一级索引中选中`(恢复默认)`可清除所有已经选中的 Tag.
+使用 `番剧时间表：打开筛选索引` 可打开索引. 选中索引后自动触发`番剧时间表：打开番剧列表`命令.
 
-`Next Page` 和 `Back Page` 提供翻页功能.
+> 在一级索引中选中`(恢复默认)`可清除所有已经选中的标签.
 
-`Next Page` 可用 `Ctrl+alt+l` 代替
+`番剧时间表：下一页` 和 `番剧时间表：上一页` 提供翻页功能.
 
-`Back Page` 可用 `Ctrl+alt+k` 代替
+`番剧时间表：下一页` 可用 `Ctrl+alt+l` 代替
 
-## Configuration
+`番剧时间表：上一页` 可用 `Ctrl+alt+k` 代替
+
+## 配置
 
 ```json
 "bangumiOpen.DisplayHistory": false,  // 是否显示前六天的番剧更新
 "bangumiOpen.EnableReminder": true,   // 是否开启番更新剧提醒
 "bangumiOpen.ReminderAheadTime": 0,   // 更新提醒时间提前 (单位：秒)
-"bangumiOpen.DisplayIndexTags": true, // 使用索引时是否显示已经选中的Tag
+"bangumiOpen.DisplayIndexTags": true, // 使用索引时是否显示已经选中的标签
 "bangumiOpen.DisplayStatusBar": true  // 是否显示状态栏提示
 ```
 
-## Contribution
+## 贡献
 
 ![](https://contributors.nn.ci/api?repo=sdttttt/vscode-bangumi)

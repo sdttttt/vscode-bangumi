@@ -18,13 +18,13 @@ describe("showBangumiUpdateRemind", () => {
 
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
             "《咒术回战》 更新啦！",
-            "Open WeekBangumi"
+            "打开周番表"
         );
     });
 
     it("opens the weekly view when the action is chosen", async () => {
         vi.mocked(vscode.window.showInformationMessage).mockResolvedValue(
-            "Open WeekBangumi" as never
+            "打开周番表" as never
         );
 
         showBangumiUpdateRemind("咒术回战");
@@ -53,7 +53,7 @@ describe("showBeforeBangumiUpdateRemind", () => {
 
         expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
             "《咒术回战》 还有5分钟就更新啦！",
-            "Open WeekBangumi"
+            "打开周番表"
         );
     });
 });
