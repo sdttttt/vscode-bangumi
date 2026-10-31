@@ -26,7 +26,7 @@ jobs:
 
             - run: pnpm install --frozen-lockfile
 
-            - run: pnpm dlx @vscode/vsce package --no-dependencies
+            - run: pnpm dlx @vscode/vsce@4.1.0 package --no-dependencies
               env:
                   CI: true
 

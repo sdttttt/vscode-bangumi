@@ -39,7 +39,7 @@ jobs:
               run: pnpm test
 
             - name: package
-              run: pnpm dlx @vscode/vsce package --no-dependencies
+              run: pnpm dlx @vscode/vsce@4.1.0 package --no-dependencies
 
             - uses: actions/upload-artifact@v4
               with:

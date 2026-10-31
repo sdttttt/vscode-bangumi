@@ -233,8 +233,10 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 - 类型检查切换到 TypeScript 7 原生编译器, 本项目类型检查耗时下降约 2.7 倍.
 - 代码检查与格式化从 ESLint + Prettier 迁移到 oxlint + oxfmt, 两者均为 Rust 原生实现, 运行速度大幅提升.
 - 移除 typescript-eslint 后不再需要兼容 TypeScript 6 的 API, 依赖树中 TypeScript 只保留 7.0.2 一个版本.
+- 依赖全部升级到最新版: `@types/vscode` 1.144.0, `@types/node` 26.6.6, 其余包已是最新.
+- CI 中 `vsce` 与 `ovsx` 锁定到明确版本, 避免发布流程随时间漂移.
 - 包管理器升级到 pnpm 10, CI 使用 Node.js 22.
-- 最低 VS Code 版本提升到 1.100, 构建目标对齐扩展宿主自带的 Node.js 20.
+- 最低 VS Code 版本提升到 1.144, 构建目标对齐扩展宿主自带的 Node.js 24（Electron 43）.
 - Webview 资源改用 `webview.asWebviewUri`, 移除已废弃的 `vscode-resource` scheme.
 - 新增 `pnpm test:watch` 监听模式, `pnpm test` 改为单次运行.
 

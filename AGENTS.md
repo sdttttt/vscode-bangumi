@@ -15,7 +15,7 @@
 | 代码检查  | `pnpm lint`（oxlint），自动修复用 `pnpm lint:fix`                      |
 | 格式化    | `pnpm format`（oxfmt 原地写入），只检查用 `pnpm format:check`          |
 | 生产打包  | `pnpm vscode:prepublish`（`vite build --minify`）                      |
-| 生成 VSIX | `pnpm dlx @vscode/vsce package --no-dependencies`                      |
+| 生成 VSIX | `pnpm dlx @vscode/vsce@4.1.0 package --no-dependencies`                |
 
 提交改动前至少跑通 `pnpm test-compile`、`pnpm lint`、`pnpm format:check`、`pnpm test`。CI（`.github/workflows/build.yml`）会执行 `pnpm format` → `pnpm format:check` → `pnpm lint` → `pnpm test` → 打包，所以请在本地先跑一次，避免提交的代码与格式化结果不一致。
 
@@ -38,7 +38,9 @@
 - 产物必须是 CommonJS 且位于 `dist/extension.js`（`build.lib` + `formats: ["cjs"]`），因为 `package.json#main` 指向该文件。
 - `vscode` 与全部 Node 内置模块保持 external（`build.rolldownOptions.external`）。绝不要把 `vscode` 打进产物，也不要引入扩展宿主环境中不存在的运行时依赖。
 - `resolve.mainFields: ["module", "main"]` 与 `resolve.conditions: ["node"]` 是必需的。缺少它们时 Vite 会解析到 axios 的浏览器版本，把 http 适配器替换成空实现，导致所有网络请求失效。验证方法是检查产物中仍存在 `isHttpAdapterSupported` 且不含 `browser-external` 桩。
-- `build.target` 为 `node20`，对应 VS Code 1.100 起自带的 Node.js 运行时。
+- `build.target` 为 `node24`，对应 VS Code 1.144 自带的 Electron 43（内含 Node.js 24）。升级 `engines.vscode` 时记得同步调整这里的 target。
+- `@types/vscode` 的 major.minor **不能高于** `engines.vscode`，这是 `vsce package` 的强制校验（`validateVSCodeTypesCompatibility`），不满足会直接打包失败。升级 `engines.vscode` 时必须同步升级 `@types/vscode`。
+- `@types/vscode` 只用于类型检查，扩展运行时不受它影响；但不要依赖比 `engines.vscode` 更新的 API，否则老版本 VS Code 上会调用不存在的接口。
 
 ## 代码检查与格式化
 

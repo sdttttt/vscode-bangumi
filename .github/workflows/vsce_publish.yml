@@ -24,7 +24,7 @@ jobs:
             - run: pnpm install --frozen-lockfile
 
             - name: Publish to Visual Studio Marketplace
-              run: pnpm dlx @vscode/vsce publish --no-dependencies -p ${{ secrets.VSCE_TOKEN }}
+              run: pnpm dlx @vscode/vsce@4.1.0 publish --no-dependencies -p ${{ secrets.VSCE_TOKEN }}
 
             - name: Publish to Open-VSX
-              run: pnpm dlx ovsx publish -p ${{ secrets.OVSX_ACCESS_KEY }}
+              run: pnpm dlx ovsx@1.3.0 publish -p ${{ secrets.OVSX_ACCESS_KEY }}

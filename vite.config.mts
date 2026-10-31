@@ -23,8 +23,8 @@ export default defineConfig({
     build: {
         outDir: "dist",
         emptyOutDir: true,
-        // VS Code 1.100 ships Node.js 20.
-        target: "node20",
+        // VS Code 1.144 ships Electron 43, which bundles Node.js 24.
+        target: "node24",
         minify: false,
         sourcemap: false,
         lib: {
