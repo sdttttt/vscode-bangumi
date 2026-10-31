@@ -4,6 +4,7 @@ import {
     buildSchedule,
     describeEvent,
     horizonOf,
+    STATUS_BAR_ICON,
     todayIndex,
     ROLLOVER_DELAY_MS,
 } from "@/reminder/schedule";
@@ -253,31 +254,73 @@ describe("todayIndex", () => {
 });
 
 describe("describeEvent", () => {
-    it("truncates a long title", () => {
+    /** 2026-11-01 12:00 UTC+8. */
+    const now = Date.UTC(2026, 10, 1, 4, 0);
+
+    it("leads with the time so the width stays stable", () => {
         expect(
-            describeEvent({
+            describeEvent(
+                { at: 0, pubTs: now, pubTime: "20:00", titles: ["甲"] },
+                now
+            )
+        ).toBe(`${STATUS_BAR_ICON} 20:00 甲`);
+    });
+
+    it("counts a group instead of listing it", () => {
+        expect(
+            describeEvent(
+                { at: 0, pubTs: now, pubTime: "20:00", titles: ["甲", "乙"] },
+                now
+            )
+        ).toBe(`${STATUS_BAR_ICON} 20:00 2部番`);
+    });
+
+    it("marks an update that happens tomorrow", () => {
+        const tomorrow = now + 24 * 60 * 60 * 1000;
+
+        expect(
+            describeEvent(
+                { at: 0, pubTs: tomorrow, pubTime: "09:00", titles: ["甲"] },
+                now
+            )
+        ).toBe(`${STATUS_BAR_ICON} 明日 09:00 甲`);
+    });
+
+    it("drops the book quotes", () => {
+        const text = describeEvent(
+            { at: 0, pubTs: now, pubTime: "20:00", titles: ["甲"] },
+            now
+        );
+
+        expect(text).not.toContain("《");
+    });
+
+    it("truncates a long title on a code point boundary", () => {
+        const text = describeEvent(
+            {
                 at: 0,
-                pubTs: 0,
+                pubTs: now,
                 pubTime: "20:00",
                 titles: ["一个特别特别特别长的番剧名称"],
-            })
-        ).toBe("《一个特别特别特...》 update at 20:00");
+            },
+            now
+        );
+
+        expect(text).toBe(`${STATUS_BAR_ICON} 20:00 一个特别特别特…`);
     });
 
-    it("names a sole season", () => {
-        expect(
-            describeEvent({ at: 0, pubTs: 0, pubTime: "20:00", titles: ["甲"] })
-        ).toBe("《甲》 update at 20:00");
-    });
-
-    it("counts a group", () => {
-        expect(
-            describeEvent({
+    it("keeps an emoji title intact", () => {
+        const text = describeEvent(
+            {
                 at: 0,
-                pubTs: 0,
+                pubTs: now,
                 pubTime: "20:00",
-                titles: ["甲", "乙"],
-            })
-        ).toBe("很神秘, 有2部番 update at 20:00");
+                titles: ["番剧🎬🎬🎬🎬🎬🎬🎬🎬🎬"],
+            },
+            now
+        );
+
+        expect(text).not.toContain("\uFFFD");
+        expect(text.endsWith("…")).toBe(true);
     });
 });

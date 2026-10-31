@@ -4,9 +4,9 @@ import {
     window,
     type Disposable,
 } from "vscode";
-import { describeEvent } from "./schedule";
+import { dayMarker, describeEvent } from "./schedule";
 import type { ScheduleEvent } from "./schedule";
-import { describeTitles } from "../utils/titles";
+import { listTitles } from "../utils/titles";
 
 /**
  * Number of upcoming events listed in the status bar tooltip.
@@ -35,7 +35,7 @@ export class ReminderStatusBar implements Disposable {
      *
      * @author sdttttt
      */
-    public show(upcoming: ReadonlyArray<ScheduleEvent>): void {
+    public show(upcoming: ReadonlyArray<ScheduleEvent>, now: number): void {
         const next = upcoming[0];
         if (!next) {
             this.hide();
@@ -43,10 +43,10 @@ export class ReminderStatusBar implements Disposable {
         }
 
         const item = this.ensureItem();
-        item.text = describeEvent(next);
-        item.tooltip = this.buildTooltip(next, upcoming.slice(1));
+        item.text = describeEvent(next, now);
+        item.tooltip = this.buildTooltip(next, upcoming.slice(1), now);
         item.accessibilityInformation = {
-            label: `${describeTitles(next.titles)} 即将更新`,
+            label: `${listTitles(next.titles)} 将于 ${dayMarker(next, now)}${next.pubTime} 更新`,
         };
 
         if (!this.visible) {
@@ -91,18 +91,22 @@ export class ReminderStatusBar implements Disposable {
         return this.item;
     }
 
+    /**
+     * Full titles and times of the next events. The status bar truncates, the
+     * tooltip never does.
+     *
+     * @author sdttttt
+     */
     private buildTooltip(
         next: ScheduleEvent,
-        rest: ReadonlyArray<ScheduleEvent>
+        rest: ReadonlyArray<ScheduleEvent>,
+        now: number
     ): string {
-        const lines = rest.slice(0, TOOLTIP_EVENTS - 1).map(event => {
-            const titles = describeTitles(event.titles);
-            return `${event.pubTime} ${titles}`;
-        });
-
-        return [
-            `${next.pubTime} ${describeTitles(next.titles)}`,
-            ...lines,
-        ].join("\n");
+        return [next, ...rest.slice(0, TOOLTIP_EVENTS - 1)]
+            .map(
+                event =>
+                    `${dayMarker(event, now)}${event.pubTime} ${listTitles(event.titles)}`
+            )
+            .join("\n");
     }
 }

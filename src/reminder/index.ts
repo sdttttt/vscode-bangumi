@@ -225,7 +225,10 @@ export class Reminder implements vscode.Disposable {
             return;
         }
 
-        this.statusBar.show(this.events.filter(event => event.at > now));
+        this.statusBar.show(
+            this.events.filter(event => event.at > now),
+            now
+        );
     }
 
     private scheduleRetry(): void {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
     BILIBILI_OFFSET_MS,
+    dayDistance,
     dayKey,
     isCurrentDay,
     nextDayStart,
@@ -94,5 +95,21 @@ describe("isCurrentDay", () => {
         expect(
             isCurrentDay({ date: "4-1", date_ts: 0, is_today: 0 }, now)
         ).toBe(false);
+    });
+});
+
+describe("dayDistance", () => {
+    it("is zero within the same UTC+8 day", () => {
+        const now = atUtc8(2026, 10, 31, 0, 1);
+        const later = atUtc8(2026, 10, 31, 23, 59);
+
+        expect(dayDistance(now, later)).toBe(0);
+    });
+
+    it("is one across the next UTC+8 midnight", () => {
+        const now = atUtc8(2026, 10, 31, 23, 59);
+        const next = atUtc8(2026, 11, 1, 0, 1);
+
+        expect(dayDistance(now, next)).toBe(1);
     });
 });

@@ -68,3 +68,15 @@ export function isCurrentDay(day: DayStamp, now: number): boolean {
     }
     return day.date === dayKey(now);
 }
+
+/**
+ * `dayKey` distance between two instants, in UTC+8 days.
+ *
+ * Used to decide whether an upcoming update still happens today or already
+ * tomorrow, so the status bar can say which one without guessing.
+ *
+ * @author sdttttt
+ */
+export function dayDistance(from: number, to: number): number {
+    return Math.round((nextDayStart(to) - nextDayStart(from)) / DAY_MS);
+}

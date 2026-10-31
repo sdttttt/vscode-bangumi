@@ -4,12 +4,19 @@ import type { ScheduleEvent } from "@/reminder/schedule";
 import { ReminderStatusBar } from "@/reminder/statusBar";
 
 /**
+ * 2026-11-01 12:00 UTC+8, the instant the status bar is rendered at.
+ *
+ * @author sdttttt
+ */
+const NOW = Date.UTC(2026, 10, 1, 4, 0);
+
+/**
  * Event double.
  *
  * @author sdttttt
  */
 function event(pubTime: string, titles: Array<string>): ScheduleEvent {
-    return { at: 1, pubTs: 1, pubTime, titles };
+    return { at: 1, pubTs: NOW, pubTime, titles };
 }
 
 /**
@@ -50,10 +57,10 @@ describe("ReminderStatusBar", () => {
         const statusBar = new ReminderStatusBar("weekBangumi");
         const next = event("20:00", ["甲"]);
 
-        statusBar.show([next]);
-        statusBar.show([next]);
+        statusBar.show([next], NOW);
+        statusBar.show([next], NOW);
 
-        expect(item.text).toBe("《甲》 update at 20:00");
+        expect(item.text).toBe("$(clock) 20:00 甲");
         expect(item.command).toBe("weekBangumi");
         expect(item.show).toHaveBeenCalledTimes(1);
         statusBar.dispose();
@@ -63,7 +70,10 @@ describe("ReminderStatusBar", () => {
         const statusBar = new ReminderStatusBar("weekBangumi");
         const next = event("20:00", ["甲"]);
 
-        statusBar.show([next, event("21:00", ["乙"]), event("22:00", ["丙"])]);
+        statusBar.show(
+            [next, event("21:00", ["乙"]), event("22:00", ["丙"])],
+            NOW
+        );
 
         expect(item.tooltip).toBe("20:00 《甲》\n21:00 《乙》\n22:00 《丙》");
         statusBar.dispose();
@@ -72,8 +82,8 @@ describe("ReminderStatusBar", () => {
     it("hides the entry when nothing is coming up", () => {
         const statusBar = new ReminderStatusBar("weekBangumi");
 
-        statusBar.show([event("20:00", ["甲"])]);
-        statusBar.show([]);
+        statusBar.show([event("20:00", ["甲"])], NOW);
+        statusBar.show([], NOW);
 
         expect(item.hide).toHaveBeenCalledTimes(1);
         statusBar.dispose();
@@ -89,9 +99,40 @@ describe("ReminderStatusBar", () => {
         const statusBar = new ReminderStatusBar("weekBangumi");
         const next = event("20:00", ["甲"]);
 
-        statusBar.show([next]);
+        statusBar.show([next], NOW);
         statusBar.dispose();
 
         expect(item.dispose).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe("ReminderStatusBar tooltip", () => {
+    it("lists every title of a group, unlike the entry", () => {
+        const item = stubItem();
+        const statusBar = new ReminderStatusBar("weekBangumi");
+        const next = event("20:00", ["甲", "乙"]);
+
+        statusBar.show([next], NOW);
+
+        expect(item.text).toBe("$(clock) 20:00 2部番");
+        expect(item.tooltip).toBe("20:00 《甲》、《乙》");
+        statusBar.dispose();
+    });
+
+    it("marks the events that happen tomorrow", () => {
+        const item = stubItem();
+        const statusBar = new ReminderStatusBar("weekBangumi");
+        const tomorrow = {
+            at: 1,
+            pubTs: NOW + 24 * 60 * 60 * 1000,
+            pubTime: "09:00",
+            titles: ["甲"],
+        };
+
+        statusBar.show([tomorrow], NOW);
+
+        expect(item.text).toBe("$(clock) 明日 09:00 甲");
+        expect(item.tooltip).toBe("明日 09:00 《甲》");
+        statusBar.dispose();
     });
 });

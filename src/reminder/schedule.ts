@@ -1,6 +1,6 @@
 import type { WBangumi, WeekBangumiData } from "../request/structure";
-import { isCurrentDay, nextDayStart } from "../utils/clock";
-import { describeTitles } from "../utils/titles";
+import { dayDistance, isCurrentDay, nextDayStart } from "../utils/clock";
+import { truncateToColumns } from "../utils/titles";
 
 /**
  * One instant of the schedule at which at least one season updates.
@@ -152,32 +152,68 @@ export function todayIndex(
 }
 
 /**
- * Status bar text of an event, kept short so it survives a narrow status bar.
+ * Icon rendered at the head of the status bar entry.
+ *
+ * A codicon costs one glyph while `update at` costs nine columns, and it makes
+ * the entry recognisable at a glance in a crowded status bar.
  *
  * @author sdttttt
  */
-export function describeEvent(event: ScheduleEvent): string {
-    if (1 !== event.titles.length) {
-        return `很神秘, 有${event.titles.length}部番 update at ${event.pubTime}`;
-    }
+export const STATUS_BAR_ICON = "$(clock)";
 
-    return `${describeTitles(event.titles.map(shortenTitle))} update at ${event.pubTime}`;
+/**
+ * How many days ahead an event is announced as `明日` in the status bar.
+ *
+ * @author sdttttt
+ */
+const TOMORROW_DAYS = 1;
+
+/**
+ * Columns reserved for the subject of the status bar entry.
+ *
+ * Seven CJK characters plus the ellipsis: long enough for a recognisable title,
+ * short enough that the time never gets pushed out of view.
+ *
+ * @author sdttttt
+ */
+export const STATUS_BAR_NAME_COLUMNS = 15;
+
+/**
+ * Name of a group, without the book quotes notifications use.
+ *
+ * The status bar is the narrowest surface of the extension, and the quotes add
+ * two columns each without adding meaning; the tooltip keeps them.
+ *
+ * @author sdttttt
+ */
+function groupName(event: ScheduleEvent): string {
+    return 1 === event.titles.length
+        ? truncateToColumns(event.titles[0], STATUS_BAR_NAME_COLUMNS)
+        : `${event.titles.length}部番`;
 }
 
 /**
- * Longest title kept in the status bar.
+ * `明日 ` prefix of an event that does not happen today.
+ *
+ * Empty for today, the common case that must stay free of noise. The trailing
+ * space is part of the prefix so callers concatenate it with the time directly;
+ * the tooltip and the accessibility label reuse it to stay consistent with the
+ * entry itself.
  *
  * @author sdttttt
  */
-export const STATUS_BAR_TITLE_LENGTH = 7;
+export function dayMarker(event: ScheduleEvent, now: number): string {
+    return TOMORROW_DAYS === dayDistance(now, event.pubTs) ? "明日 " : "";
+}
 
 /**
- * Truncates a title to fit a narrow status bar entry.
+ * Status bar text of an event.
+ *
+ * Time first so the entry keeps a constant width and the eye lands on the only
+ * part that changes between refreshes; the subject follows, without quotes.
  *
  * @author sdttttt
  */
-function shortenTitle(title: string): string {
-    return STATUS_BAR_TITLE_LENGTH < title.length
-        ? `${title.slice(0, STATUS_BAR_TITLE_LENGTH)}...`
-        : title;
+export function describeEvent(event: ScheduleEvent, now: number): string {
+    return `${STATUS_BAR_ICON} ${dayMarker(event, now)}${event.pubTime} ${groupName(event)}`;
 }
