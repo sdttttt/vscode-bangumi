@@ -115,8 +115,11 @@ jobs:
             # The release itself did happen, so the job only fails once the
             # GitHub release exists; the annotation names the channel that
             # needs attention.
+            #
+            # `outcome` is the raw result of the step: `conclusion` would read
+            # `success` because both publish steps set `continue-on-error`.
             - name: report the channels that failed
-              if: steps.vsce.outcome == 'failure' || steps.ovsx.outcome == 'failure'
+              if: always() && (steps.vsce.outcome == 'failure' || steps.ovsx.outcome == 'failure')
               run: |
                   set -eu
                   if [ "${{ steps.vsce.outcome }}" = "failure" ]; then
