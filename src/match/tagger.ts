@@ -1,8 +1,7 @@
 /**
  * Tagger
  */
-export default new (class Tagger
-{
+export default new (class Tagger {
     /**
      * Hit Tag
      *
@@ -10,18 +9,15 @@ export default new (class Tagger
      */
     private _tags: Map<string, string> = new Map();
 
-    set tags(value: Map<string, string>)
-    {
+    set tags(value: Map<string, string>) {
         this._tags = value;
     }
 
-    get tags(): Map<string, string>
-    {
+    get tags(): Map<string, string> {
         return this._tags;
     }
 
-    public clear()
-    {
+    public clear() {
         this._tags.clear();
     }
 })();

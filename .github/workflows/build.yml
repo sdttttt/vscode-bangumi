@@ -29,6 +29,12 @@ jobs:
             - name: format
               run: pnpm format
 
+            - name: format check
+              run: pnpm format:check
+
+            - name: lint
+              run: pnpm lint
+
             - name: test
               run: pnpm test
 

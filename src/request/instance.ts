@@ -1,6 +1,4 @@
-import Axios, {
-    AxiosRequestConfig, AxiosInstance
-} from "axios";
+import Axios, { AxiosRequestConfig, AxiosInstance } from "axios";
 
 const config: AxiosRequestConfig = {
     timeout: 8888,

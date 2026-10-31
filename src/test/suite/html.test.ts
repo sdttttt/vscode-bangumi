@@ -1,9 +1,5 @@
-import {
-    describe, test, expect, vi
-} from "vitest";
-import type {
-    Webview
-} from "vscode";
+import { describe, test, expect, vi } from "vitest";
+import type { Webview } from "vscode";
 import LoadingHTMLGenerator from "@/html/loadingHtml";
 import NotFoundHTMLGenerator from "@/html/NotFoundHtml";
 
@@ -17,13 +13,12 @@ vi.mock("@/constants", () => ({
     getContext: () => ({
         extensionPath: "/extension",
     }),
-    HUIHUI     : "loading.gif",
+    HUIHUI: "loading.gif",
     ENTERRPRISE: "enterprise.jpg",
     LOADING_CSS: "css/loading.css",
 }));
 
-function makeWebview(id: string): Webview
-{
+function makeWebview(id: string): Webview {
     return {
         asWebviewUri: (uri: unknown) => `${id}:${String(uri)}`,
     } as unknown as Webview;
@@ -34,10 +29,8 @@ function makeWebview(id: string): Webview
  *
  * @author sdttttt
  */
-describe("HTML Generator TEST", () =>
-{
-    test("loading view binds resources to the given webview", () =>
-    {
+describe("HTML Generator TEST", () => {
+    test("loading view binds resources to the given webview", () => {
         const first = LoadingHTMLGenerator.generateHTML(
             undefined,
             makeWebview("panel-a")
@@ -53,8 +46,7 @@ describe("HTML Generator TEST", () =>
         expect(second).not.toContain("panel-a:");
     });
 
-    test("not found view binds resources to the given webview", () =>
-    {
+    test("not found view binds resources to the given webview", () => {
         const html = NotFoundHTMLGenerator.generateHTML(
             undefined,
             makeWebview("panel-c")

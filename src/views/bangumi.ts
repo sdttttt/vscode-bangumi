@@ -1,17 +1,9 @@
 import * as vscode from "vscode";
-import {
-    getAllBangumi
-} from "../request/bangumi";
+import { getAllBangumi } from "../request/bangumi";
 import BangumisHTMLGenerator from "../html/bangumiHtml";
-import {
-    BangumiUrl
-} from "../request/bangumiUrl";
-import {
-    Bangumi, BangumisData
-} from "../request/structure";
-import {
-    toNumber
-} from "../utils/type";
+import { BangumiUrl } from "../request/bangumiUrl";
+import { Bangumi, BangumisData } from "../request/structure";
+import { toNumber } from "../utils/type";
 import AbstractView from "./view";
 
 /**
@@ -20,8 +12,7 @@ import AbstractView from "./view";
  * @class BangumisView
  * @author sdttttt
  */
-export default new (class BangumisView extends AbstractView
-{
+export default new (class BangumisView extends AbstractView {
     protected readonly viewType: string = "html";
     protected readonly title: string = "bangumis";
 
@@ -29,8 +20,7 @@ export default new (class BangumisView extends AbstractView
 
     private _bangumiUrl: BangumiUrl;
 
-    constructor()
-    {
+    constructor() {
         super();
         this._bangumiUrl = new BangumiUrl();
         this._pageNumber = 1;
@@ -42,18 +32,15 @@ export default new (class BangumisView extends AbstractView
      * @param bangumis
      * @author sdttttt
      */
-    private createBangumiView(bangumiRes: BangumisData | undefined): void
-    {
-        if (!bangumiRes)
-        {
+    private createBangumiView(bangumiRes: BangumisData | undefined): void {
+        if (!bangumiRes) {
             this.showNotFoundView();
             return;
         }
 
         const bangumis: Array<Bangumi> = bangumiRes.list;
 
-        this.openWebViewPanel((pv: vscode.WebviewPanel) =>
-        {
+        this.openWebViewPanel((pv: vscode.WebviewPanel) => {
             pv.webview.html = BangumisHTMLGenerator.generateHTML(
                 bangumis,
                 pv.webview
@@ -65,8 +52,7 @@ export default new (class BangumisView extends AbstractView
      * show number of Page
      * @author sdttttt
      */
-    private showPageNumber(): void
-    {
+    private showPageNumber(): void {
         vscode.window.showInformationMessage(`🐶 第${this._pageNumber}页`);
     }
 
@@ -75,8 +61,7 @@ export default new (class BangumisView extends AbstractView
      *
      * @author sdttttt
      */
-    get bangumiUrl(): BangumiUrl
-    {
+    get bangumiUrl(): BangumiUrl {
         return this._bangumiUrl;
     }
 
@@ -85,8 +70,7 @@ export default new (class BangumisView extends AbstractView
      *
      * @author sdttttt
      */
-    set bangumiUrl(url: BangumiUrl)
-    {
+    set bangumiUrl(url: BangumiUrl) {
         this._bangumiUrl = url;
     }
 
@@ -95,8 +79,7 @@ export default new (class BangumisView extends AbstractView
      *
      * @author sdttttt
      */
-    openBangumi(): void
-    {
+    openBangumi(): void {
         this.showLoadingView();
 
         getAllBangumi(this._bangumiUrl.setPage(this._pageNumber)).then(
@@ -110,8 +93,7 @@ export default new (class BangumisView extends AbstractView
      * @export
      * @author sdttttt
      */
-    nextPage(): void
-    {
+    nextPage(): void {
         this._pageNumber++;
         this.showPageNumber();
         this.openBangumi();
@@ -123,16 +105,12 @@ export default new (class BangumisView extends AbstractView
      * @export
      * @author sdttttt
      */
-    backPage(): void
-    {
-        if (1 < this._pageNumber)
-        {
+    backPage(): void {
+        if (1 < this._pageNumber) {
             this._pageNumber--;
             this.showPageNumber();
             this.openBangumi();
-        }
-        else
-        {
+        } else {
             this._pageNumber = 1;
             vscode.window.showInformationMessage("😰真的一滴都没有了!");
             this.openBangumi();
@@ -145,20 +123,17 @@ export default new (class BangumisView extends AbstractView
      * @export
      * @author sdttttt
      */
-    jumpPage(): void
-    {
+    jumpPage(): void {
         const inputOptions: vscode.InputBoxOptions = {
-            value : "1",
+            value: "1",
             prompt: "TIP: 如果一直在加载，那应该是没这一页了 🚀",
         };
 
         const inputResult = vscode.window.showInputBox(inputOptions);
 
-        inputResult.then((text: string | undefined) =>
-        {
+        inputResult.then((text: string | undefined) => {
             const number = toNumber(text);
-            if (0 === number)
-            {
+            if (0 === number) {
                 vscode.window.showInformationMessage(`
         输入的内容,不能是0或者非数字
         数字大小不做限制.

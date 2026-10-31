@@ -1,8 +1,6 @@
 "use strict";
 
-import {
-    toNumber, isEmptyArray, isEmptyObject
-} from "../../utils/type";
+import { toNumber, isEmptyArray, isEmptyObject } from "../../utils/type";
 import {
     isToday,
     currentTimestamp,
@@ -10,19 +8,15 @@ import {
     toMinuteFromSecode,
     randomInteger,
 } from "../../utils/strings";
-import {
-    describe, test, expect
-} from "vitest";
+import { describe, test, expect } from "vitest";
 
 /**
  * Utils TEST
  *
  * @author sdttttt
  */
-describe("Utils TEST", () =>
-{
-    test("toNumber", () =>
-    {
+describe("Utils TEST", () => {
+    test("toNumber", () => {
         const str = "1";
         const num: number = toNumber(str);
 
@@ -34,8 +28,7 @@ describe("Utils TEST", () =>
         expect(toNumber(undef)).to.be.equal(0);
     });
 
-    test("is empty Array TEST", () =>
-    {
+    test("is empty Array TEST", () => {
         const emptyArr: Array<unknown> = [];
         const arr: Array<number> = [1, 2, 3];
         const arr2: Array<string> = ["a", "b", "c"];
@@ -47,10 +40,8 @@ describe("Utils TEST", () =>
         expect(isEmptyArray(arr2)).to.be.false;
     });
 
-    test("is empty Object TEST", () =>
-    {
-        const emptyObj: unknown = {
-        };
+    test("is empty Object TEST", () => {
+        const emptyObj: unknown = {};
         const obj: unknown = {
             a: 1,
         };
@@ -61,8 +52,7 @@ describe("Utils TEST", () =>
         expect(isEmptyObject(obj)).to.be.false;
     });
 
-    test("today TEST", () =>
-    {
+    test("today TEST", () => {
         const currentTime: Date = new Date();
         const today = `${currentTime.getMonth() + 1}-${currentTime.getDate()}`;
 
@@ -70,13 +60,11 @@ describe("Utils TEST", () =>
         expect(isToday(today)).to.be.true;
     });
 
-    test("timestamp TEST", () =>
-    {
+    test("timestamp TEST", () => {
         expect(currentTimestamp()).to.be.a("number");
     });
 
-    test("Number to Week String TEST", () =>
-    {
+    test("Number to Week String TEST", () => {
         expect(toWeekDay(1)).to.be.equal("星期一");
         expect(toWeekDay(5)).to.be.equal("星期五");
 
@@ -84,8 +72,7 @@ describe("Utils TEST", () =>
         expect(toWeekDay(8)).to.be.equal("");
     });
 
-    test("To Minute From Secode TEST", () =>
-    {
+    test("To Minute From Secode TEST", () => {
         expect(toMinuteFromSecode(60)).to.be.equal(1);
         expect(toMinuteFromSecode(30)).to.be.equal(1);
         expect(toMinuteFromSecode(5)).to.be.equal(1);
@@ -96,8 +83,7 @@ describe("Utils TEST", () =>
         expect(toMinuteFromSecode(121)).to.be.equal(3);
     });
 
-    test("Random TEST", () =>
-    {
+    test("Random TEST", () => {
         const num1: number = randomInteger(0, 2);
         expect(num1).to.be.least(0).that.most(2);
 

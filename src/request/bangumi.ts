@@ -1,26 +1,16 @@
-import {
-    window
-} from "vscode";
+import { window } from "vscode";
 import Axios from "./instance";
-import {
-    AxiosResponse
-} from "axios";
-import {
-    BangumiUrl, BANGUMI_WEEK
-} from "./bangumiUrl";
-import {
-    isEmptyArray
-} from "../utils/type";
-import {
-    BangumiCache, WeekBangumiCache
-} from "./cache";
+import { AxiosResponse } from "axios";
+import { BangumiUrl, BANGUMI_WEEK } from "./bangumiUrl";
+import { isEmptyArray } from "../utils/type";
+import { BangumiCache, WeekBangumiCache } from "./cache";
 import {
     BangumisResponse,
     WeekBangumiData,
     WeekBangumiResponse,
     BangumisData,
     isSuccess,
-    isValidBangumisRequest as isValidBangumisRequest,
+    isValidBangumisRequest,
 } from "./structure";
 
 /**
@@ -32,15 +22,13 @@ import {
  */
 export async function getAllBangumi(
     burl: BangumiUrl
-): Promise<BangumisData | undefined>
-{
+): Promise<BangumisData | undefined> {
     const url: string = burl.build().finalUrl;
 
     const cacheData: BangumisData | undefined = BangumiCache.get(url);
     let result: BangumisData | undefined = cacheData;
 
-    if (!cacheData)
-    {
+    if (!cacheData) {
         const res: AxiosResponse<BangumisResponse> = await Axios.get<
             unknown,
             AxiosResponse<BangumisResponse>
@@ -48,8 +36,7 @@ export async function getAllBangumi(
 
         const bangumisResponse: BangumisResponse = res.data;
 
-        if (!isValidBangumisRequest(bangumisResponse))
-        {
+        if (!isValidBangumisRequest(bangumisResponse)) {
             return;
         }
         result = bangumisResponse.data;
@@ -67,15 +54,13 @@ export async function getAllBangumi(
  */
 export async function getWeekBangumi(): Promise<
     Array<WeekBangumiData> | undefined
-    >
-{
+> {
     const cacheData: Array<WeekBangumiData> | undefined =
         WeekBangumiCache.get(BANGUMI_WEEK);
 
     let result: Array<WeekBangumiData> | undefined = cacheData;
 
-    if (!cacheData)
-    {
+    if (!cacheData) {
         const res: AxiosResponse<WeekBangumiResponse> = await Axios.get<
             unknown,
             AxiosResponse<WeekBangumiResponse>
@@ -86,8 +71,7 @@ export async function getWeekBangumi(): Promise<
         if (
             !isSuccess(weekBangumiResponse) ||
             isEmptyArray(weekBangumiResponse.result)
-        )
-        {
+        ) {
             window.showInformationMessage("诶?!没有找到番剧时间表诶...");
             return;
         }

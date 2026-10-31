@@ -1,14 +1,8 @@
-import {
-    isDisplayIndexTags
-} from "../configuration";
-import {
-    AbstractIndexList, Hook, Hooks
-} from "./indexList";
+import { isDisplayIndexTags } from "../configuration";
+import { AbstractIndexList, Hook, Hooks } from "./indexList";
 import Tagger from "./tagger";
 import * as vscode from "vscode";
-import {
-    BangumiUrl
-} from "../request/bangumiUrl";
+import { BangumiUrl } from "../request/bangumiUrl";
 import BangumisView from "../views/bangumi";
 
 /**
@@ -18,16 +12,14 @@ import BangumisView from "../views/bangumi";
  * @abstract
  * @author sdttttt
  */
-export abstract class FinalIndexList extends AbstractIndexList
-{
+export abstract class FinalIndexList extends AbstractIndexList {
     protected abstract readonly tag: string;
 
     protected readonly openIndexListAfter: Hooks;
 
     protected readonly openIndexListBefore: Hooks;
 
-    constructor()
-    {
+    constructor() {
         super();
         // Add Hook
         this.openIndexListBefore = [this.pushTagHook];
@@ -41,12 +33,9 @@ export abstract class FinalIndexList extends AbstractIndexList
      * @param {string} index
      * @author sdttttt
      */
-    protected pushTagHook: Hook = (index?: string): void =>
-    {
-        if (isDisplayIndexTags())
-        {
-            if (index)
-            {
+    protected pushTagHook: Hook = (index?: string): void => {
+        if (isDisplayIndexTags()) {
+            if (index) {
                 const tags: Map<string, string> = Tagger.tags;
                 tags.set(this.tag, index);
                 Tagger.tags = tags;
@@ -59,17 +48,13 @@ export abstract class FinalIndexList extends AbstractIndexList
      *
      * @author sdttttt
      */
-    private showTagHook(): void
-    {
-        if (isDisplayIndexTags())
-        {
+    private showTagHook(): void {
+        if (isDisplayIndexTags()) {
             const tags: Map<string, string> = Tagger.tags;
-            if (0 < tags.size)
-            {
+            if (0 < tags.size) {
                 let message = "";
                 message += "Tags: | ";
-                for (const tag of tags.values())
-                {
+                for (const tag of tags.values()) {
                     message += tag;
                     message += "|";
                 }
@@ -95,16 +80,14 @@ export abstract class FinalIndexList extends AbstractIndexList
  * @extends {FinalIndexList}
  * @author sdttttt
  */
-export abstract class SimpleFinalIndexList extends FinalIndexList
-{
+export abstract class SimpleFinalIndexList extends FinalIndexList {
     protected readonly list: Array<string> = [];
 
     protected abstract readonly map: Map<string, string>;
 
     protected abstract updateUrlParams(url: BangumiUrl, index: string): void;
 
-    constructor()
-    {
+    constructor() {
         super();
     }
 
@@ -116,8 +99,7 @@ export abstract class SimpleFinalIndexList extends FinalIndexList
      * @memberof SimpleFinalIndexList
      * @author sdttttt
      */
-    protected init(): void
-    {
+    protected init(): void {
         this.list.push(...this.map.keys());
     }
 
@@ -128,13 +110,11 @@ export abstract class SimpleFinalIndexList extends FinalIndexList
      * @param index
      * @author sdttttt
      */
-    protected conditionHandler(index: string): void
-    {
+    protected conditionHandler(index: string): void {
         const url: BangumiUrl = BangumisView.bangumiUrl;
         const param: string | undefined = this.map.get(index);
 
-        if (param)
-        {
+        if (param) {
             this.updateUrlParams(url, param);
         }
 

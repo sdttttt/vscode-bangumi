@@ -1,16 +1,10 @@
 "use strict";
 
-import {
-    Cache
-} from "@/request/cache";
+import { Cache } from "@/request/cache";
 
-import {
-    describe, test, expect
-} from "vitest";
-describe("Cache Test", () =>
-{
-    test("Running TEST", () =>
-    {
+import { describe, test, expect } from "vitest";
+describe("Cache Test", () => {
+    test("Running TEST", () => {
         const cache: Cache<number> = new Cache(10);
 
         cache.set("one", 1);

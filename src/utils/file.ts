@@ -1,8 +1,6 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import {
-    getContext
-} from "../constants";
+import { getContext } from "../constants";
 
 /**
  * Gets resource Uri usable inside a Webview.
@@ -18,8 +16,7 @@ import {
 export function getResourceFile(
     webview: vscode.Webview,
     filename: string
-): vscode.Uri
-{
+): vscode.Uri {
     const onDiskPath = vscode.Uri.file(
         path.join(getContext().extensionPath, "resources", filename)
     );

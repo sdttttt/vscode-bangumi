@@ -1,12 +1,7 @@
-import {
-    SimpleFinalIndexList
-} from "./finalIndexList";
-import {
-    BangumiUrl
-} from "../request/bangumiUrl";
+import { SimpleFinalIndexList } from "./finalIndexList";
+import { BangumiUrl } from "../request/bangumiUrl";
 
-export default new (class StyleList extends SimpleFinalIndexList
-{
+export default new (class StyleList extends SimpleFinalIndexList {
     protected readonly tag: string = "Style";
 
     protected readonly map: Map<string, string> = new Map([
@@ -50,13 +45,11 @@ export default new (class StyleList extends SimpleFinalIndexList
         ["职场", "10048"],
     ]);
 
-    protected updateUrlParams(url: BangumiUrl, index: string): void
-    {
+    protected updateUrlParams(url: BangumiUrl, index: string): void {
         url.setStyleId(index);
     }
 
-    constructor()
-    {
+    constructor() {
         super();
         this.init();
     }

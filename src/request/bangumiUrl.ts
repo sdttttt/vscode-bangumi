@@ -13,10 +13,8 @@ const BANGUMI_SHOW = "https://api.bilibili.com/pgc/season/index/result?";
  *
  * @author sdttttt
  */
-export class BangumiUrl
-{
-    constructor()
-    {
+export class BangumiUrl {
+    constructor() {
         this._finalUrl = BANGUMI_SHOW;
         this._seasonVersion = "-1";
         this._area = "-1";
@@ -58,8 +56,7 @@ export class BangumiUrl
      *
      * @author sdttttt
      */
-    restoreDefault(): void
-    {
+    restoreDefault(): void {
         this._seasonVersion = "-1";
         this._area = "-1";
         this._isFinish = "-1";
@@ -77,106 +74,89 @@ export class BangumiUrl
         this._type = "1";
     }
 
-    setSeasonVersion(value: string): this
-    {
+    setSeasonVersion(value: string): this {
         this._seasonVersion = value;
         return this;
     }
 
-    setArea(value: string): this
-    {
+    setArea(value: string): this {
         this._area = value;
         return this;
     }
 
-    setIsFinish(value: string): this
-    {
+    setIsFinish(value: string): this {
         this._isFinish = value;
         return this;
     }
 
-    setCopyright(value: string): this
-    {
+    setCopyright(value: string): this {
         this._copyright = value;
         return this;
     }
 
-    setStyleId(value: string): this
-    {
+    setStyleId(value: string): this {
         this._styleId = value;
         return this;
     }
 
-    setSt(value: string): this
-    {
+    setSt(value: string): this {
         this._st = value;
         return this;
     }
 
-    setSort(value: string): this
-    {
+    setSort(value: string): this {
         this._sort = value;
         return this;
     }
 
-    setPage(value: number): this
-    {
+    setPage(value: number): this {
         this._page = value;
         return this;
     }
 
-    setSeasonStatus(value: string): this
-    {
+    setSeasonStatus(value: string): this {
         this._seasonStatus = value;
         return this;
     }
 
-    setSeasonMonth(value: string): this
-    {
+    setSeasonMonth(value: string): this {
         this._seasonMonth = value;
         return this;
     }
 
-    setYear(value: string): this
-    {
+    setYear(value: string): this {
         this._year = value;
         return this;
     }
 
-    setSeasonType(value: string): this
-    {
+    setSeasonType(value: string): this {
         this._seasonType = value;
         return this;
     }
 
-    setPageSize(value: string): this
-    {
+    setPageSize(value: string): this {
         this._pagesize = value;
         return this;
     }
 
-    setType(value: string): this
-    {
+    setType(value: string): this {
         this._type = value;
         return this;
     }
 
-    private and(): this
-    {
+    private and(): this {
         this._finalUrl += "&";
         return this;
     }
 
-    private add(key: string, value: string): this
-    {
+    private add(key: string, value: string): this {
         this._finalUrl += key;
         this._finalUrl += "=";
         this._finalUrl += value;
         return this;
     }
 
-    private next(key: string, value: string): this
-    {
+    private next(key: string, value: string): this {
         return this.add(key, value).and();
     }
 
@@ -187,8 +167,7 @@ export class BangumiUrl
      * @memberof BangumiUrl
      * @author sdttttt
      */
-    build(): this
-    {
+    build(): this {
         this._finalUrl = BANGUMI_SHOW;
 
         return this.next("season_version", this._seasonVersion)
@@ -215,8 +194,7 @@ export class BangumiUrl
      * @type {string}
      * @memberof BangumiUrl
      */
-    get finalUrl(): string
-    {
+    get finalUrl(): string {
         return this._finalUrl;
     }
 }

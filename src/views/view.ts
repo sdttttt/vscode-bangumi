@@ -1,8 +1,6 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import {
-    getContext
-} from "../constants";
+import { getContext } from "../constants";
 import LoadingHTMLGenerator from "../html/loadingHtml";
 import NotFoundHTMLGenerator from "../html/NotFoundHtml";
 
@@ -13,8 +11,7 @@ import NotFoundHTMLGenerator from "../html/NotFoundHtml";
  * @class AbstractView
  * @author sdttttt
  */
-export default abstract class AbstractView
-{
+export default abstract class AbstractView {
     protected abstract readonly viewType: string;
     protected abstract readonly title: string;
 
@@ -24,8 +21,7 @@ export default abstract class AbstractView
     /**
      * initializer an instance of abstract view.
      */
-    protected constructor()
-    {
+    protected constructor() {
         this.columToShowIn = vscode.window.activeTextEditor
             ? vscode.window.activeTextEditor.viewColumn
             : undefined;
@@ -45,8 +41,7 @@ export default abstract class AbstractView
      */
     private createWebviewPanel(
         closeListener: () => unknown
-    ): vscode.WebviewPanel
-    {
+    ): vscode.WebviewPanel {
         const context: vscode.ExtensionContext = getContext();
 
         const panel = vscode.window.createWebviewPanel(
@@ -55,8 +50,8 @@ export default abstract class AbstractView
             vscode.ViewColumn.Two,
             {
                 retainContextWhenHidden: false,
-                enableFindWidget       : true,
-                localResourceRoots     : [
+                enableFindWidget: true,
+                localResourceRoots: [
                     vscode.Uri.file(
                         path.join(context.extensionPath, "resources")
                     ),
@@ -76,17 +71,12 @@ export default abstract class AbstractView
      */
     protected openWebViewPanel(
         callback: (pv: vscode.WebviewPanel) => void
-    ): void
-    {
-        if (this.panelView)
-        {
+    ): void {
+        if (this.panelView) {
             this.panelView.reveal(this.columToShowIn);
             callback(this.panelView);
-        }
-        else
-        {
-            this.panelView = this.createWebviewPanel(() =>
-            {
+        } else {
+            this.panelView = this.createWebviewPanel(() => {
                 this.panelView = undefined;
             });
 
@@ -99,10 +89,8 @@ export default abstract class AbstractView
      *
      * @author sdttttt
      */
-    protected showLoadingView(): void
-    {
-        this.openWebViewPanel((pv: vscode.WebviewPanel) =>
-        {
+    protected showLoadingView(): void {
+        this.openWebViewPanel((pv: vscode.WebviewPanel) => {
             pv.webview.html = LoadingHTMLGenerator.generateHTML(
                 undefined,
                 pv.webview
@@ -117,10 +105,8 @@ export default abstract class AbstractView
      * @memberof AbstractView
      * @author sdttttt
      */
-    protected showNotFoundView(): void
-    {
-        this.openWebViewPanel((pv: vscode.WebviewPanel) =>
-        {
+    protected showNotFoundView(): void {
+        this.openWebViewPanel((pv: vscode.WebviewPanel) => {
             pv.webview.html = NotFoundHTMLGenerator.generateHTML(
                 undefined,
                 pv.webview

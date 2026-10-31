@@ -1,22 +1,12 @@
 "use strict";
 
 import * as vscode from "vscode";
-import {
-    WeekBangumiData, WBangumi
-} from "../request/structure";
-import {
-    toWeekDay, isToday
-} from "../utils/strings";
+import { WeekBangumiData, WBangumi } from "../request/structure";
+import { toWeekDay, isToday } from "../utils/strings";
 import AbstractHTMLGenerator from "./generator";
-import {
-    isDisplayHistory
-} from "../configuration";
-import {
-    getResourceFile
-} from "../utils/file";
-import {
-    YING_LILI, WEEK_BANGUMI_CSS
-} from "../constants";
+import { isDisplayHistory } from "../configuration";
+import { getResourceFile } from "../utils/file";
+import { YING_LILI, WEEK_BANGUMI_CSS } from "../constants";
 
 /**
  * Week Bangumis HTML Generator
@@ -26,22 +16,18 @@ import {
  */
 export default new (class WeekBangumisHTMLGenerator extends AbstractHTMLGenerator<
     Array<WeekBangumiData>
->
-{
+> {
     protected style = "";
 
     protected html?: string;
 
-    constructor()
-    {
+    constructor() {
         super();
     }
 
-    private makeOneDay(day: WeekBangumiData, webview: vscode.Webview): string
-    {
+    private makeOneDay(day: WeekBangumiData, webview: vscode.Webview): string {
         let toDayBadge: vscode.Uri | undefined;
-        if (isToday(day.date))
-        {
+        if (isToday(day.date)) {
             toDayBadge = getResourceFile(webview, YING_LILI);
         }
 
@@ -49,20 +35,18 @@ export default new (class WeekBangumisHTMLGenerator extends AbstractHTMLGenerato
     <div class="item ${isToday(day.date) ? "today" : ""}">
             <div class="day">
                 <h2>${toWeekDay(day.day_of_week)} ${
-        toDayBadge
-            ? `<div class="today-badge" ><img src="${toDayBadge}"></div>`
-            : ""
-    }
+                    toDayBadge
+                        ? `<div class="today-badge" ><img src="${toDayBadge}"></div>`
+                        : ""
+                }
                 </h2>
                 ${day.date}
             </div>
     `;
 
         let bangumiDate = "";
-        for (const bangumi of day.seasons)
-        {
-            if (bangumi.pub_time !== bangumiDate)
-            {
+        for (const bangumi of day.seasons) {
+            if (bangumi.pub_time !== bangumiDate) {
                 daysHtml += `<div class="time-point">
                 🕒${bangumi.pub_time}
             </div>`;
@@ -76,10 +60,8 @@ export default new (class WeekBangumisHTMLGenerator extends AbstractHTMLGenerato
         return daysHtml;
     }
 
-    private makeOneBangumi(bangumi: WBangumi): string
-    {
-        if (1 === bangumi.delay)
-        {
+    private makeOneBangumi(bangumi: WBangumi): string {
+        if (1 === bangumi.delay) {
             // 拖更了！
             return `
             <div class="bangumi delay">
@@ -125,25 +107,18 @@ export default new (class WeekBangumisHTMLGenerator extends AbstractHTMLGenerato
     generateHTML(
         data: Array<WeekBangumiData>,
         webview: vscode.Webview
-    ): string
-    {
+    ): string {
         this.html = "";
         this.makeCssUri(webview, WEEK_BANGUMI_CSS);
 
-        if (isDisplayHistory())
-        {
-            for (const day of data)
-            {
+        if (isDisplayHistory()) {
+            for (const day of data) {
                 this.html += this.makeOneDay(day, webview);
             }
-        }
-        else
-        {
+        } else {
             let index = 0;
-            for (const item of data)
-            {
-                if (5 <= index)
-                {
+            for (const item of data) {
+                if (5 <= index) {
                     this.html += this.makeOneDay(item, webview);
                 }
                 index++;

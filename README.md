@@ -32,7 +32,6 @@
 
 `Back Page` 可用 `Ctrl+alt+k` 代替
 
-
 ## Configuration 🛠
 
 ```json

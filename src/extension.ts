@@ -1,12 +1,8 @@
 import * as vscode from "vscode";
 import BangumiView from "./views/bangumi";
 import WeekBangumiView from "./views/weekBangumi";
-import {
-    setContext
-} from "./constants";
-import {
-    ConfigKey, getConfig
-} from "./configuration";
+import { setContext } from "./constants";
+import { ConfigKey, getConfig } from "./configuration";
 import MainIndexList from "./match/index";
 import Reminder from "./reminder";
 
@@ -18,10 +14,8 @@ let isInit = false;
  * @param {vscode.ExtensionContext} context
  * @author sdttttt
  */
-function initializer(context: vscode.ExtensionContext): void
-{
-    if (isInit)
-    {
+function initializer(context: vscode.ExtensionContext): void {
+    if (isInit) {
         return;
     }
     setContext(context);
@@ -34,14 +28,12 @@ function initializer(context: vscode.ExtensionContext): void
  * @param {vscode.ExtensionContext} context
  * @author sdttttt
  */
-export function activate(context: vscode.ExtensionContext): void
-{
+export function activate(context: vscode.ExtensionContext): void {
     initializer(context);
 
     const useReminder: unknown = getConfig(ConfigKey.EnableReminder);
 
-    if (useReminder as boolean)
-    {
+    if (useReminder as boolean) {
         Reminder.enableBangumiUpdateReminder();
     }
 
@@ -79,7 +71,6 @@ export function activate(context: vscode.ExtensionContext): void
  * @export
  * @author sdttttt
  */
-export function deactivate(): void
-{
+export function deactivate(): void {
     Reminder.destroyReminder();
 }

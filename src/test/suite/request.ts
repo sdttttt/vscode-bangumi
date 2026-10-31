@@ -1,21 +1,13 @@
-import {
-    describe, test, expect
-} from "vitest";
-import {
-    getAllBangumi, getWeekBangumi
-} from "../../request/bangumi";
-import {
-    BangumiUrl
-} from "../../request/bangumiUrl";
+import { describe, test, expect } from "vitest";
+import { getAllBangumi, getWeekBangumi } from "../../request/bangumi";
+import { BangumiUrl } from "../../request/bangumiUrl";
 import {
     Bangumi,
     BangumisData,
     WeekBangumiData,
     WBangumi,
 } from "../../request/structure";
-import {
-    getTodayIndexInWeekBangumi
-} from "../../utils/strings";
+import { getTodayIndexInWeekBangumi } from "../../utils/strings";
 
 /**
  * There's something wrong with the environment.
@@ -23,16 +15,12 @@ import {
  *
  * @author sdttttt
  */
-describe("TEST API", () =>
-{
-    test("BILIBILI BANGUMI API TEST", async () =>
-    {
+describe("TEST API", () => {
+    test("BILIBILI BANGUMI API TEST", async () => {
         const callback: (res: BangumisData | undefined) => void = (
             data: BangumisData | undefined
-        ) =>
-        {
-            if (data)
-            {
+        ) => {
+            if (data) {
                 const hasNext: number = data.has_next;
                 const bangumis: Array<Bangumi> = data.list;
 
@@ -49,9 +37,7 @@ describe("TEST API", () =>
 
                 // tslint:disable-next-line: no-unused-expression
                 expect(bangumi).to.be.exist;
-            }
-            else
-            {
+            } else {
                 return Error("数据获取为空🅰");
             }
         };
@@ -60,14 +46,11 @@ describe("TEST API", () =>
         await getAllBangumi(url).then(callback);
     });
 
-    test("BILIBILI WEEK API TEST", async () =>
-    {
+    test("BILIBILI WEEK API TEST", async () => {
         const callback: (data: Array<WeekBangumiData> | undefined) => void = (
             barr: Array<WeekBangumiData> | undefined
-        ) =>
-        {
-            if (barr)
-            {
+        ) => {
+            if (barr) {
                 const index: number | undefined =
                     getTodayIndexInWeekBangumi(barr);
 
@@ -78,8 +61,7 @@ describe("TEST API", () =>
                 expect(barr).to.not.empty;
                 expect(barr.length).to.be.above(1);
 
-                for (const data of barr)
-                {
+                for (const data of barr) {
                     const date: string = data.date;
                     const dataTs: number = data.date_ts;
                     const dayOfWeek: number = data.day_of_week;
@@ -98,10 +80,8 @@ describe("TEST API", () =>
 
                     expect(seasons.length).to.be.least(0);
 
-                    if (seasons && 0 < seasons.length)
-                    {
-                        for (const bangumi of seasons)
-                        {
+                    if (seasons && 0 < seasons.length) {
+                        for (const bangumi of seasons) {
                             // tslint:disable-next-line: no-unused-expression
                             expect(bangumi.cover).to.be.exist;
                             // tslint:disable-next-line: no-unused-expression
@@ -112,8 +92,7 @@ describe("TEST API", () =>
                                 .that.most(1);
                             expect(bangumi.delay).to.be.least(0).that.most(1);
 
-                            if (0 === bangumi.delay)
-                            {
+                            if (0 === bangumi.delay) {
                                 // tslint:disable-next-line: no-unused-expression
                                 expect(bangumi.pub_index).to.be.exist;
                             }
@@ -130,9 +109,7 @@ describe("TEST API", () =>
                         }
                     }
                 }
-            }
-            else
-            {
+            } else {
                 return Error("数据获取为空🅰");
             }
         };

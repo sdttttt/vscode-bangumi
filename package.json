@@ -105,23 +105,19 @@
         "pretest": "pnpm test-compile",
         "test": "vitest run",
         "test:watch": "vitest",
-        "eslint": "eslint --format stylish \"./**/*.{js,mjs,ts,mts,json}\"",
-        "eslint:fix": "eslint --fix --format stylish \"./**/*.{js,mjs,ts,mts,json}\"",
-        "prettie": "prettier \"./**/*.{js,ts,mjs,mts}\" --write",
-        "format": "pnpm prettie && pnpm eslint:fix"
+        "lint": "oxlint",
+        "lint:fix": "oxlint --fix",
+        "format": "oxfmt",
+        "format:check": "oxfmt --check"
     },
     "devDependencies": {
-        "@eslint/js": "^10.0.1",
         "@types/node": "^22.20.5",
         "@types/vscode": "~1.100.0",
         "axios": "^1.21.0",
-        "eslint": "^10.14.0",
-        "eslint-plugin-json": "^5.0.0",
-        "prettier": "^3.9.10",
-        "typescript": "npm:@typescript/typescript6@^6.0.2",
-        "typescript-eslint": "^8.72.1",
+        "oxfmt": "0.75.0",
+        "oxlint": "1.90.0",
+        "typescript": "^7.0.2",
         "vite": "^8.3.5",
-        "vitest": "^5.0.5",
-        "@typescript/native": "npm:typescript@^7.0.2"
+        "vitest": "^5.0.5"
     }
 }

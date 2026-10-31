@@ -12,8 +12,7 @@ export type Hooks = Array<Hook>;
  * @class
  * @author sdttttt
  */
-export abstract class AbstractIndexList
-{
+export abstract class AbstractIndexList {
     /**
      * List  of abstract index list
      *
@@ -57,8 +56,7 @@ export abstract class AbstractIndexList
      *
      * @author sdttttt
      */
-    protected openBangumiHook(): void
-    {
+    protected openBangumiHook(): void {
         vscode.commands.executeCommand("openBangumi");
     }
 
@@ -71,12 +69,9 @@ export abstract class AbstractIndexList
      * @memberof AbstractIndexList
      * @author sdttttt
      */
-    private runHooks(hooks: Hooks, index?: string): void
-    {
-        if (0 < hooks.length)
-        {
-            for (const callback of hooks)
-            {
+    private runHooks(hooks: Hooks, index?: string): void {
+        if (0 < hooks.length) {
+            for (const callback of hooks) {
                 callback(index);
             }
         }
@@ -88,8 +83,7 @@ export abstract class AbstractIndexList
      * @memberof AbstractIndexList
      * @author sdttttt
      */
-    private runBeforeOpenIndexListHook(index?: string): void
-    {
+    private runBeforeOpenIndexListHook(index?: string): void {
         this.runHooks(this.openIndexListBefore, index);
     }
 
@@ -99,8 +93,7 @@ export abstract class AbstractIndexList
      * @memberof AbstractIndexList
      * @author sdttttt
      */
-    private runAfterOpenIndexListHook(index?: string): void
-    {
+    private runAfterOpenIndexListHook(index?: string): void {
         this.runHooks(this.openIndexListAfter, index);
     }
 
@@ -109,14 +102,11 @@ export abstract class AbstractIndexList
      *
      * @author sdttttt
      */
-    openIndexList(): void
-    {
+    openIndexList(): void {
         vscode.window
             .showQuickPick(this.list)
-            .then((index: string | undefined) =>
-            {
-                if (index)
-                {
+            .then((index: string | undefined) => {
+                if (index) {
                     // Run Before Hook.
                     this.runBeforeOpenIndexListHook(index);
                     // Core

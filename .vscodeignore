@@ -19,9 +19,8 @@ scripts/**
 TODO.md
 AGENTS.md
 CONTRIBUTING.md
-eslint.config.mjs
-prettier.config.js
+.oxlintrc.json
+.oxfmtrc.json
 vite.config.mts
 vitest.config.mts
-.prettierignore
 pnpm-lock.yaml

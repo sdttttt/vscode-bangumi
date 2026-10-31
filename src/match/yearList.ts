@@ -1,13 +1,8 @@
 import BangumisView from "../views/bangumi";
-import {
-    numberOfStringPlus
-} from "../utils/strings";
-import {
-    FinalIndexList
-} from "./finalIndexList";
+import { numberOfStringPlus } from "../utils/strings";
+import { FinalIndexList } from "./finalIndexList";
 
-export default new (class YearList extends FinalIndexList
-{
+export default new (class YearList extends FinalIndexList {
     protected readonly tag: string = "Year";
 
     protected readonly list: Array<string> = [
@@ -25,34 +20,30 @@ export default new (class YearList extends FinalIndexList
         "很久很久以前",
     ];
 
-    private encodeYear(years: Array<string>): string
-    {
+    private encodeYear(years: Array<string>): string {
         return encodeURI(`[${years[0]},${years[1]})`);
     }
 
-    protected conditionHandler(index: string): void
-    {
+    protected conditionHandler(index: string): void {
         const url = BangumisView.bangumiUrl;
 
         const years: Array<string> = index.split("-");
-        if (1 < years.length)
-        {
+        if (1 < years.length) {
             years[1] = numberOfStringPlus(years[1], 1);
             url.setYear(this.encodeYear(years));
             return;
         }
 
-        switch (index)
-        {
-        case "90年代":
-            url.setYear(this.encodeYear(["1990", "2000"]));
-            return;
-        case "80年代":
-            url.setYear(this.encodeYear(["1980", "1990"]));
-            return;
-        case "很久很久以前":
-            url.setYear(this.encodeYear(["", "1980"]));
-            return;
+        switch (index) {
+            case "90年代":
+                url.setYear(this.encodeYear(["1990", "2000"]));
+                return;
+            case "80年代":
+                url.setYear(this.encodeYear(["1980", "1990"]));
+                return;
+            case "很久很久以前":
+                url.setYear(this.encodeYear(["", "1980"]));
+                return;
         }
 
         const min: string = index;
@@ -60,8 +51,7 @@ export default new (class YearList extends FinalIndexList
         url.setYear(this.encodeYear([min, max]));
     }
 
-    openIndexList(): void
-    {
+    openIndexList(): void {
         super.openIndexList();
     }
 })();

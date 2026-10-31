@@ -1,12 +1,7 @@
-import {
-    SimpleFinalIndexList
-} from "./finalIndexList";
-import {
-    BangumiUrl
-} from "../request/bangumiUrl";
+import { SimpleFinalIndexList } from "./finalIndexList";
+import { BangumiUrl } from "../request/bangumiUrl";
 
-export default new (class SeasonVersionList extends SimpleFinalIndexList
-{
+export default new (class SeasonVersionList extends SimpleFinalIndexList {
     protected readonly tag: string = "SeasonVersion";
 
     protected readonly map: Map<string, string> = new Map([
@@ -16,14 +11,12 @@ export default new (class SeasonVersionList extends SimpleFinalIndexList
         ["其他", "3"],
     ]);
 
-    constructor()
-    {
+    constructor() {
         super();
         this.init();
     }
 
-    protected updateUrlParams(url: BangumiUrl, param: string): void
-    {
+    protected updateUrlParams(url: BangumiUrl, param: string): void {
         url.setSeasonVersion(param);
     }
 })();

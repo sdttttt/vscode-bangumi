@@ -1,12 +1,6 @@
-import {
-    describe, test, expect, vi
-} from "vitest";
-import type {
-    Webview
-} from "vscode";
-import {
-    getResourceFile
-} from "@/utils/file";
+import { describe, test, expect, vi } from "vitest";
+import type { Webview } from "vscode";
+import { getResourceFile } from "@/utils/file";
 
 const asWebviewUri = vi.fn((uri: unknown) => `webview:${String(uri)}`);
 
@@ -27,10 +21,8 @@ vi.mock("@/constants", () => ({
  *
  * @author sdttttt
  */
-describe("Resource File TEST", () =>
-{
-    test("uses asWebviewUri and joins the resources folder", () =>
-    {
+describe("Resource File TEST", () => {
+    test("uses asWebviewUri and joins the resources folder", () => {
         const webview = {
             asWebviewUri,
         } as unknown as Webview;

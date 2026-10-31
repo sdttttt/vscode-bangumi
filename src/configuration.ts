@@ -17,8 +17,7 @@ export enum ConfigKey {
  *
  * @author sdttttt
  */
-export function getConfig(key: ConfigKey): unknown
-{
+export function getConfig(key: ConfigKey): unknown {
     return vscode.workspace.getConfiguration().get(key);
 }
 
@@ -28,12 +27,10 @@ export function getConfig(key: ConfigKey): unknown
  * @returns reminder ahead time
  * @author sdttttt
  */
-export function getReminderAheadTime(): number
-{
+export function getReminderAheadTime(): number {
     const aheadTime: unknown = getConfig(ConfigKey.ReminderAheadTime);
     const result: number = aheadTime as number;
-    if (isNaN(result) || 0 > result)
-    {
+    if (isNaN(result) || 0 > result) {
         return 0;
     }
     return result;
@@ -45,8 +42,7 @@ export function getReminderAheadTime(): number
  * @returns true if display index tags
  * @author sdttttt
  */
-export function isDisplayIndexTags(): boolean
-{
+export function isDisplayIndexTags(): boolean {
     const displayStatus: unknown = getConfig(ConfigKey.DisplayIndexTags);
     return displayStatus as boolean;
 }
@@ -57,8 +53,7 @@ export function isDisplayIndexTags(): boolean
  * @returns true if display status bar
  * @author sdttttt
  */
-export function isDisplayStatusBar(): boolean
-{
+export function isDisplayStatusBar(): boolean {
     const displayStatus: unknown = getConfig(ConfigKey.DisplayStatusBar);
     return displayStatus as boolean;
 }
@@ -69,8 +64,7 @@ export function isDisplayStatusBar(): boolean
  * @returns true if display history
  * @author sdttttt
  */
-export function isDisplayHistory(): boolean
-{
+export function isDisplayHistory(): boolean {
     const displayStatus: unknown = getConfig(ConfigKey.DisplayHistory);
     return displayStatus as boolean;
 }

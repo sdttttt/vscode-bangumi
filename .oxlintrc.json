@@ -1,0 +1,45 @@
+{
+    "$schema": "./node_modules/oxlint/configuration_schema.json",
+    "plugins": ["typescript", "unicorn", "oxc"],
+    "categories": {
+        "correctness": "error"
+    },
+    "env": {
+        "builtin": true
+    },
+    "ignorePatterns": [
+        "node_modules/**",
+        "dist/**",
+        "out/**",
+        "resources/**",
+        "public/**",
+        "**/*.png",
+        "**/*.jpg",
+        "**/*.gif",
+        "**/*.css"
+    ],
+    "rules": {
+        "no-undef": "off",
+        "no-else-return": "error",
+        "no-extra-boolean-cast": "error",
+        "no-extra-label": "error",
+        "no-implicit-coercion": "error",
+        "no-lonely-if": "error",
+        "no-unused-labels": "error",
+        "no-var": "error",
+        "prefer-arrow-callback": "error",
+        "prefer-const": "error",
+        "prefer-template": "error",
+        "curly": "error",
+        "yoda": ["error", "always"],
+        "typescript/dot-notation": "error"
+    },
+    "overrides": [
+        {
+            "files": ["src/test/**/*.ts"],
+            "rules": {
+                "no-unused-expressions": "off"
+            }
+        }
+    ]
+}

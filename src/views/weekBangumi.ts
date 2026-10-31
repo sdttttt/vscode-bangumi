@@ -1,11 +1,7 @@
-import {
-    getWeekBangumi
-} from "../request/bangumi";
+import { getWeekBangumi } from "../request/bangumi";
 import * as vscode from "vscode";
 import WeekBangumisHTMLGenerator from "../html/weekBangumiHtml";
-import {
-    WeekBangumiData
-} from "../request/structure";
+import { WeekBangumiData } from "../request/structure";
 import AbstractView from "./view";
 
 /**
@@ -15,15 +11,13 @@ import AbstractView from "./view";
  * @export
  * @author sdttttt
  */
-export default new (class WeekBangumisView extends AbstractView
-{
+export default new (class WeekBangumisView extends AbstractView {
     protected readonly viewType = "html";
     protected readonly title = "Week Bangumis";
 
     private remindTimers: Array<NodeJS.Timeout> = [];
 
-    constructor()
-    {
+    constructor() {
         super();
     }
 
@@ -33,10 +27,8 @@ export default new (class WeekBangumisView extends AbstractView
      * @param {Array<WeekBangumiData>} data
      * @author sdttttt
      */
-    private createWeekBangumiView(data: Array<WeekBangumiData>): void
-    {
-        this.openWebViewPanel((pv: vscode.WebviewPanel) =>
-        {
+    private createWeekBangumiView(data: Array<WeekBangumiData>): void {
+        this.openWebViewPanel((pv: vscode.WebviewPanel) => {
             pv.webview.html = WeekBangumisHTMLGenerator.generateHTML(
                 data,
                 pv.webview
@@ -49,14 +41,11 @@ export default new (class WeekBangumisView extends AbstractView
      *
      * @author sdttttt
      */
-    openWeekBangumi(): void
-    {
+    openWeekBangumi(): void {
         this.showLoadingView();
 
-        getWeekBangumi().then((result: Array<WeekBangumiData> | undefined) =>
-        {
-            if (result)
-            {
+        getWeekBangumi().then((result: Array<WeekBangumiData> | undefined) => {
+            if (result) {
                 this.createWeekBangumiView(result);
             }
         });

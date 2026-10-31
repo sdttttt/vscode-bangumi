@@ -1,9 +1,5 @@
-import {
-    defineConfig
-} from "vite";
-import {
-    builtinModules
-} from "module";
+import { defineConfig } from "vite";
+import { builtinModules } from "module";
 import path from "path";
 
 const nodeBuiltins = [
@@ -20,20 +16,20 @@ export default defineConfig({
          * Node.js implementations (e.g. axios' http adapter).
          */
         conditions: ["node"],
-        alias     : {
+        alias: {
             "@": path.resolve(import.meta.dirname, "src"),
         },
     },
     build: {
-        outDir     : "dist",
+        outDir: "dist",
         emptyOutDir: true,
         // VS Code 1.100 ships Node.js 20.
-        target     : "node20",
-        minify     : false,
-        sourcemap  : false,
-        lib        : {
-            entry   : path.resolve(import.meta.dirname, "src/extension.ts"),
-            formats : ["cjs"],
+        target: "node20",
+        minify: false,
+        sourcemap: false,
+        lib: {
+            entry: path.resolve(import.meta.dirname, "src/extension.ts"),
+            formats: ["cjs"],
             fileName: () => "extension.js",
         },
         rolldownOptions: {

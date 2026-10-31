@@ -1,9 +1,7 @@
 "use strict";
 
 import * as vscode from "vscode";
-import {
-    isEmptyArray, isEmptyObject
-} from "../utils/type";
+import { isEmptyArray, isEmptyObject } from "../utils/type";
 
 /**
  * Determines whether success is
@@ -12,10 +10,8 @@ import {
  * @returns true if success
  * @author sdttttt
  */
-export function isSuccess(res: BiliResponse): boolean
-{
-    if (0 === res.code && "success" === res.message)
-    {
+export function isSuccess(res: BiliResponse): boolean {
+    if (0 === res.code && "success" === res.message) {
         return true;
     }
 
@@ -37,8 +33,7 @@ export function isSuccess(res: BiliResponse): boolean
  */
 export function isValidBangumisRequest(
     bangumisResponse: BangumisResponse
-): boolean
-{
+): boolean {
     return (
         isSuccess(bangumisResponse) &&
         !isEmptyObject(bangumisResponse.data) &&

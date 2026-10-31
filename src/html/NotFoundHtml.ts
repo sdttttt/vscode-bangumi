@@ -1,12 +1,8 @@
 "use strict";
 
 import AbstractHTMLGenerator from "./generator";
-import {
-    getResourceFile
-} from "../utils/file";
-import {
-    LOADING_CSS, ENTERRPRISE
-} from "../constants";
+import { getResourceFile } from "../utils/file";
+import { LOADING_CSS, ENTERRPRISE } from "../constants";
 import * as vscode from "vscode";
 
 /**
@@ -15,13 +11,11 @@ import * as vscode from "vscode";
  * @class NotFoundHTMLGenerator
  * @author sdttttt
  */
-export default new (class NotFoundHTMLGenerator extends AbstractHTMLGenerator<undefined>
-{
+export default new (class NotFoundHTMLGenerator extends AbstractHTMLGenerator<undefined> {
     protected style?: string;
     protected html?: string;
 
-    generateHTML(data: undefined, webview: vscode.Webview): string
-    {
+    generateHTML(data: undefined, webview: vscode.Webview): string {
         const loadImg: vscode.Uri = getResourceFile(webview, ENTERRPRISE);
         this.makeCssUri(webview, LOADING_CSS);
         /* 资源 URI 与 Webview 绑定，不能跨面板复用，因此每次重新生成 */

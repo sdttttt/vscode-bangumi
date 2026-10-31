@@ -1,12 +1,7 @@
-import {
-    SimpleFinalIndexList
-} from "./finalIndexList";
-import {
-    BangumiUrl
-} from "../request/bangumiUrl";
+import { SimpleFinalIndexList } from "./finalIndexList";
+import { BangumiUrl } from "../request/bangumiUrl";
 
-export default new (class FinishList extends SimpleFinalIndexList
-{
+export default new (class FinishList extends SimpleFinalIndexList {
     protected readonly tag: string = "FinishList";
 
     protected readonly map: Map<string, string> = new Map([
@@ -15,14 +10,12 @@ export default new (class FinishList extends SimpleFinalIndexList
         ["连载", "0"],
     ]);
 
-    constructor()
-    {
+    constructor() {
         super();
         this.init();
     }
 
-    protected updateUrlParams(url: BangumiUrl, param: string): void
-    {
+    protected updateUrlParams(url: BangumiUrl, param: string): void {
         url.setIsFinish(param);
     }
 })();

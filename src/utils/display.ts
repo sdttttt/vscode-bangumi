@@ -1,6 +1,4 @@
-import {
-    window, commands
-} from "vscode";
+import { window, commands } from "vscode";
 
 /**
  * show Remind.
@@ -8,14 +6,11 @@ import {
  * @param {string} bangumiName
  * @author sdttttt
  */
-function showRemind(content: string): void
-{
+function showRemind(content: string): void {
     window
         .showInformationMessage(content, "Open WeekBangumi")
-        .then((result: string | undefined) =>
-        {
-            if (result)
-            {
+        .then((result: string | undefined) => {
+            if (result) {
                 commands.executeCommand("weekBangumi");
             }
         });
@@ -24,12 +19,10 @@ function showRemind(content: string): void
 export function showBeforeBangumiUpdateRemind(
     content: string,
     minuteTime: string | number
-): void
-{
+): void {
     showRemind(`《${content}》 还有${minuteTime}分钟就更新啦！ 🎉`);
 }
 
-export function showBangumiUpdateRemind(content: string): void
-{
+export function showBangumiUpdateRemind(content: string): void {
     showRemind(`《${content}》 更新啦！🎉`);
 }

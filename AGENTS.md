@@ -4,20 +4,20 @@
 
 ## 构建与测试
 
-包管理器固定为 pnpm 10（见 `package.json` 的 `packageManager` 字段），**不要**使用 npm 或 yarn。Node.js 需要 22 及以上（Vite 8、Vitest 5 与 ESLint 10 的要求）。
+包管理器固定为 pnpm 10（见 `package.json` 的 `packageManager` 字段），**不要**使用 npm 或 yarn。Node.js 需要 22 及以上（Vite 8、Vitest 5 与 oxlint 的要求）。
 
-| 用途 | 命令 |
-| --- | --- |
-| 构建 | `pnpm build`（`vite build`） |
-| 监听构建 | `pnpm watch`（`vite build --sourcemap inline --watch`） |
-| 类型检查 | `pnpm test-compile`（`tsc -p ./ --noEmit`，strict 模式，TypeScript 7） |
-| 单元测试 | `pnpm test`（Vitest 单次运行，监听模式用 `pnpm test:watch`） |
-| 代码检查 | `pnpm eslint` |
-| 格式化 + 自动修复 | `pnpm format`（先 prettier 再 `eslint --fix`） |
-| 生产打包 | `pnpm vscode:prepublish`（`vite build --minify`） |
-| 生成 VSIX | `pnpm dlx @vscode/vsce package --no-dependencies` |
+| 用途      | 命令                                                                   |
+| --------- | ---------------------------------------------------------------------- |
+| 构建      | `pnpm build`（`vite build`）                                           |
+| 监听构建  | `pnpm watch`（`vite build --sourcemap inline --watch`）                |
+| 类型检查  | `pnpm test-compile`（`tsc -p ./ --noEmit`，strict 模式，TypeScript 7） |
+| 单元测试  | `pnpm test`（Vitest 单次运行，监听模式用 `pnpm test:watch`）           |
+| 代码检查  | `pnpm lint`（oxlint），自动修复用 `pnpm lint:fix`                      |
+| 格式化    | `pnpm format`（oxfmt 原地写入），只检查用 `pnpm format:check`          |
+| 生产打包  | `pnpm vscode:prepublish`（`vite build --minify`）                      |
+| 生成 VSIX | `pnpm dlx @vscode/vsce package --no-dependencies`                      |
 
-提交改动前至少跑通 `pnpm test-compile`、`pnpm eslint`、`pnpm test`。CI（`.github/workflows/build.yml`）会先执行 `pnpm format` 再测试打包，所以请在本地先跑一次，避免提交的代码与格式化结果不一致。
+提交改动前至少跑通 `pnpm test-compile`、`pnpm lint`、`pnpm format:check`、`pnpm test`。CI（`.github/workflows/build.yml`）会执行 `pnpm format` → `pnpm format:check` → `pnpm lint` → `pnpm test` → 打包，所以请在本地先跑一次，避免提交的代码与格式化结果不一致。
 
 ## 目录结构与职责
 
@@ -40,30 +40,27 @@
 - `resolve.mainFields: ["module", "main"]` 与 `resolve.conditions: ["node"]` 是必需的。缺少它们时 Vite 会解析到 axios 的浏览器版本，把 http 适配器替换成空实现，导致所有网络请求失效。验证方法是检查产物中仍存在 `isHttpAdapterSupported` 且不含 `browser-external` 桩。
 - `build.target` 为 `node20`，对应 VS Code 1.100 起自带的 Node.js 运行时。
 
+## 代码检查与格式化
+
+代码检查用 [oxlint](https://oxc.rs/docs/guide/usage/linter)，配置在 [.oxlintrc.json](.oxlintrc.json)；格式化用 [oxfmt](https://oxc.rs/docs/guide/usage/formatter)，配置在 [.oxfmtrc.json](.oxfmtrc.json)。两者都是 Rust 原生实现，速度远快于 ESLint + Prettier。
+
+- oxlint **不实现**格式化类规则（`indent`、`quotes`、`semi`、`brace-style`、`key-spacing` 等），这些全部由 oxfmt 负责，不要在 oxlint 配置里写。
+- oxfmt **只支持 K&R 花括号风格**，没有 `braceStyle` 选项。因此本项目统一使用 `if (cond) {` 同行写法，不要手动改成左花括号独占一行。
+- oxfmt 会重排 import（`import { A, B } from "x";` 合并为一行）并把对象属性的对齐冒号还原成单个空格，这是预期行为。
+- `pnpm format` 会原地改写文件；提交前用 `pnpm format:check` 确认无差异。
+
 ## TypeScript 版本约定
 
-TypeScript 7 是 Go 原生实现，**不提供 JS 编译器 API**，而 typescript-eslint 等工具仍依赖该 API。因此 `package.json` 用 npm alias 并存两套：
+项目直接使用 TypeScript 7（`typescript@^7.0.2`）。它是 Go 原生实现，**不提供 JS 编译器 API**：
 
-```json
-{
-    "devDependencies": {
-        "@typescript/native": "npm:typescript@^7.0.2",
-        "typescript": "npm:@typescript/typescript6@^6.0.2"
-    }
-}
-```
+- `npx tsc` / `pnpm test-compile` 正常工作
+- 任何依赖 TypeScript 旧版 API 的工具（如 typescript-eslint）都无法使用，因此本项目不再引入这类工具
 
-- `npx tsc` → TypeScript 7（原生，`pnpm test-compile` 用的就是它）
-- `npx tsc6` → TypeScript 6
-- `require("typescript")` → TypeScript 6 API，typescript-eslint 靠它工作
-
-改版本时务必保持这个别名关系。一旦 `typescript` 指向 TS 7，ESLint 会直接报 `typescript-eslint does not support TS 7.0` 并退出。TS 7.1 之后官方会提供新 API，届时可移除 `@typescript/typescript6` 别名。
+如果将来需要 oxlint 的类型感知规则（`--type-aware`），要额外安装 `oxlint-tsgolint` 包。
 
 ## 编码约定
 
-- 4 空格缩进、双引号、行尾分号、Allman 花括号（左花括号独占一行）。这些由 [eslint.config.mjs](eslint.config.mjs) 强制，不要手动写成相反风格。
-- 对象字面量要求 `key-spacing` 对齐（`name   : value`）。新增对象后请执行 `pnpm eslint:fix`。
-- 不要单独执行 `pnpm prettie`：prettier 会把左花括号移到行尾，与 Allman 规则冲突。始终使用 `pnpm format`（先 prettier、再 eslint 修复），它输出的才是最终风格。
+- 4 空格缩进、双引号、行尾分号、K&R 花括号（`{` 与控制语句同行）。这些由 [.oxfmtrc.json](.oxfmtrc.json) 与 oxfmt 保证，不要手动写成相反风格。
 - 跨目录引用使用 `@/*` 别名指向 `src/*`，该别名在 `vite.config.mts` 与 `vitest.config.mts` 中均已配置。
 - 视图类与提醒模块沿用 `export default new (class ...)` 的模块级单例写法，状态放在实例上，不要新增游离的模块级变量。
 - 新增命令需同时修改 `contributes.commands`、`src/extension.ts` 中的注册，并 push 进 `context.subscriptions`。

@@ -18,8 +18,7 @@ let _context: vscode.ExtensionContext;
  * @param {vscode.ExtensionContext}
  * @author sdttttt
  */
-export function setContext(ctx: vscode.ExtensionContext): void
-{
+export function setContext(ctx: vscode.ExtensionContext): void {
     _context = ctx;
 }
 
@@ -29,7 +28,6 @@ export function setContext(ctx: vscode.ExtensionContext): void
  * @returns {vscode.ExtensionContext}
  * @author sdttttt
  */
-export function getContext(): vscode.ExtensionContext
-{
+export function getContext(): vscode.ExtensionContext {
     return _context;
 }

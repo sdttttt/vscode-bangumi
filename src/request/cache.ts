@@ -1,8 +1,6 @@
 "use strict";
 
-import {
-    BangumisData, WeekBangumiData
-} from "./structure";
+import { BangumisData, WeekBangumiData } from "./structure";
 
 /**
  * Cache
@@ -11,14 +9,12 @@ import {
  * @template T
  * @author sdttttt
  */
-export class Cache<T = unknown>
-{
+export class Cache<T = unknown> {
     private readonly caches: Map<string, T>;
 
     private readonly timeoutTime: number;
 
-    constructor(timeoutTime: number)
-    {
+    constructor(timeoutTime: number) {
         this.timeoutTime = timeoutTime * 1000;
         this.caches = new Map<string, T>();
     }
@@ -29,8 +25,7 @@ export class Cache<T = unknown>
      * @param key
      * @author sdttttt
      */
-    get(key: string): T | undefined
-    {
+    get(key: string): T | undefined {
         return this.caches.get(key);
     }
 
@@ -41,11 +36,9 @@ export class Cache<T = unknown>
      * @param value
      * @author sdttttt
      */
-    set(key: string, value: T): void
-    {
+    set(key: string, value: T): void {
         this.caches.set(key, value);
-        setTimeout(() =>
-        {
+        setTimeout(() => {
             this.caches.delete(key);
         }, this.timeoutTime);
     }
