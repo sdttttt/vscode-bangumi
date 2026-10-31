@@ -24,6 +24,7 @@
         "onStartupFinished"
     ],
     "main": "./dist/extension.js",
+    "type": "module",
     "contributes": {
         "commands": [
             {

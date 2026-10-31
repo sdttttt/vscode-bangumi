@@ -53,14 +53,14 @@
 
 扩展与 Webview 各有一个 Vite 配置，**依次**执行（`pnpm build` 已封装）：
 
-- [vite.config.mts](vite.config.mts) → `dist/extension.js`（CommonJS，Node.js 20）
+- [vite.config.mts](vite.config.mts) → `dist/extension.js`（ES module，Node.js 20）
 - [vite.webview.mts](vite.webview.mts) → `webview-dist/main.js` + `webview-dist/main.css`（ES module，Chromium 132）
 
 两者不能合并成一个数组配置：Vite 8 的 `defineConfig` 只接受单个对象（传数组会报 `config must export or return an object`）。也不能让 Webview 产物落在 `dist/` 下：`emptyOutDir` 会清空整个 `outDir`，扩展的监听构建每次重编都会把 `dist/webview` 一并删掉，所以 Webview 产物固定在仓库根部的 `webview-dist/`。
 
 [vite.config.mts](vite.config.mts) 中有几处配置不能随意改动：
 
-- 产物必须是 CommonJS 且位于 `dist/extension.js`（`build.lib` + `formats: ["cjs"]`），因为 `package.json#main` 指向该文件。
+- 产物必须是 ES module 且位于 `dist/extension.js`（`build.lib` + `formats: ["es"]`），因为 `package.json#main` 指向该文件。`package.json` 的 `"type": "module"` 让扩展宿主按 ESM 加载它；Node.js 扩展宿主自 VS Code 1.100 起支持 ESM，正好等于 `engines.vscode` 的下限，Web 扩展宿主（vscode.dev）至今仍不支持，将来若要上 Web 端需要另出一份 CJS 产物。`.vscodeignore` 与 `dist/` 之外不要出现会被误当 ESM 加载的 `.js`（配置文件均为 `.mts`，Webview 产物只由浏览器加载）。
 - `vscode` 与全部 Node 内置模块保持 external（`build.rolldownOptions.external`）。绝不要把 `vscode` 打进产物，也不要引入扩展宿主环境中不存在的运行时依赖。
 - `resolve.mainFields: ["module", "main"]` 与 `resolve.conditions: ["node"]` 是必需的：缺少它们时 Vite 会解析到依赖的浏览器版本，把只在 Node.js 下可用的实现替换成空桩。验证方法是产物中不含 `browser-external` 桩。
 - `build.target` 为 `node20`，对应 VS Code 1.100 自带的 Electron 34（内含 Node.js 20）。升级 `engines.vscode` 时记得同步调整这里的 target；`vite.webview.mts` 的 `chrome132` 同理（Electron 34 = Chromium 132）。

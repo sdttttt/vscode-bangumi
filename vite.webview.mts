@@ -6,9 +6,9 @@ import path from "path";
  * Bundle of the webview application.
  *
  * Built separately from the extension because the two targets have nothing in
- * common: the extension is CommonJS for Node.js 20, the webview is an ES module
- * for the Chromium shipped with VS Code, and it must never see `vscode` or a
- * Node.js builtin.
+ * common: the extension is an ES module for Node.js 20, the webview is an ES
+ * module for the Chromium shipped with VS Code, and it must never see `vscode`
+ * or a Node.js builtin.
  *
  * A fixed file name keeps the host free of a manifest lookup: it always links
  * `main.js` and `main.css`.

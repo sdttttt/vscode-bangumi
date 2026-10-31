@@ -29,10 +29,16 @@ export default defineConfig({
         sourcemap: false,
         lib: {
             entry: path.resolve(import.meta.dirname, "src/extension.ts"),
-            formats: ["cjs"],
+            /*
+             * ES modules, matching `type: module` in package.json. The Node.js
+             * extension host understands ESM since VS Code 1.100, which is the
+             * version `engines.vscode` requires anyway.
+             */
+            formats: ["es"],
             fileName: () => "extension.js",
         },
         rolldownOptions: {
+            // `import("vscode")` is provided by the host, never bundled.
             external: ["vscode", ...nodeBuiltins],
         },
     },

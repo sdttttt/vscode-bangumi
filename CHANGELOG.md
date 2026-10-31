@@ -263,6 +263,7 @@ All notable changes to the **Bangumi Open** extension will be documented in this
 
 ### Changed
 
+- 扩展产物从 CommonJS 切换为 ES module（`formats: ["es"]` + `package.json` 的 `"type": "module"`）。Node.js 扩展宿主自 VS Code 1.100 起支持 ESM，正好等于 `engines.vscode` 的下限；产物去掉 CJS 互操作样板后体积略降。Web 扩展宿主仍不支持 ESM，将来支持 vscode.dev 时需要另出一份 CJS 产物。
 - 请求层改用原生 `fetch`（Node.js 20 自带），移除 `axios` 依赖：新增 `src/request/http.ts` 提供带 8.888s 超时的 `getJson<T>()`，删除 `src/request/instance.ts`，请求头简化为 `Accept: application/json`。
 - Webview 渲染从宿主侧字符串拼接迁移到独立的前端工程（Preact + TypeScript，`webview/` 目录），由 `vite.webview.mts` 单独构建到 `webview-dist/`。
 - 宿主与 Webview 改为 `postMessage` 通信：宿主推送 `ViewState`，Webview 回传翻页/刷新命令，业务状态（页码、缓存）仍留在扩展侧。
