@@ -1,7 +1,6 @@
 import { window } from "vscode";
-import Axios from "./instance";
-import { AxiosResponse } from "axios";
 import { BangumiUrl, BANGUMI_WEEK } from "./bangumiUrl";
+import { getJson } from "./http";
 import { isEmptyArray } from "../utils/type";
 import { BangumiCache, WeekBangumiCache } from "./cache";
 import {
@@ -29,12 +28,7 @@ export async function getAllBangumi(
     let result: BangumisData | undefined = cacheData;
 
     if (!cacheData) {
-        const res: AxiosResponse<BangumisResponse> = await Axios.get<
-            unknown,
-            AxiosResponse<BangumisResponse>
-        >(url);
-
-        const bangumisResponse: BangumisResponse = res.data;
+        const bangumisResponse = await getJson<BangumisResponse>(url);
 
         if (!isValidBangumisRequest(bangumisResponse)) {
             return;
@@ -63,11 +57,8 @@ export async function getWeekBangumi(): Promise<
     if (!cacheData) {
         let weekBangumiResponse: WeekBangumiResponse;
         try {
-            const res: AxiosResponse<WeekBangumiResponse> = await Axios.get<
-                unknown,
-                AxiosResponse<WeekBangumiResponse>
-            >(BANGUMI_WEEK);
-            weekBangumiResponse = res.data;
+            weekBangumiResponse =
+                await getJson<WeekBangumiResponse>(BANGUMI_WEEK);
         } catch {
             /*
              * A network failure is reported like an empty schedule: the view

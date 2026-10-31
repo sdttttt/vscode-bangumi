@@ -12,8 +12,8 @@ export default defineConfig({
         // Bundle the Node.js entry points (`main`), never the browser ones.
         mainFields: ["module", "main"],
         /*
-         * Prefer the `node` export condition so dependencies keep their
-         * Node.js implementations (e.g. axios' http adapter).
+         * Prefer the `node` export condition so any dependency resolves to its
+         * Node.js implementation instead of the browser one.
          */
         conditions: ["node"],
         alias: {

@@ -42,7 +42,7 @@
 - `src/views/` —— `AbstractView` 封装 Webview 面板生命周期与消息通道，另有番剧列表视图、周番视图及翻页状态。
 - `src/webview/` —— 宿主侧 Webview 基础设施：`protocol.ts`（双向消息类型，两段共享）、`host.ts`（CSP、nonce、`localResourceRoots`、资源 URI）、`viewModel.ts`（API 原始数据 → 渲染载荷）。
 - `webview/` —— 独立的前端工程（Preact + TypeScript + UnoCSS），源码在 `webview/src/`，样式配置在 `webview/uno.config.ts`，产物由 `vite.webview.mts` 输出到 `webview-dist/`。
-- `src/request/` —— axios 实例、URL 构造器、响应类型定义以及内存缓存（`cache.ts`）。
+- `src/request/` —— `http.ts`（`fetch` 封装与超时）、URL 构造器、响应类型定义以及内存缓存（`cache.ts`）。
 - `src/match/` —— 索引视图（年份 / 季度 / 标签 / 地区筛选），由若干静态列表模块组合而成。
 - `src/reminder/` —— 更新提醒：`schedule.ts`（周番数据 → 触发事件，纯函数）、`scheduler.ts`（单定时器重新调度器，可注入时钟）、`statusBar.ts`（状态栏条目封装）、`index.ts`（配置、数据源与生命周期编排）。
 - `src/utils/` —— 纯函数工具（`strings`、`type`、`file`、`display`、`clock`（UTC+8 日界）、`titles`（通知文案））。
@@ -62,7 +62,7 @@
 
 - 产物必须是 CommonJS 且位于 `dist/extension.js`（`build.lib` + `formats: ["cjs"]`），因为 `package.json#main` 指向该文件。
 - `vscode` 与全部 Node 内置模块保持 external（`build.rolldownOptions.external`）。绝不要把 `vscode` 打进产物，也不要引入扩展宿主环境中不存在的运行时依赖。
-- `resolve.mainFields: ["module", "main"]` 与 `resolve.conditions: ["node"]` 是必需的。缺少它们时 Vite 会解析到 axios 的浏览器版本，把 http 适配器替换成空实现，导致所有网络请求失效。验证方法是检查产物中仍存在 `isHttpAdapterSupported` 且不含 `browser-external` 桩。
+- `resolve.mainFields: ["module", "main"]` 与 `resolve.conditions: ["node"]` 是必需的：缺少它们时 Vite 会解析到依赖的浏览器版本，把只在 Node.js 下可用的实现替换成空桩。验证方法是产物中不含 `browser-external` 桩。
 - `build.target` 为 `node20`，对应 VS Code 1.100 自带的 Electron 34（内含 Node.js 20）。升级 `engines.vscode` 时记得同步调整这里的 target；`vite.webview.mts` 的 `chrome132` 同理（Electron 34 = Chromium 132）。
 - Webview 配置里 `base: "./"` 与 `build.lib` + `formats: ["es"]` 是必需的。`base` 绝对路径会在 `vscode-webview://` 源下解析失败；lib 模式保证产物文件名固定为 `main.js`，宿主无需读取 manifest。CSS 通过 `rolldownOptions.output.assetFileNames` 固定为 `main.css`，因为 ES 格式的 lib 产物不会 import 自己的样式表。
 - UnoCSS 插件必须传入配置文件路径（`UnoCSS(path.resolve(import.meta.dirname, "webview/uno.config.ts"))`），不能依赖默认的文件查找：Vite 的 root 是 `webview/`，但插件按 `process.cwd()`（仓库根）查找，会报 `Config file not found` 并退回默认配置，产物里所有自定义颜色与 shortcut 都会消失。
