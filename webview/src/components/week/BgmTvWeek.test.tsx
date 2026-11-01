@@ -73,6 +73,25 @@ describe("BgmTvWeek", () => {
         expect(container.querySelector(".season-part")).toBeNull();
     });
 
+    it("prefixes the first air date so it is not read as this week", () => {
+        const { container } = render(
+            <BgmTvWeek
+                days={[
+                    bgmDay({
+                        seasons: [
+                            season({ pubTime: "", pubIndex: "2026-10-01" }),
+                        ],
+                    }),
+                ]}
+                assets={assets}
+            />
+        );
+
+        expect(container.querySelector(".season-part")?.textContent).toBe(
+            "首播 2026-10-01"
+        );
+    });
+
     it("uses the original title as a hover hint", () => {
         const { container } = render(
             <BgmTvWeek

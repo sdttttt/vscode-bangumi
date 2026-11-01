@@ -145,7 +145,7 @@ Vitest 配置了两个 project，互不干扰：
 - 周番页按来源拆成两个组件，`webview/src/components/` 下的 `WeekBangumiList.tsx` 只做分派：`week/BilibiliWeek.tsx`（按更新时段分组 + 「你在这里」标记）与 `week/BgmTvWeek.tsx`（没有时段，只有星期、首播日期、评分与原名）。新增来源时加一个组件并在分派处加一个分支，不要往现有组件里塞条件。
 - `week/SourceNote.tsx` 是顶部来源提示条的共用实现（`week-source`、`role="note"`），两个来源各自通过 `WeekBoard` 的 `source` 槽传入自己的文案：B 站说明「播出时刻为北京时间」，Bangumi 说明「不含播出时间，因此没有更新提醒」。
 - `week/marker.ts` 放两个来源共用的纯函数与 hooks（`pubTimeMinute`、`markerIndex`、`nextGapMinutes`、`describeGap`、`describeNow`、`groupByPubTime`、`useNow`）以及标记文案常量；`week/WeekBoard.tsx` 放两页共用的滚动网格（`week-shell` / `week-board`）与「今天」滚动锚点，Bangumi 页通过 `source` prop 传入来源提示条（`week-source`）。
-- Bangumi 页的条目没有播出时刻与延期概念，因此 `SeasonRow` 不渲染 `.time-point`、不画标记、不渲染空的进度行；首播日期占集数的位置，评分单独一枚 `chip`，原名放在 `.season-title` 的悬浮提示里。
+- Bangumi 页的条目没有播出时刻与延期概念，因此 `SeasonRow` 不渲染 `.time-point`、不画标记、不渲染空的进度行；首播日期占集数的位置，评分单独一枚 `chip`，原名放在 `.season-title` 的悬浮提示里。首播日期必须带「首播」前缀：`air_date` 是整部作品的第一集开播日，不带前缀会被读成本周的更新日期。
 - 两个来源的封面尺寸不同：B 站是方图，用 `season-cover`（56×56）；Bangumi 多是约 1:1.4 的书封长条，用单独一套更高的 `season-poster`（56×80），否则方形画框会把构图裁掉大半。不要合并这两个 shortcut。
 - Bangumi 的封面地址在适配器里取 `images.common`（约 150 像素宽）而不是 `grid`（只有 48×48，放大后明显发糊）；`large` 常有 1500 像素以上、单张几百 KB，只作为 `common` 缺失时的回退。
 - 周番页的「你在这里」标记（`now-marker`）只画在 `isToday` 的那一列，位置由 `markerIndex()` 按 `HH:MM` 计算；时间来源是 `@shared/utils/clock` 的 `minuteOfDay()`（UTC+8，与接口一致），不要改用本地时区或新的 Date 计算。时钟只在当天那一列订阅（`useNow`），其余六列保持静态；`now` prop 用于测试冻结时间。标记用 `--gold`（`main.css` 中由警告色与前景色混合，保证明暗主题下都够对比度），高对比主题下回退到前景色。标记后缀是倒计时而不是墙钟：`nextGapMinutes()` 从 `markerIndex()` 的位置向后找第一场，`describeGap()` 负责文案（<60 分钟用分钟，否则小时+分钟），`describeNow()` 处理「今日已播完」与「今日没有更新」；墙钟只保留在 `aria-label` 里。

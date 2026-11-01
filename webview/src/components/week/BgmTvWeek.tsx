@@ -10,7 +10,8 @@ import { SourceNote } from "./SourceNote";
  * 渲染 Bangumi 的一条番剧。
  *
  * 与 B 站不同，条目里没有播出时刻、集数进度与延期概念，取而代之的是首播日期、
- * 评分与原作名：首播日期占原本集数的位置，评分单独一行，原名放在悬浮提示里。
+ * 评分与原作名：首播日期占原本集数的位置（带「首播」前缀，否则会被读成本周的日期），
+ * 评分单独一行，原名放在悬浮提示里。
  *
  * 封面用比 B 站更高的画框（`season-poster`）：Bangumi 的封面是书封式的长条，
  * 塞进方形画框会被裁掉大半构图。
@@ -34,7 +35,7 @@ function SeasonRow({ season }: { season: SeasonPayload }) {
                     {season.title}
                 </span>
                 {season.pubIndex ? (
-                    <span class="season-part">{season.pubIndex}</span>
+                    <span class="season-part">首播 {season.pubIndex}</span>
                 ) : null}
                 {undefined === season.score ? null : (
                     <span class="chip season-score">
