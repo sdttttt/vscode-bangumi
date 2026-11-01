@@ -10,7 +10,7 @@ import {
     BangumisData,
     isSuccess,
     isValidBangumisRequest,
-} from "./structure";
+} from "./schema";
 
 /**
  * 接口返回不可用内容时展示的消息。

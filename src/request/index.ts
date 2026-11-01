@@ -1,5 +1,5 @@
 import type { BilibiliApi } from "./bilibili/api";
-import type { BangumisData } from "./bilibili/structure";
+import type { BangumisData } from "./bilibili/schema";
 import type { BgmTvApi } from "./bgmtv/api";
 import {
     toScheduleFromBgmTv,

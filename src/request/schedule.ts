@@ -1,5 +1,5 @@
-import type { WBangumi, WeekBangumiData } from "./bilibili/structure";
-import type { BgmCalendarDay, BgmImages, BgmSubject } from "./bgmtv/structure";
+import type { WBangumi, WeekBangumiData } from "./bilibili/schema";
+import type { BgmCalendarDay, BgmImages, BgmSubject } from "./bgmtv/schema";
 import { dayKey, isCurrentDay, weekDayOf } from "../utils/clock";
 import { toHttpsUrl } from "../utils/strings";
 

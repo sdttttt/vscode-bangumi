@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import type { Notifier } from "../notifier";
 import { affectsReminder, type Settings } from "../configuration";
 import type { Commands } from "../commands";
-import type { WeekBangumiData } from "../request/bilibili/structure";
+import type { WeekBangumiData } from "../request/bilibili/schema";
 import type { WeeklySchedule } from "../request/schedule";
 import {
     REMIND_ACTION,

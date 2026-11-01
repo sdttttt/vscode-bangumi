@@ -1,4 +1,4 @@
-import type { WBangumi, WeekBangumiData } from "@/request/bilibili/structure";
+import type { WBangumi, WeekBangumiData } from "@/request/bilibili/schema";
 
 /**
  * 周番数据中的单部番剧。

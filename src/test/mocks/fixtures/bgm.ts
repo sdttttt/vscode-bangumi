@@ -1,4 +1,4 @@
-import type { BgmCalendarDay, BgmSubject } from "@/request/bgmtv/structure";
+import type { BgmCalendarDay, BgmSubject } from "@/request/bgmtv/schema";
 
 /**
  * Bangumi 每日放送中的单部作品。

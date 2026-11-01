@@ -2,7 +2,7 @@ import type { Notifier } from "../../notifier";
 import { getJson } from "../http";
 import type { RequestCaches } from "../cache";
 import { BANGUMI_CALENDAR } from "./query";
-import { isValidCalendar, type BgmCalendarDay } from "./structure";
+import { isValidCalendar, type BgmCalendarDay } from "./schema";
 
 /**
  * 无法拉取 Bangumi 放送表时展示的消息。

@@ -1,5 +1,5 @@
-import type { BangumisData, WeekBangumiData } from "./bilibili/structure";
-import type { BgmCalendarDay } from "./bgmtv/structure";
+import type { BangumisData, WeekBangumiData } from "./bilibili/schema";
+import type { BgmCalendarDay } from "./bgmtv/schema";
 
 /**
  * 带时效的键值缓存。

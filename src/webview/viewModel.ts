@@ -1,4 +1,4 @@
-import type { Bangumi } from "../request/bilibili/structure";
+import type { Bangumi } from "../request/bilibili/schema";
 import type {
     ScheduleDay,
     ScheduleItem,

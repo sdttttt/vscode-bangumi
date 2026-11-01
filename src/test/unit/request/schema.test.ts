@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
-import {
-    isSuccess,
-    isValidBangumisRequest,
-} from "@/request/bilibili/structure";
-import { isValidCalendar } from "@/request/bgmtv/structure";
+import { isSuccess, isValidBangumisRequest } from "@/request/bilibili/schema";
+import { isValidCalendar } from "@/request/bgmtv/schema";
 import { bgmCalendar, bgmCalendarDay } from "@/test/mocks/fixtures/bgm";
 import { bangumisData } from "@/test/mocks/fixtures/bangumi";
 

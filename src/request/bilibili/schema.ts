@@ -1,6 +1,12 @@
 import { isEmptyArray, isEmptyObject } from "../../utils/type";
 
 /**
+ * B 站接口的响应 schema：索引与周番的原始字段类型，以及「响应是否可用」的纯谓词。
+ *
+ * @author sdttttt
+ */
+
+/**
  * 判断接口响应是否成功。
  *
  * 上报失败是调用方的事，面向用户的文案由调用方持有；这个判定保持纯函数，
