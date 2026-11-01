@@ -41,6 +41,8 @@ export interface Settings {
 /**
  * 影响提醒的设置是否发生了变化。
  *
+ * 数据来源也在其中：切换来源会让提醒在「装载通知」与「今日概览」两种形态之间切换。
+ *
  * 纯函数：调用方传入事件的 `affectsConfiguration` 探针。
  *
  * @author sdttttt
@@ -51,7 +53,8 @@ export function affectsReminder(
     return (
         affected(ConfigKey.EnableReminder) ||
         affected(ConfigKey.ReminderAheadTime) ||
-        affected(ConfigKey.DisplayStatusBar)
+        affected(ConfigKey.DisplayStatusBar) ||
+        affected(ConfigKey.WeekSource)
     );
 }
 

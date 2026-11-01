@@ -76,7 +76,7 @@
                 "bangumiOpen.EnableReminder": {
                     "type": "boolean",
                     "default": true,
-                    "description": "开启后，番剧更新时会弹出提醒。"
+                    "description": "开启后，番剧更新时会弹出提醒。选择 Bangumi 数据源时不生效，因为该来源没有播出时刻。"
                 },
                 "bangumiOpen.ReminderAheadTime": {
                     "type": "integer",
@@ -86,7 +86,7 @@
                 "bangumiOpen.DisplayStatusBar": {
                     "type": "boolean",
                     "default": true,
-                    "description": "开启后，状态栏会显示下一部即将更新的番剧。"
+                    "description": "开启后，状态栏会显示下一部即将更新的番剧；选择 Bangumi 数据源时改为显示当日更新的番剧概要。"
                 },
                 "bangumiOpen.DisplayIndexTags": {
                     "type": "boolean",

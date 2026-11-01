@@ -106,6 +106,8 @@ function createSession(
     const reminder = useReminder({
         /* 提醒直接消费 B 站周番：它需要 `pub_ts`，Bangumi 没有这个字段。 */
         source: sources.bilibili.getWeekBangumi,
+        /* Bangumi 模式下只展示今日概览，因此走统一模型。 */
+        overview: api.getBgmTvSchedule,
         statusBar,
         settings,
         notifier,

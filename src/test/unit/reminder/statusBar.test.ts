@@ -106,6 +106,45 @@ describe("useStatusBar", () => {
     });
 });
 
+describe("useStatusBar summary", () => {
+    it("renders the today overview instead of an event", () => {
+        const item = stubItem();
+        const statusBar = useStatusBar("weekBangumi");
+
+        statusBar.showSummary({ date: "10-31", titles: ["甲", "乙"] });
+
+        expect(item.text).toBe("$(calendar) 今日 2部番");
+        expect(item.tooltip).toBe("今日（10-31）\n《甲》、《乙》");
+        expect(item.show).toHaveBeenCalledTimes(1);
+        statusBar.dispose();
+    });
+
+    it("switches an already visible entry to the overview", () => {
+        const item = stubItem();
+        const statusBar = useStatusBar("weekBangumi");
+
+        statusBar.show([event("20:00", ["甲"])], NOW);
+        statusBar.showSummary({ date: "10-31", titles: ["乙"] });
+
+        expect(item.text).toBe("$(calendar) 今日 乙");
+        /* 条目已经在展示，不必再调用一次 show。 */
+        expect(item.show).toHaveBeenCalledTimes(1);
+        statusBar.dispose();
+    });
+
+    it("gives the overview its own accessible label", () => {
+        const item = stubItem();
+        const statusBar = useStatusBar("weekBangumi");
+
+        statusBar.showSummary({ date: "10-31", titles: ["甲"] });
+
+        expect((item.accessibilityInformation as { label: string }).label).toBe(
+            "今日（10-31）有 1 部番剧更新：《甲》"
+        );
+        statusBar.dispose();
+    });
+});
+
 describe("useStatusBar tooltip", () => {
     it("lists every title of a group, unlike the entry", () => {
         const item = stubItem();

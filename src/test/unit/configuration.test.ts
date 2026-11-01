@@ -108,6 +108,8 @@ describe("affectsReminder", () => {
             ConfigKey.EnableReminder,
             ConfigKey.ReminderAheadTime,
             ConfigKey.DisplayStatusBar,
+            /* 切换来源会让状态栏在「下一场更新」与「今日概览」之间切换。 */
+            ConfigKey.WeekSource,
         ]) {
             expect(affectsReminder(section => section === key)).toBe(true);
         }

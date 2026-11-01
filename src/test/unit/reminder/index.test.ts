@@ -7,7 +7,12 @@ import {
     type CommandsStub,
     type NotifierStub,
 } from "@/test/mocks/ports";
-import { useReminder, type Reminder, type WeekSource } from "@/reminder";
+import {
+    useReminder,
+    type Reminder,
+    type OverviewSource,
+    type WeekSource,
+} from "@/reminder";
 import { useScheduler } from "@/reminder/scheduler";
 import { useStatusBar } from "@/reminder/statusBar";
 import { weekBangumiData, wBangumi } from "@/test/mocks/fixtures/weekBangumi";
@@ -89,7 +94,8 @@ interface ReminderHarness {
 
 function createHarness(
     source: WeekSource,
-    settings: SettingsStub
+    settings: SettingsStub,
+    overview: OverviewSource = () => Promise.resolve(undefined)
 ): ReminderHarness {
     const statusBar = useStatusBar("weekBangumi");
     const notifier = createNotifierStub();
@@ -98,6 +104,7 @@ function createHarness(
 
     const reminder = useReminder({
         source,
+        overview,
         statusBar,
         settings,
         notifier: notifier.notifier,
@@ -179,6 +186,264 @@ describe("Reminder", () => {
         await reminder.start();
 
         expect(statusBar.show).not.toHaveBeenCalled();
+        reminder.dispose();
+    });
+
+    it("shows the today overview in the bangumi mode", async () => {
+        settings.values["bangumiOpen.WeekSource"] = "bangumi";
+        const schedule = vi.fn(() =>
+            Promise.resolve({
+                source: "bangumi" as const,
+                hasSlots: false,
+                days: [
+                    {
+                        dayOfWeek: 6,
+                        date: "10-31",
+                        isToday: true,
+                        items: [
+                            {
+                                title: "今日番剧",
+                                cover: "",
+                                url: "",
+                                pubTime: "",
+                                progress: "2026-10-31",
+                                delay: false,
+                                delayReason: "",
+                            },
+                        ],
+                    },
+                ],
+            })
+        );
+        const { reminder } = createHarness(
+            () => Promise.resolve(today({})),
+            settings,
+            schedule
+        );
+
+        await reminder.start();
+
+        expect(statusBar.text).toBe("$(calendar) 今日 今日番剧");
+        reminder.dispose();
+    });
+
+    it("keeps the bilibili reminder off in the bangumi mode", async () => {
+        settings.values["bangumiOpen.WeekSource"] = "bangumi";
+        const source = vi.fn(() =>
+            Promise.resolve(today({ offsetSeconds: 60 }))
+        );
+        const { reminder, notifier } = createHarness(source, settings, () =>
+            Promise.resolve(undefined)
+        );
+
+        await reminder.start();
+        vi.advanceTimersByTime(120_000);
+
+        expect(source).not.toHaveBeenCalled();
+        expect(notifier.action).not.toHaveBeenCalled();
+        reminder.dispose();
+    });
+
+    it("does not even fetch the overview when the status bar is off", async () => {
+        settings.values["bangumiOpen.WeekSource"] = "bangumi";
+        settings.values["bangumiOpen.DisplayStatusBar"] = false;
+        const schedule = vi.fn(() => Promise.resolve(undefined));
+        const { reminder } = createHarness(
+            () => Promise.resolve(today({})),
+            settings,
+            schedule
+        );
+
+        await reminder.start();
+
+        expect(schedule).not.toHaveBeenCalled();
+        expect(statusBar.show).not.toHaveBeenCalled();
+        reminder.dispose();
+    });
+
+    it("reloads the overview after the day rolls over", async () => {
+        settings.values["bangumiOpen.WeekSource"] = "bangumi";
+        const schedule = vi.fn(() =>
+            Promise.resolve({
+                source: "bangumi" as const,
+                hasSlots: false,
+                days: [
+                    { dayOfWeek: 6, date: "10-31", isToday: true, items: [] },
+                ],
+            })
+        );
+        const { reminder } = createHarness(
+            () => Promise.resolve(today({})),
+            settings,
+            schedule
+        );
+
+        await reminder.start();
+        schedule.mockClear();
+        vi.advanceTimersByTime(24 * 60 * 60 * 1000);
+
+        await vi.waitFor(() => {
+            expect(schedule).toHaveBeenCalled();
+        });
+        reminder.dispose();
+    });
+
+    it("hides the overview when no day is flagged as today", async () => {
+        settings.values["bangumiOpen.WeekSource"] = "bangumi";
+        const { reminder } = createHarness(
+            () => Promise.resolve(today({})),
+            settings,
+            () =>
+                Promise.resolve({
+                    source: "bangumi" as const,
+                    hasSlots: false,
+                    days: [
+                        {
+                            dayOfWeek: 6,
+                            date: "10-31",
+                            isToday: false,
+                            items: [],
+                        },
+                    ],
+                })
+        );
+
+        await reminder.start();
+
+        expect(statusBar.show).not.toHaveBeenCalled();
+        reminder.dispose();
+    });
+
+    it("retries the overview when the request fails", async () => {
+        settings.values["bangumiOpen.WeekSource"] = "bangumi";
+        const schedule = vi
+            .fn()
+            .mockRejectedValueOnce(new Error("boom"))
+            .mockResolvedValue({
+                source: "bangumi" as const,
+                hasSlots: false,
+                days: [
+                    { dayOfWeek: 6, date: "10-31", isToday: true, items: [] },
+                ],
+            });
+        const { reminder } = createHarness(
+            () => Promise.resolve(today({})),
+            settings,
+            schedule
+        );
+
+        await reminder.start();
+        vi.advanceTimersByTime(30_000);
+
+        await vi.waitFor(() => {
+            expect(schedule).toHaveBeenCalledTimes(2);
+        });
+        reminder.dispose();
+    });
+
+    it("switches to the overview when the source changes", async () => {
+        const { reminder } = createHarness(
+            () => Promise.resolve(today({})),
+            settings,
+            () =>
+                Promise.resolve({
+                    source: "bangumi" as const,
+                    hasSlots: false,
+                    days: [
+                        {
+                            dayOfWeek: 6,
+                            date: "10-31",
+                            isToday: true,
+                            items: [
+                                {
+                                    title: "今日番剧",
+                                    cover: "",
+                                    url: "",
+                                    pubTime: "",
+                                    progress: "",
+                                    delay: false,
+                                    delayReason: "",
+                                },
+                            ],
+                        },
+                    ],
+                })
+        );
+        await reminder.start();
+        expect(statusBar.text).toContain("今日番剧");
+
+        const listener = vi.mocked(vscode.workspace.onDidChangeConfiguration)
+            .mock.calls[0][0];
+        settings.values["bangumiOpen.WeekSource"] = "bangumi";
+        listener({ affectsConfiguration: () => true } as never);
+
+        await vi.waitFor(() => {
+            expect(statusBar.text).toBe("$(calendar) 今日 今日番剧");
+        });
+        reminder.dispose();
+    });
+
+    it("keeps the overview across a dismissed notification callback", async () => {
+        settings.values["bangumiOpen.WeekSource"] = "bangumi";
+        const { reminder, commands } = createHarness(
+            () => Promise.resolve(today({})),
+            settings,
+            () =>
+                Promise.resolve({
+                    source: "bangumi" as const,
+                    hasSlots: false,
+                    days: [
+                        {
+                            dayOfWeek: 6,
+                            date: "10-31",
+                            isToday: true,
+                            items: [],
+                        },
+                    ],
+                })
+        );
+
+        await reminder.start();
+        /* 概览模式下没有事件，fire 不会改变状态栏。 */
+        reminder.fire({ at: 0, pubTs: 0, pubTime: "20:00", titles: ["甲"] });
+
+        expect(commands.execute).not.toHaveBeenCalled();
+        expect(statusBar.text).toBe("$(calendar) 今日没有更新");
+        reminder.dispose();
+    });
+
+    it("drops the overview when switching back to bilibili", async () => {
+        settings.values["bangumiOpen.WeekSource"] = "bangumi";
+        const { reminder } = createHarness(
+            () => Promise.resolve(today({})),
+            settings,
+            () =>
+                Promise.resolve({
+                    source: "bangumi" as const,
+                    hasSlots: false,
+                    days: [
+                        {
+                            dayOfWeek: 6,
+                            date: "10-31",
+                            isToday: true,
+                            items: [],
+                        },
+                    ],
+                })
+        );
+        await reminder.start();
+        expect(statusBar.text).toContain("今日");
+
+        const listener = vi.mocked(vscode.workspace.onDidChangeConfiguration)
+            .mock.calls[0][0];
+        settings.values["bangumiOpen.WeekSource"] = "bilibili";
+        listener({ affectsConfiguration: () => true } as never);
+
+        /* 回到 B 站后条目必须是「下一场更新」，不能残留概览。 */
+        await vi.waitFor(() => {
+            expect(statusBar.text).toContain("今日番剧");
+            expect(statusBar.text).not.toContain("今日 今日番剧");
+        });
         reminder.dispose();
     });
 
