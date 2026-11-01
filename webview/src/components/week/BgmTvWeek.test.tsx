@@ -162,7 +162,7 @@ describe("BgmTvWeek", () => {
         expect(container.querySelector(".item.today")).toBeTruthy();
         expect(
             container.querySelector(".today-badge img")?.getAttribute("src")
-        ).toBe(assets.todayBadge);
+        ).toBe(assets.image);
     });
 
     it("hides the today badge when no assets were sent", () => {

@@ -85,7 +85,9 @@ export default defineConfig({
         load: "box-border flex h-screen flex-col items-center justify-center gap-4 p-6",
         "load-card":
             "flex flex-col items-center gap-3 px-10 py-8 bg-surface border border-solid border-line rounded-3 [box-shadow:var(--card-shadow)]",
-        "load-image": "w-30 h-32.5 bg-tint rounded-2 object-contain",
+        // 插图是 746×870 的竖向立绘（约 1:1.17），画框按同一比例取值，
+        // 否则更方的框会把立绘裁掉或留出明显的留白。
+        "load-image": "w-28 h-32.5 bg-tint rounded-2 object-contain",
         "load-text": "m-0 text-sm font-500 text-muted",
 
         /* ----------------------------------------------------------- 周番面板 */
@@ -113,8 +115,9 @@ export default defineConfig({
             "flex items-center gap-1.5 m-0 text-sm font-600 leading-[1.3] whitespace-nowrap",
         "day-title-today": "text-accent",
         "day-date": "chip flex-none",
-        "today-badge": "inline-flex flex-none w-5.5 h-5.5",
-        "today-badge-image": "block w-full h-full rounded-[4px]",
+        // 徽标的画框沿用插图的竖立比例；方框会把全身立绘裁成一条。
+        "today-badge": "inline-flex flex-none w-6 h-7",
+        "today-badge-image": "block w-full h-full rounded-[3px] object-cover",
         timeline: "flex flex-col gap-4 p-3.5",
         "time-group": "flex flex-col gap-2",
         "time-point": "chip self-start font-600 tracking-[0.02em]",

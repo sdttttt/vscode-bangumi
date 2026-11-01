@@ -34,7 +34,7 @@ describe("BilibiliWeek", () => {
         expect(container.querySelector(".item.today")).toBeTruthy();
         expect(
             container.querySelector(".today-badge img")?.getAttribute("src")
-        ).toBe(assets.todayBadge);
+        ).toBe(assets.image);
     });
 
     it("hides the badge when no assets were sent", () => {

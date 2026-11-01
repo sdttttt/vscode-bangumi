@@ -32,7 +32,7 @@ describe("App", () => {
         expect(screen.getByText("加载中...")).toBeTruthy();
         expect(
             container.querySelector(".load-image")?.getAttribute("src")
-        ).toBe(assets.loading);
+        ).toBe(assets.image);
     });
 
     it("shows the not found screen with the placeholder image", () => {
@@ -41,7 +41,7 @@ describe("App", () => {
         expect(screen.getByText("没有找到数据！")).toBeTruthy();
         expect(
             container.querySelector(".load-image")?.getAttribute("src")
-        ).toBe(assets.enterprise);
+        ).toBe(assets.image);
     });
 
     it("omits the image when the host sent no assets", () => {

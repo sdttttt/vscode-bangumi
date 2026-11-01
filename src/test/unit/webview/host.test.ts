@@ -50,16 +50,10 @@ describe("createWebviewHost", () => {
 });
 
 describe("assets", () => {
-    it("resolves every image through the webview", () => {
+    it("resolves the illustration through the webview", () => {
         const assets = host.assets(makeWebview());
 
-        expect(assets.todayBadge).toBe(
-            "webview:/extension/resources/heiheihei.gif"
-        );
-        expect(assets.loading).toBe("webview:/extension/resources/loading.gif");
-        expect(assets.enterprise).toBe(
-            "webview:/extension/resources/enterprise.jpg"
-        );
+        expect(assets.image).toBe("webview:/extension/resources/miyagi.jpg");
     });
 });
 
@@ -68,7 +62,7 @@ describe("withAssets", () => {
         const state = host.withAssets(makeWebview(), { kind: "loading" });
 
         expect(state.kind).toBe("loading");
-        expect(state.assets?.loading).toContain("/extension/resources/");
+        expect(state.assets?.image).toContain("/extension/resources/");
     });
 
     it("keeps the payload of the state", () => {

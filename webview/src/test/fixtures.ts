@@ -6,9 +6,7 @@ import type { ViewState } from "@shared/webview/protocol";
  * @author sdttttt
  */
 export const assets = {
-    todayBadge: "webview:/resources/heiheihei.gif",
-    loading: "webview:/resources/loading.gif",
-    enterprise: "webview:/resources/enterprise.jpg",
+    image: "webview:/resources/miyagi.jpg",
 };
 
 /**

@@ -75,7 +75,7 @@ function Day({
                         <span class="today-badge">
                             <img
                                 class="today-badge-image"
-                                src={assets.todayBadge}
+                                src={assets.image}
                                 alt="今天更新"
                             />
                         </span>

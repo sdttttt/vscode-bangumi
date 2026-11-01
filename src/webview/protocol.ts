@@ -96,12 +96,13 @@ export interface ViewState {
  * Webview 需要加载的本地文件。由宿主填充，因为只有扩展侧才能把磁盘路径
  * 转换成 Webview 可安全访问的 Uri。
  *
+ * 占位界面与「今天」徽标共用同一张插图，因此只暴露一个字段：
+ * 换图时不必再在三处保持同步。
+ *
  * @author sdttttt
  */
 export interface AssetUris {
-    todayBadge: string;
-    enterprise: string;
-    loading: string;
+    image: string;
 }
 
 /**

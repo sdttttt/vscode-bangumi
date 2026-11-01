@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import * as path from "node:path";
 import * as vscode from "vscode";
-import { ENTERRPRISE, HUIHUI, YING_LILI } from "../constants";
+import { MIYAGI } from "../constants";
 import { getResourceFile } from "../utils/file";
 import type { AssetUris, ViewState } from "./protocol";
 
@@ -67,17 +67,7 @@ export function createWebviewHost(extensionPath: string): WebviewHost {
         );
 
     const assets = (webview: vscode.Webview): AssetUris => ({
-        todayBadge: getResourceFile(
-            webview,
-            YING_LILI,
-            extensionPath
-        ).toString(),
-        loading: getResourceFile(webview, HUIHUI, extensionPath).toString(),
-        enterprise: getResourceFile(
-            webview,
-            ENTERRPRISE,
-            extensionPath
-        ).toString(),
+        image: getResourceFile(webview, MIYAGI, extensionPath).toString(),
     });
 
     /**

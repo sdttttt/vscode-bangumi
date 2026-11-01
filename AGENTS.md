@@ -52,7 +52,7 @@
 - `src/reminder/` —— 更新提醒：`schedule.ts`（周番数据 → 触发事件，纯函数）、`notice.ts`（事件 → 通知形态，纯函数）、`summary.ts`（当日概览的文案，纯函数）、`ignored.ts`（忽略列表的归一化、去重与按 180 天剪枝，纯函数）、`mute.ts`（「不再提醒」二级菜单的构造与匹配，纯函数）、`scheduler.ts`（`useScheduler`，单定时器，可注入时钟）、`statusBar.ts`（`useStatusBar`，两种形态共用同一个条目）、`index.ts`（`useReminder`，按数据来源在「事件提醒」与「今日概览」之间切换）。
 - `src/utils/` —— 纯函数工具（`strings`、`type`、`file`、`display`、`clock`（UTC+8 日界）、`titles`（通知文案））。
 - `src/test/` —— 单元测试目录，布局见下方「测试约定」。
-- `resources/` —— 占位图片，由宿主通过 `asWebviewUri` 注入给 Webview，不参与打包。
+- `resources/` —— 内置插图（`miyagi.jpg`），由宿主通过 `asWebviewUri` 注入给 Webview。加载中、没有数据与「今天」徽标共用这一张图，文件名收在 `src/constants.ts` 的 `MIYAGI` 里；`resources/b2.png` 只给 README 用，已在 `.vscodeignore` 中排除，不随扩展分发。
 
 ## 打包约束
 
@@ -85,7 +85,7 @@ Webview 不再是字符串拼接出来的静态 HTML，而是一个独立构建�
 - Webview 侧的交互（翻页、跳页、刷新）通过 `WebviewCommand` 回传给宿主，宿主把页码等业务状态放在 `src/state/app.ts` 的会话实例里，Webview 保持无状态。
 - 不要再往 Webview 里加直连 HTTP 的代码：Webview 没有 Node.js、受 CORS 限制，请求、缓存、错误提示都留在宿主侧的 `src/request/`。
 - 文档由 `createWebviewHtml()` 生成，必须是完整 HTML（`<!DOCTYPE html>` + `charset` + `viewport`），并带 CSP 与 nonce。禁止引入 inline `<script>`。
-- 需要新增本地图片时，走 `createAssetUris()` 放进 `ViewState.assets`，由 Webview 从 props 取用；不要硬编码 `vscode-resource` 或绝对路径。
+- 需要新增本地图片时，走 `AssetUris` 放进 `ViewState.assets`，由 Webview 从 props 取用；不要硬编码 `vscode-resource` 或绝对路径。目前只暴露一个 `image` 字段，因为三个界面共用同一张插图；将来若各自需要不同的图，再按用途拆字段，不要为一个文件开三个键。
 - 两个视图的 `viewType` 必须唯一（现为 `bangumiOpen.list` 与 `bangumiOpen.week`），重复会让 `registerWebviewPanelSerializer` 之类的 API 冲突。
 
 ## 代码检查与格式化
@@ -152,6 +152,7 @@ Vitest 配置了两个 project，互不干扰：
 - Bangumi 页的条目没有播出时刻与延期概念，因此 `SeasonRow` 不渲染 `.time-point`、不画标记、不渲染空的进度行；首播日期占集数的位置，评分单独一枚 `chip`，原名放在 `.season-title` 的悬浮提示里。首播日期必须带「首播」前缀：`air_date` 是整部作品的第一集开播日，不带前缀会被读成本周的更新日期。
 - 两个来源的封面尺寸不同：B 站是方图，用 `season-cover`（56×56）；Bangumi 多是约 1:1.4 的书封长条，用单独一套更高的 `season-poster`（56×80），否则方形画框会把构图裁掉大半。不要合并这两个 shortcut。
 - Bangumi 的封面地址在适配器里取 `images.common`（约 150 像素宽）而不是 `grid`（只有 48×48，放大后明显发糊）；`large` 常有 1500 像素以上、单张几百 KB，只作为 `common` 缺失时的回退。
+- 「今天」徽标（`today-badge` / `today-badge-image`）与两个占位界面共用同一张 `miyagi.jpg`，它是 746×870 的竖向立绘，因此这两个画框也都是竖向的（加载占位 7:8，徽标 6:7）：换成方形框会把立绘裁成一条。换图时若比例差得远，要同步调这两个 shortcut。
 - 周番页的「你在这里」标记（`now-marker`）只画在 `isToday` 的那一列，位置由 `markerIndex()` 按 `HH:MM` 计算；时间来源是 `@shared/utils/clock` 的 `minuteOfDay()`（UTC+8，与接口一致），不要改用本地时区或新的 Date 计算。时钟只在当天那一列订阅（`useNow`），其余六列保持静态；`now` prop 用于测试冻结时间。标记用 `--gold`（`main.css` 中由警告色与前景色混合，保证明暗主题下都够对比度），高对比主题下回退到前景色。标记后缀是倒计时而不是墙钟：`nextGapMinutes()` 从 `markerIndex()` 的位置向后找第一场，`describeGap()` 负责文案（<60 分钟用分钟，否则小时+分钟），`describeNow()` 处理「今日已播完」与「今日没有更新」；墙钟只保留在 `aria-label` 里。
 - `.today` / `.delay` 用 `!` 前缀（如 `!border-accent`）压过同一元素的其它颜色工具类：UnoCSS 的输出顺序不按 class 书写顺序，不加 `!` 时结果不可预测。
 - `@unocss/vite` 会自动扫描 `.tsx`，但也会把源码里的普通英文单词当成候选类名（例如注释里出现 `tab` 之类的英文单词会生成 `.tab`）。这些多出来的规则无害，不要为了消除它们而下调 `content` 的扫描范围：关掉 pipeline 会让 Vite 引入的虚拟样式表解析失败。

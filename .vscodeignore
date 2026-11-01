@@ -1,6 +1,8 @@
 .vscode/**
 .vscode-test/**
 node_modules/**
+# README 里的截图走 raw.githubusercontent，仅用于仓库展示，不随扩展分发。
+resources/b2.png
 out/**
 coverage/**
 src/**

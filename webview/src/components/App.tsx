@@ -36,15 +36,12 @@ export function App({
     switch (state.kind) {
         case "loading":
             return (
-                <Placeholder
-                    image={state.assets?.loading}
-                    message="加载中..."
-                />
+                <Placeholder image={state.assets?.image} message="加载中..." />
             );
         case "notFound":
             return (
                 <Placeholder
-                    image={state.assets?.enterprise}
+                    image={state.assets?.image}
                     message="没有找到数据！"
                 />
             );
