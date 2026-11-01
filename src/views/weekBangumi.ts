@@ -1,6 +1,6 @@
 import type { BangumiApi } from "../request";
 import type { Settings } from "../configuration";
-import type { WeeklySchedule } from "../request/schedule";
+import type { WeekSourceKind, WeeklySchedule } from "../request/schedule";
 import { toWeekDayPayloads } from "../webview/viewModel";
 import type { WebviewCommand } from "../webview/protocol";
 import type { Panel } from "./panel";
@@ -38,6 +38,14 @@ export function useWeekBangumiView(
 ): WeekBangumiView {
     const { api, panel, settings } = options;
 
+    /*
+     * 面板自己记住用户从顶部按钮选中的来源。
+     *
+     * 它只在这次面板生命周期内有效，既不会写回设置项，也不会影响提醒与状态栏；
+     * 关闭面板后重新打开会退回设置项里的来源。
+     */
+    let currentSource: WeekSourceKind | undefined;
+
     /**
      * 渲染统一模型。
      */
@@ -50,27 +58,47 @@ export function useWeekBangumiView(
     };
 
     /**
-     * 按设置项选择数据源。Bangumi 的收录更全，但没有播出时刻，因此不能用于提醒。
+     * 当前应当使用的来源：面板内的临时选择优先，其次才是设置项。
+     */
+    const sourceOf = (): WeekSourceKind =>
+        currentSource ?? settings.weekSource();
+
+    /**
+     * 按来源拉取统一模型。Bangumi 的收录更全，但没有播出时刻，因此不能用于提醒。
      */
     const loadSchedule = (): Promise<WeeklySchedule | undefined> =>
-        "bangumi" === settings.weekSource()
+        "bangumi" === sourceOf()
             ? api.getBgmTvSchedule()
             : api.getBilibiliSchedule();
 
+    const render = (): void => {
+        panel.showLoading();
+
+        loadSchedule().then(schedule => {
+            if (schedule) {
+                createWeekBangumiView(schedule);
+            }
+        });
+    };
+
     const view: WeekBangumiView = {
         openWeekBangumi: () => {
-            panel.showLoading();
-
-            loadSchedule().then(schedule => {
-                if (schedule) {
-                    createWeekBangumiView(schedule);
-                }
-            });
+            /* 命令重新打开面板时，放弃上一次的临时选择。 */
+            currentSource = undefined;
+            render();
         },
 
         handleCommand: command => {
             if ("weekBangumi:refresh" === command.type) {
-                view.openWeekBangumi();
+                render();
+                return;
+            }
+
+            if ("weekBangumi:switchSource" === command.type) {
+                if (command.source !== sourceOf()) {
+                    currentSource = command.source;
+                    render();
+                }
             }
         },
     };

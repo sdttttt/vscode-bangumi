@@ -18,6 +18,12 @@ export interface WeekBangumiListProps {
     source?: WeekSourceKind;
     /** 覆盖走动的时钟；测试用它把时间固定住。 */
     now?: number;
+    /**
+     * 切换到另一个数据来源。
+     *
+     * 只作用于当前面板，不改写设置项；缺省时不显示切换按钮。
+     */
+    onSwitchSource?: (source: WeekSourceKind) => void;
 }
 
 /**
@@ -33,10 +39,20 @@ export function WeekBangumiList({
     assets,
     source,
     now,
+    onSwitchSource,
 }: WeekBangumiListProps) {
     return "bangumi" === source ? (
-        <BgmTvWeek days={days} assets={assets} />
+        <BgmTvWeek
+            days={days}
+            assets={assets}
+            onSwitchSource={onSwitchSource}
+        />
     ) : (
-        <BilibiliWeek days={days} assets={assets} now={now} />
+        <BilibiliWeek
+            days={days}
+            assets={assets}
+            now={now}
+            onSwitchSource={onSwitchSource}
+        />
     );
 }

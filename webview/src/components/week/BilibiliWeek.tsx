@@ -3,6 +3,7 @@ import type {
     AssetUris,
     SeasonPayload,
     WeekDayPayload,
+    WeekSourceKind,
 } from "@shared/webview/protocol";
 import { formatMinuteOfDay, minuteOfDay } from "@shared/utils/clock";
 import {
@@ -13,7 +14,7 @@ import {
     useNow,
 } from "./marker";
 import { WeekBoard } from "./WeekBoard";
-import { SourceNote } from "./SourceNote";
+import { SourceNote, SourceSwitch } from "./SourceNote";
 
 /**
  * 渲染日程中的单部番剧。
@@ -175,15 +176,23 @@ export function BilibiliWeek({
     days,
     assets,
     now,
+    onSwitchSource,
 }: {
     days: Array<WeekDayPayload>;
     assets: AssetUris | undefined;
     now?: number;
+    onSwitchSource?: (source: WeekSourceKind) => void;
 }) {
     return (
         <WeekBoard
             source={
-                <SourceNote>
+                <SourceNote
+                    action={
+                        <SourceSwitch
+                            current="bilibili"
+                            onSwitch={onSwitchSource}
+                        />
+                    }>
                     数据来源：Bilibili 番剧时间表 · 播出时刻为北京时间
                 </SourceNote>
             }>

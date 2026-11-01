@@ -1,4 +1,4 @@
-import type { ViewState } from "@shared/webview/protocol";
+import type { ViewState, WeekSourceKind } from "@shared/webview/protocol";
 import { BangumiList } from "./BangumiList";
 import { Placeholder } from "./Placeholder";
 import { WeekBangumiList } from "./WeekBangumiList";
@@ -13,6 +13,8 @@ export interface AppProps {
     onNextPage: () => void;
     onBackPage: () => void;
     onJumpPage: () => void;
+    /** 切换到另一个数据来源，只作用于当前面板。 */
+    onSwitchSource?: (source: WeekSourceKind) => void;
 }
 
 /**
@@ -20,7 +22,13 @@ export interface AppProps {
  *
  * @author sdttttt
  */
-export function App({ state, onNextPage, onBackPage, onJumpPage }: AppProps) {
+export function App({
+    state,
+    onNextPage,
+    onBackPage,
+    onJumpPage,
+    onSwitchSource,
+}: AppProps) {
     if (!state) {
         return <Placeholder image={undefined} message="加载中..." />;
     }
@@ -56,6 +64,7 @@ export function App({ state, onNextPage, onBackPage, onJumpPage }: AppProps) {
                     days={state.days ?? []}
                     assets={state.assets}
                     source={state.source}
+                    onSwitchSource={onSwitchSource}
                 />
             );
         default:

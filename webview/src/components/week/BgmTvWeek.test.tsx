@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/preact";
+import { describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/preact";
 import { BgmTvWeek } from "@webview/components/week/BgmTvWeek";
 import { assets } from "@webview/test/fixtures";
 import { bgmDay, season } from "@webview/test/week";
@@ -45,6 +45,47 @@ describe("BgmTvWeek", () => {
         render(<BgmTvWeek days={[bgmDay()]} assets={assets} />);
 
         expect(screen.getByRole("note").textContent).toContain("Bangumi");
+    });
+
+    it("offers a switch back to Bilibili", () => {
+        render(
+            <BgmTvWeek
+                days={[bgmDay()]}
+                assets={assets}
+                onSwitchSource={vi.fn()}
+            />
+        );
+
+        expect(screen.getByRole("button").textContent).toContain(
+            "切换到 bilibili"
+        );
+    });
+
+    it("calls back with the other source when the switch is clicked", () => {
+        const onSwitchSource = vi.fn();
+        render(
+            <BgmTvWeek
+                days={[bgmDay()]}
+                assets={assets}
+                onSwitchSource={onSwitchSource}
+            />
+        );
+
+        fireEvent.click(screen.getByRole("button"));
+
+        expect(onSwitchSource).toHaveBeenCalledWith("bilibili");
+    });
+
+    it("hides the switch when the host cannot switch", () => {
+        render(
+            <BgmTvWeek
+                days={[bgmDay()]}
+                assets={assets}
+                onSwitchSource={undefined}
+            />
+        );
+
+        expect(screen.queryByRole("button")).toBeNull();
     });
 
     it("shows the score of a subject when there is one", () => {

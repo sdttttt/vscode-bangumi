@@ -144,6 +144,7 @@ Vitest 配置了两个 project，互不干扰：
 - 三个页面（索引列表、周番、加载/空态）共用同一套 shortcut：`board`（滚动根）、`surface`（卡片表面）、`chip`（小标签）、`row-link`（整行链接）、`focus-ring`。新增页面优先复用它们，不要另造一套色值。
 - 周番页按来源拆成两个组件，`webview/src/components/` 下的 `WeekBangumiList.tsx` 只做分派：`week/BilibiliWeek.tsx`（按更新时段分组 + 「你在这里」标记）与 `week/BgmTvWeek.tsx`（没有时段，只有星期、首播日期、评分与原名）。新增来源时加一个组件并在分派处加一个分支，不要往现有组件里塞条件。
 - `week/SourceNote.tsx` 是顶部来源提示条的共用实现（`week-source`、`role="note"`），两个来源各自通过 `WeekBoard` 的 `source` 槽传入自己的文案：B 站说明「播出时刻为北京时间」，Bangumi 说明「不含播出时间，因此没有更新提醒」。
+- 提示条右侧的切换按钮（`SourceSwitch`，`week-source-switch`）只切换当前面板的数据来源：`useWeekBangumiView` 用闭包变量记住它，通过 `weekBangumi:switchSource` 命令按需重拉，**不写回** `bangumiOpen.WeekSource`，因此提醒、状态栏与下次打开的面板仍按设置项走。`openWeekBangumi` 会清掉这个临时选择，`weekBangumi:refresh` 则保留它。两个页面都要把它接到 `SourceNote` 的 `action` 槽；`onSwitchSource` 缺省时不渲染按钮（测试与预览页依赖这一点）。按钮文案用站点名（`bilibili` / `bgm.tv`）而不是设置项的枚举值，与标题里的「Bangumi 每日放送」区分开。
 - `week/marker.ts` 放两个来源共用的纯函数与 hooks（`pubTimeMinute`、`markerIndex`、`nextGapMinutes`、`describeGap`、`describeNow`、`groupByPubTime`、`useNow`）以及标记文案常量；`week/WeekBoard.tsx` 放两页共用的滚动网格（`week-shell` / `week-board`）与「今天」滚动锚点，Bangumi 页通过 `source` prop 传入来源提示条（`week-source`）。
 - Bangumi 页的条目没有播出时刻与延期概念，因此 `SeasonRow` 不渲染 `.time-point`、不画标记、不渲染空的进度行；首播日期占集数的位置，评分单独一枚 `chip`，原名放在 `.season-title` 的悬浮提示里。首播日期必须带「首播」前缀：`air_date` 是整部作品的第一集开播日，不带前缀会被读成本周的更新日期。
 - 两个来源的封面尺寸不同：B 站是方图，用 `season-cover`（56×56）；Bangumi 多是约 1:1.4 的书封长条，用单独一套更高的 `season-poster`（56×80），否则方形画框会把构图裁掉大半。不要合并这两个 shortcut。

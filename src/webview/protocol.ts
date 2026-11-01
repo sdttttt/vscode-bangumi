@@ -114,4 +114,10 @@ export type WebviewCommand =
     | { type: "bangumi:nextPage" }
     | { type: "bangumi:backPage" }
     | { type: "bangumi:jumpPage" }
-    | { type: "weekBangumi:refresh" };
+    | { type: "weekBangumi:refresh" }
+    /**
+     * 只切换当前面板的数据来源，不写回设置项。
+     *
+     * 与刷新分开，宿主因此能区分「重拉当前来源」与「换一个来源再拉」。
+     */
+    | { type: "weekBangumi:switchSource"; source: WeekSourceKind };

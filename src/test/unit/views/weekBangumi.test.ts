@@ -271,3 +271,117 @@ describe("WeeklySchedule construction", () => {
         expect(schedule.hasSlots).toBe(false);
     });
 });
+
+describe("Week bangumi view source switch", () => {
+    let view: WeekBangumiView;
+    let api: BangumiApi;
+    let settings: SettingsStub;
+    let stub: PanelStub;
+
+    const now = Date.UTC(2026, 9, 31, 4, 0);
+
+    beforeEach(() => {
+        settings = createSettingsStub({
+            "bangumiOpen.WeekSource": "bilibili",
+            "bangumiOpen.DisplayHistory": false,
+        });
+        stub = createPanelStub();
+        ({ view, api } = loadView(settings, stub));
+        vi.mocked(api.getBilibiliSchedule).mockResolvedValue(
+            toScheduleFromBilibili(weekBangumi())
+        );
+        vi.mocked(api.getBgmTvSchedule).mockResolvedValue(
+            toScheduleFromBgmTv(bgmCalendar(), now)
+        );
+    });
+
+    it("loads the other source without touching the setting", async () => {
+        view.openWeekBangumi();
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.source).toBe("bilibili");
+        });
+
+        stub.receive({ type: "weekBangumi:switchSource", source: "bangumi" });
+
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.source).toBe("bangumi");
+        });
+        expect(api.getBgmTvSchedule).toHaveBeenCalledTimes(1);
+        expect(settings.values["bangumiOpen.WeekSource"]).toBe("bilibili");
+    });
+
+    it("shows the loading state while the other source is fetched", async () => {
+        view.openWeekBangumi();
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.kind).toBe("weekBangumi");
+        });
+
+        stub.receive({ type: "weekBangumi:switchSource", source: "bangumi" });
+
+        expect(stub.posted().at(-1)?.kind).toBe("loading");
+    });
+
+    it("ignores a switch to the source already on screen", async () => {
+        view.openWeekBangumi();
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.kind).toBe("weekBangumi");
+        });
+        vi.mocked(api.getBilibiliSchedule).mockClear();
+
+        stub.receive({ type: "weekBangumi:switchSource", source: "bilibili" });
+
+        expect(api.getBilibiliSchedule).not.toHaveBeenCalled();
+    });
+
+    it("keeps the switched source across a refresh", async () => {
+        view.openWeekBangumi();
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.kind).toBe("weekBangumi");
+        });
+        stub.receive({ type: "weekBangumi:switchSource", source: "bangumi" });
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.source).toBe("bangumi");
+        });
+        vi.mocked(api.getBgmTvSchedule).mockClear();
+
+        stub.receive({ type: "weekBangumi:refresh" });
+
+        await vi.waitFor(() => {
+            expect(api.getBgmTvSchedule).toHaveBeenCalledTimes(1);
+        });
+        expect(api.getBilibiliSchedule).toHaveBeenCalledTimes(1);
+    });
+
+    it("forgets the switch when the panel is opened again", async () => {
+        view.openWeekBangumi();
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.kind).toBe("weekBangumi");
+        });
+        stub.receive({ type: "weekBangumi:switchSource", source: "bangumi" });
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.source).toBe("bangumi");
+        });
+        vi.mocked(api.getBilibiliSchedule).mockClear();
+
+        view.openWeekBangumi();
+
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.source).toBe("bilibili");
+        });
+    });
+
+    it("starts from the setting when the panel opens in the bangumi mode", async () => {
+        settings.values["bangumiOpen.WeekSource"] = "bangumi";
+        const another = loadView(settings, createPanelStub());
+        vi.mocked(another.api.getBgmTvSchedule).mockResolvedValue(
+            toScheduleFromBgmTv(bgmCalendar(), now)
+        );
+
+        another.view.openWeekBangumi();
+
+        await vi.waitFor(() => {
+            expect(another.api.getBgmTvSchedule).toHaveBeenCalledTimes(1);
+        });
+        expect(another.api.getBilibiliSchedule).not.toHaveBeenCalled();
+    });
+});

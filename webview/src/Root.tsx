@@ -32,6 +32,9 @@ export function Root() {
             onNextPage={() => send({ type: "bangumi:nextPage" })}
             onBackPage={() => send({ type: "bangumi:backPage" })}
             onJumpPage={() => send({ type: "bangumi:jumpPage" })}
+            onSwitchSource={source =>
+                send({ type: "weekBangumi:switchSource", source })
+            }
         />
     );
 }

@@ -97,7 +97,11 @@ export default defineConfig({
         // 来源提示条占住高度后，剩下的空间才交给可滚动的日程。
         "week-shell": "flex h-screen flex-col",
         "week-source":
-            "flex-none m-0 px-3 py-1.5 text-[11px] leading-normal text-muted bg-tint border-b-1 border-b-solid border-line min-[600px]:px-5",
+            "flex-none flex items-center justify-between gap-3 px-3 py-1.5 text-[11px] leading-normal text-muted bg-tint border-b-1 border-b-solid border-line min-[600px]:px-5",
+        // 提示文案可能很长，允许它换行并占满剩余宽度，按钮因此始终贴在最右侧。
+        "week-source-note": "m-0 min-w-0",
+        "week-source-switch":
+            "flex-none px-2 py-0.5 text-[11px] leading-normal text-button-fg bg-button border border-solid border-button-border rounded-[3px] cursor-pointer [font:inherit] hover:bg-button-hover focus-ring",
         week: "grid grid-flow-col auto-cols-[232px] min-[600px]:auto-cols-[252px] items-stretch gap-3 min-[600px]:gap-4 w-max m-0 p-0",
         item: "surface flex flex-col",
         // 无论工具类的输出顺序如何，`!` 都能压过 `item` 的颜色。

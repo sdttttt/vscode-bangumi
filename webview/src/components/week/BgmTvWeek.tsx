@@ -2,9 +2,10 @@ import type {
     AssetUris,
     SeasonPayload,
     WeekDayPayload,
+    WeekSourceKind,
 } from "@shared/webview/protocol";
 import { WeekBoard } from "./WeekBoard";
-import { SourceNote } from "./SourceNote";
+import { SourceNote, SourceSwitch } from "./SourceNote";
 
 /**
  * 渲染 Bangumi 的一条番剧。
@@ -102,14 +103,22 @@ function Day({
 export function BgmTvWeek({
     days,
     assets,
+    onSwitchSource,
 }: {
     days: Array<WeekDayPayload>;
     assets: AssetUris | undefined;
+    onSwitchSource?: (source: WeekSourceKind) => void;
 }) {
     return (
         <WeekBoard
             source={
-                <SourceNote>
+                <SourceNote
+                    action={
+                        <SourceSwitch
+                            current="bangumi"
+                            onSwitch={onSwitchSource}
+                        />
+                    }>
                     数据来源：Bangumi 每日放送 · 不含播出时间，因此没有更新提醒
                 </SourceNote>
             }>

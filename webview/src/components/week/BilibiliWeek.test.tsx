@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { act, render, screen } from "@testing-library/preact";
+import { act, fireEvent, render, screen } from "@testing-library/preact";
 import { BilibiliWeek } from "@webview/components/week/BilibiliWeek";
 import {
     NOW_DONE_LABEL,
@@ -507,6 +507,41 @@ describe("BilibiliWeek source note", () => {
         render(<BilibiliWeek days={[day()]} assets={assets} />);
 
         expect(screen.getByRole("note").textContent).toContain("Bilibili");
+    });
+
+    it("offers a switch to Bangumi", () => {
+        render(
+            <BilibiliWeek
+                days={[day()]}
+                assets={assets}
+                onSwitchSource={vi.fn()}
+            />
+        );
+
+        expect(screen.getByRole("button").textContent).toContain(
+            "切换到 bgm.tv"
+        );
+    });
+
+    it("calls back with the other source when the switch is clicked", () => {
+        const onSwitchSource = vi.fn();
+        render(
+            <BilibiliWeek
+                days={[day()]}
+                assets={assets}
+                onSwitchSource={onSwitchSource}
+            />
+        );
+
+        fireEvent.click(screen.getByRole("button"));
+
+        expect(onSwitchSource).toHaveBeenCalledWith("bangumi");
+    });
+
+    it("hides the switch when the host cannot switch", () => {
+        render(<BilibiliWeek days={[day()]} assets={assets} />);
+
+        expect(screen.queryByRole("button")).toBeNull();
     });
 
     it("tells the reader the slots are Beijing time", () => {

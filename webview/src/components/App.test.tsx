@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/preact";
+import { fireEvent, render, screen } from "@testing-library/preact";
 import { App } from "@webview/components/App";
 import { assets, viewState } from "@webview/test/fixtures";
 
@@ -112,6 +112,23 @@ describe("App", () => {
         );
 
         expect(container.querySelectorAll(".cover")).toHaveLength(0);
+    });
+
+    it("forwards the source switch from the schedule", () => {
+        const onSwitchSource = vi.fn();
+        render(
+            <App
+                state={viewState({ kind: "weekBangumi", days: [] })}
+                onNextPage={vi.fn()}
+                onBackPage={vi.fn()}
+                onJumpPage={vi.fn()}
+                onSwitchSource={onSwitchSource}
+            />
+        );
+
+        fireEvent.click(screen.getByRole("button"));
+
+        expect(onSwitchSource).toHaveBeenCalledWith("bangumi");
     });
 
     it("renders an empty schedule when no day was sent", () => {

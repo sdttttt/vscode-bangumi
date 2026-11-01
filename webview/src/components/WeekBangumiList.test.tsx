@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { render } from "@testing-library/preact";
+import { describe, expect, it, vi } from "vitest";
+import { fireEvent, render } from "@testing-library/preact";
 import { WeekBangumiList } from "@webview/components/WeekBangumiList";
 import { assets } from "@webview/test/fixtures";
 import { AT_09_30, bgmDay, day, season } from "@webview/test/week";
@@ -33,6 +33,31 @@ describe("WeekBangumiList", () => {
         );
 
         expect(container.querySelector(".now-marker")).toBeTruthy();
+    });
+
+    it("passes the switch callback to whichever page is on screen", () => {
+        const onSwitchSource = vi.fn();
+
+        const { container } = render(
+            <WeekBangumiList
+                days={[bgmDay()]}
+                assets={assets}
+                source="bangumi"
+                onSwitchSource={onSwitchSource}
+            />
+        );
+
+        fireEvent.click(container.querySelector(".week-source-switch")!);
+
+        expect(onSwitchSource).toHaveBeenCalledWith("bilibili");
+    });
+
+    it("hides the switch without a callback", () => {
+        const { container } = render(
+            <WeekBangumiList days={[day()]} assets={assets} />
+        );
+
+        expect(container.querySelector(".week-source-switch")).toBeNull();
     });
 
     it("renders the Bangumi schedule for the bangumi source", () => {
