@@ -105,10 +105,31 @@ jobs:
                   fi
                   pnpm publish:ovsx $args
 
+            # `action-gh-release` only writes a body when one is given, so the
+            # release notes are taken from `CHANGELOG.md`: the section whose
+            # heading matches the version being published.
+            - name: collect the release notes
+              id: notes
+              run: |
+                  set -eu
+                  version="${{ steps.version.outputs.version }}"
+                  notes="$(mktemp)"
+                  awk -v heading="## [$version]" '
+                      index($0, heading) == 1 { capture = 1; next }
+                      capture && /^## \[/ { exit }
+                      capture { print }
+                  ' CHANGELOG.md > "$notes"
+                  if [ ! -s "$notes" ]; then
+                      echo "::error::CHANGELOG.md has no section for $version"
+                      exit 1
+                  fi
+                  echo "path=$notes" >> "$GITHUB_OUTPUT"
+
             - name: publish the GitHub release
               uses: softprops/action-gh-release@v3
               with:
                   files: artifacts/bangumiopen.vsix
+                  body_path: ${{ steps.notes.outputs.path }}
                   prerelease: ${{ steps.version.outputs.prerelease }}
                   fail_on_unmatched_files: true
 
