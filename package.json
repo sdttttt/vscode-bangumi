@@ -76,7 +76,7 @@
                 "bangumiOpen.EnableReminder": {
                     "type": "boolean",
                     "default": true,
-                    "description": "开启后，番剧更新时会弹出提醒。选择 Bangumi 数据源时不生效，因为该来源没有播出时刻。"
+                    "description": "开启后，番剧更新时会弹出提醒。提醒通知里的「不再提醒」按钮会把它关掉，之后可以在这里重新开启。选择 Bangumi 数据源时不生效，因为该来源没有播出时刻。"
                 },
                 "bangumiOpen.ReminderAheadTime": {
                     "type": "integer",

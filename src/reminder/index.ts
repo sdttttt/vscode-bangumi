@@ -1,11 +1,16 @@
 import * as vscode from "vscode";
 import type { Notifier } from "../notifier";
-import { affectsReminder, type Settings } from "../configuration";
+import {
+    affectsReminder,
+    type Settings,
+    type SettingsWriter,
+} from "../configuration";
 import type { Commands } from "../commands";
 import type { WeekBangumiData } from "../request/bilibili/structure";
 import type { WeeklySchedule } from "../request/schedule";
 import {
     REMIND_ACTION,
+    REMIND_MUTE_ACTION,
     updatedMessage,
     upcomingMessage,
 } from "../utils/display";
@@ -81,6 +86,8 @@ export interface ReminderOptions {
     readonly scheduler: Scheduler;
     /** 本次会话的设置。 */
     readonly settings: Settings;
+    /** 写入用户设置，用于「不再提醒」。 */
+    readonly settingsWriter: SettingsWriter;
     /** 面向用户的输出。 */
     readonly notifier: Notifier;
     /** 执行扩展命令。 */
@@ -108,6 +115,7 @@ export function useReminder(options: ReminderOptions): Reminder {
     const statusBar = options.statusBar;
     const scheduler = options.scheduler;
     const settings = options.settings;
+    const settingsWriter = options.settingsWriter;
     const notifier = options.notifier;
     const onSettingsChanged = options.onSettingsChanged;
     const commands = options.commands;
@@ -122,12 +130,48 @@ export function useReminder(options: ReminderOptions): Reminder {
     let retryAttempt = 0;
     let warnedMissingToday = false;
     let disposed = false;
+    /*
+     * 用户在提醒上按下「不再提醒」后的本地静音标记。
+     *
+     * 写入全局设置是异步的，而关闭必须立刻生效，因此本地先记一笔；设置读数
+     * 重新变成「开启」时，这个标记才会失效——那说明用户在设置里显式打开了它。
+     */
+    let muted = false;
+    /* 上一次读到的提醒开关，用于识别「用户重新开启」这一转变。 */
+    let lastEnabled = settings.isReminderEnabled();
 
     const cancelRetry = (): void => {
         if (undefined !== retryTimer) {
             clearTimeout(retryTimer);
             retryTimer = undefined;
         }
+    };
+
+    /**
+     * 是否还允许安排通知。
+     *
+     * 「不再提醒」只关掉弹窗，状态栏条目不受影响。
+     */
+    const canNotify = (): boolean => !muted && settings.isReminderEnabled();
+
+    /**
+     * 读一次提醒开关，并识别用户是否重新开启了提醒。
+     *
+     * 设置重新变成「开启」时静音标记失效：解除静音只能由用户显式完成，
+     * 否则设置写入失败时提醒会自己复活。
+     */
+    const observeEnabled = (): void => {
+        const enabled = settings.isReminderEnabled();
+
+        /*
+         * 只有「从关到开」这一转变才解除静音：解除静音必须由用户显式完成，
+         * 否则设置写入失败时提醒会自己复活。
+         */
+        if (enabled && !lastEnabled) {
+            muted = false;
+        }
+
+        lastEnabled = enabled;
     };
 
     const renderStatusBar = (at: number): void => {
@@ -151,7 +195,38 @@ export function useReminder(options: ReminderOptions): Reminder {
         );
     };
 
+    /**
+     * 关闭更新提醒：写入全局设置，并立刻停掉后续的通知。
+     *
+     * 状态栏不受影响：静音只针对弹窗，「下一场更新」仍然照常显示。
+     */
+    const disableReminder = async (): Promise<void> => {
+        muted = true;
+
+        try {
+            await settingsWriter.disableReminder();
+        } catch {
+            /* 写不进去也不能让提醒继续弹窗。 */
+        }
+
+        notifier.info("已关闭更新提醒，可在设置中重新开启。");
+        await apply();
+    };
+
     const fire = (event: ScheduleEvent): void => {
+        const at = now();
+
+        /*
+         * 提醒已被关闭时不再弹窗，但事件照样要出队：状态栏要把它从
+         * 「下一场更新」里划掉，否则会一直显示一部已经更新的番剧。
+         */
+        events = events.filter(other => other.at > at);
+        renderStatusBar(at);
+
+        if (!canNotify()) {
+            return;
+        }
+
         const notice = describeNotice(event, now());
 
         const message =
@@ -159,15 +234,18 @@ export function useReminder(options: ReminderOptions): Reminder {
                 ? updatedMessage(event.titles)
                 : upcomingMessage(event.titles, notice.minutes);
 
-        void notifier.action(message, REMIND_ACTION).then(chosen => {
-            if (chosen) {
-                commands.execute("weekBangumi");
-            }
-        });
+        void notifier
+            .actions(message, [REMIND_ACTION, REMIND_MUTE_ACTION])
+            .then(chosen => {
+                if (REMIND_MUTE_ACTION === chosen) {
+                    void disableReminder();
+                    return;
+                }
 
-        const at = now();
-        events = events.filter(other => other.at > at);
-        renderStatusBar(at);
+                if (chosen) {
+                    commands.execute("weekBangumi");
+                }
+            });
     };
 
     const scheduleRetry = (): void => {
@@ -219,7 +297,13 @@ export function useReminder(options: ReminderOptions): Reminder {
 
         if (!warnedMissingToday && undefined === todayIndex(days, at)) {
             warnedMissingToday = true;
-            notifier.info("没有找到今日的番剧数据，提醒可能不准确。");
+
+            /*
+             * 提醒已经关闭时不必再提示数据问题：这条提示本身就是提醒的一部分。
+             */
+            if (canNotify()) {
+                notifier.info("没有找到今日的番剧数据，提醒可能不准确。");
+            }
         }
 
         const schedule: Schedule = buildSchedule(
@@ -273,6 +357,8 @@ export function useReminder(options: ReminderOptions): Reminder {
             return;
         }
 
+        observeEnabled();
+
         /*
          * Bangumi 没有播出时刻，提醒无法成立，因此该来源下不做开关判断，
          * 只刷新状态栏概览；状态栏本身仍受 `DisplayStatusBar` 控制，
@@ -292,7 +378,11 @@ export function useReminder(options: ReminderOptions): Reminder {
             return;
         }
 
-        if (!settings.isReminderEnabled()) {
+        /*
+         * 提醒关掉时状态栏条目仍然要显示「下一场更新」：静音只针对弹窗。
+         * 因此这里照常装载日程，`fire()` 会在真正到期时跳过通知。
+         */
+        if (!settings.isDisplayStatusBar()) {
             generation += 1;
             cancelRetry();
             scheduler.disarm();

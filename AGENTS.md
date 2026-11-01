@@ -40,8 +40,8 @@
 
 - `src/extension.ts` —— 激活入口，注册 `package.json` 中声明的所有命令。
 - `src/state/` —— 会话状态的唯一归宿：`store.ts`（`createStore`）、`app.ts`（`AppState`、纯变换、`useAppState`）。
-- `src/configuration.ts` —— `ConfigKey` 与 `useSettings()`：设置以 `Settings` 接口（端口）对外暴露，消费者接收注入而不是自己读 workspace。
-- `src/notifier.ts` —— `Notifier` 端口（`info` / `error` / `ask` / `pick` / `action`）与 `useNotifier()`，所有面向用户的消息与选择框都经由它。
+- `src/configuration.ts` —— `ConfigKey`、`useSettings()`（只读）与 `useSettingsWriter()`（写入）：设置以 `Settings` / `SettingsWriter` 两个接口（端口）对外暴露，消费者接收注入而不是自己读 workspace。读取与写入分成两个端口，只有「不再提醒」这类需要改写配置的动作才依赖 `SettingsWriter`。
+- `src/notifier.ts` —— `Notifier` 端口（`info` / `error` / `ask` / `pick` / `actions`）与 `useNotifier()`，所有面向用户的消息与选择框都经由它。`actions` 接受一组按钮文案并回传用户选中的那个，多按钮场景用它，不要再为第二个按钮另开端口。
 - `src/commands.ts` —— `COMMAND_IDS`、`Commands` 端口与 `useCommands()`，跨视图跳转通过它而不是直接调 `vscode.commands`。
 - `src/views/` —— `panel.ts` 的 `usePanel` 用闭包承载 Webview 面板生命周期与消息通道；`bangumi.ts` / `weekBangumi.ts` 导出 `useBangumiView` / `useWeekBangumiView`。周番视图按 `Settings.weekSource()` 选择统一模型的来源；索引视图与提醒只消费 Bilibili 实现。
 - `src/extension.ts` —— 组合根：`activate()` 里用 `use*` 建好一个会话的 state、host、视图与提醒，再把它们拼成命令表。
@@ -127,6 +127,7 @@ Vitest 配置了两个 project，互不干扰：
 - 断言统一用 Vitest 原生 matcher（`toBe`/`toEqual`/`toBeUndefined`/`toBeGreaterThanOrEqual`），**不要**用 chai 风格（`to.be.equal`、`to.be.exist`）——后者是裸表达式，会迫使 oxlint 关掉 `no-unused-expressions`。
 - 涉及时间、定时器、随机数的用例必须用假时钟（`vi.useFakeTimers()` + `vi.setSystemTime`）或 `vi.spyOn(Math, "random")`，不要依赖真实时钟。
 - 提醒相关的用例用 `useReminder({ source, overview, now })` 注入假数据源（`source` 是 B 站原始周番，`overview` 是周番统一模型）与时钟，不要共享实例；`src/reminder/*` 的纯函数（`schedule`、`notice`、`summary`）与调度器各自有独立用例，改动其中一处时同步补对应断言。
+- 提醒通知有两个按钮：「打开周番表」与「不再提醒」。「不再提醒」写入 `bangumiOpen.EnableReminder` 的全局设置（`SettingsWriter` 端口），并置上本地静音标记：写入是异步的，关闭必须立刻生效，因此本地先记一笔；静音只由用户显式重新打开设置才解除。**静音只针对弹窗，状态栏条目不受影响**：`EnableReminder` 只控制弹窗，状态栏由 `DisplayStatusBar` 单独控制。
 - 请求层测试 `vi.mock("@/request/http")`，每个用例传入自己 `useCache(...)` 组出的缓存，不要共享实例；缓存的 TTL 行为单独用 `useCache(...)` 覆盖。
 - `src/test/unit/manifest.test.ts` 校验 `package.json` 的 commands 与 `src/commands.ts` 的 `COMMAND_IDS` 一致、`@types/vscode` 不高于 `engines.vscode`。新增命令时先改 `src/commands.ts`，TypeScript 会强制 `extension.ts` 补上处理函数。
 - Webview 用例需要在 `acquireVsCodeApi` 存在的前提下运行；`webview/src/test/setup.ts` 已注入桩，断言消息用其中的 `vsCodeApi`。Preact 的 effect 清理是异步刷新的，涉及卸载的断言要先 `await new Promise(r => setTimeout(r, 0))`，否则会读到未清理的监听器。

@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { useAppState } from "./state/app";
-import { useSettings } from "./configuration";
+import { useSettings, useSettingsWriter } from "./configuration";
 import { useCache, type RequestCaches } from "./request/cache";
 import { useBangumiApi, type Sources } from "./request";
 import { useBilibiliApi } from "./request/bilibili/api";
@@ -44,6 +44,7 @@ function createSession(
 
     const state = useAppState();
     const settings = useSettings();
+    const settingsWriter = useSettingsWriter();
     const notifier = useNotifier();
     const commands = useCommands();
     const caches: RequestCaches = {
@@ -110,6 +111,7 @@ function createSession(
         overview: api.getBgmTvSchedule,
         statusBar,
         settings,
+        settingsWriter,
         notifier,
         commands,
         onSettingsChanged: listener =>

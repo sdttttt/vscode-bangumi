@@ -15,6 +15,15 @@ export type RemindTitles = string | ReadonlyArray<string>;
 export const REMIND_ACTION = "打开周番表";
 
 /**
+ * 提醒中「不再提醒」按钮的文案。
+ *
+ * 按下后更新提醒会关闭，状态栏条目仍然保留。
+ *
+ * @author sdttttt
+ */
+export const REMIND_MUTE_ACTION = "不再提醒";
+
+/**
  * 通过共用的通知格式化器渲染标题。
  *
  * @author sdttttt

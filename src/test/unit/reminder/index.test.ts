@@ -4,8 +4,10 @@ import { createSettingsStub, type SettingsStub } from "@/test/mocks/settings";
 import {
     createCommandsStub,
     createNotifierStub,
+    createSettingsWriterStub,
     type CommandsStub,
     type NotifierStub,
+    type SettingsWriterStub,
 } from "@/test/mocks/ports";
 import {
     useReminder,
@@ -90,6 +92,7 @@ interface ReminderHarness {
     readonly reminder: Reminder;
     readonly notifier: NotifierStub;
     readonly commands: CommandsStub;
+    readonly settingsWriter: SettingsWriterStub;
 }
 
 function createHarness(
@@ -100,6 +103,16 @@ function createHarness(
     const statusBar = useStatusBar("weekBangumi");
     const notifier = createNotifierStub();
     const commands = createCommandsStub();
+    const settingsWriter = createSettingsWriterStub();
+    /*
+     * 真实的写入会改动设置本身，因此替身也要照做：否则「不再提醒」之后的
+     * 静音判定会读到过期的值。
+     */
+    settingsWriter.disableReminder.mockImplementation(() => {
+        settings.values["bangumiOpen.EnableReminder"] = false;
+
+        return Promise.resolve();
+    });
     const now = (): number => Date.now();
 
     const reminder = useReminder({
@@ -107,6 +120,7 @@ function createHarness(
         overview,
         statusBar,
         settings,
+        settingsWriter: settingsWriter.settingsWriter,
         notifier: notifier.notifier,
         commands: commands.commands,
         onSettingsChanged: listener =>
@@ -123,7 +137,7 @@ function createHarness(
         now,
     });
 
-    return { reminder, notifier, commands };
+    return { reminder, notifier, commands, settingsWriter };
 }
 
 function createReminder(source: WeekSource, settings: SettingsStub): Reminder {
@@ -240,7 +254,7 @@ describe("Reminder", () => {
         vi.advanceTimersByTime(120_000);
 
         expect(source).not.toHaveBeenCalled();
-        expect(notifier.action).not.toHaveBeenCalled();
+        expect(notifier.actions).not.toHaveBeenCalled();
         reminder.dispose();
     });
 
@@ -447,8 +461,25 @@ describe("Reminder", () => {
         reminder.dispose();
     });
 
-    it("schedules nothing when the reminder is disabled", async () => {
+    it("keeps the status bar but drops the notification when the reminder is disabled", async () => {
         settings.values["bangumiOpen.EnableReminder"] = false;
+        const source = vi.fn(() => Promise.resolve(today({})));
+        const { reminder, notifier } = createHarness(source, settings);
+
+        await reminder.start();
+
+        /* 提醒关了，状态栏仍然要显示「下一场更新」。 */
+        expect(statusBar.text).toContain("今日番剧");
+
+        vi.advanceTimersByTime(120_000);
+
+        expect(notifier.actions).not.toHaveBeenCalled();
+        reminder.dispose();
+    });
+
+    it("schedules nothing when both the reminder and the status bar are off", async () => {
+        settings.values["bangumiOpen.EnableReminder"] = false;
+        settings.values["bangumiOpen.DisplayStatusBar"] = false;
         const source = vi.fn(() => Promise.resolve(today({})));
         const reminder = createReminder(source, settings);
 
@@ -485,10 +516,10 @@ describe("Reminder", () => {
         await reminder.start();
         vi.advanceTimersByTime(60_000);
 
-        expect(notifier.action).toHaveBeenCalledWith(
-            "《今日番剧》 更新啦！",
-            "打开周番表"
-        );
+        expect(notifier.actions).toHaveBeenCalledWith("《今日番剧》 更新啦！", [
+            "打开周番表",
+            "不再提醒",
+        ]);
         reminder.dispose();
     });
 
@@ -502,9 +533,9 @@ describe("Reminder", () => {
         await reminder.start();
         vi.advanceTimersByTime(3_000_000);
 
-        expect(notifier.action).toHaveBeenCalledWith(
+        expect(notifier.actions).toHaveBeenCalledWith(
             "《今日番剧》 还有10分钟就更新啦！",
-            "打开周番表"
+            ["打开周番表", "不再提醒"]
         );
         reminder.dispose();
     });
@@ -535,10 +566,10 @@ describe("Reminder", () => {
         await reminder.start();
         vi.advanceTimersByTime(60_000);
 
-        expect(notifier.action).toHaveBeenCalledTimes(1);
-        expect(notifier.action).toHaveBeenCalledWith(
+        expect(notifier.actions).toHaveBeenCalledTimes(1);
+        expect(notifier.actions).toHaveBeenCalledWith(
             "《甲》、《乙》 更新啦！",
-            "打开周番表"
+            ["打开周番表", "不再提醒"]
         );
         reminder.dispose();
     });
@@ -565,10 +596,145 @@ describe("Reminder", () => {
         await reminder.start();
         vi.advanceTimersByTime(60_000);
 
-        expect(notifier.action).toHaveBeenCalledWith(
+        expect(notifier.actions).toHaveBeenCalledWith(
             "《甲》、《乙》、《丙》等 4 部 更新啦！",
-            "打开周番表"
+            ["打开周番表", "不再提醒"]
         );
+        reminder.dispose();
+    });
+
+    it("offers a mute button next to the open action", async () => {
+        const { reminder, notifier } = createHarness(
+            () => Promise.resolve(today({ offsetSeconds: 60 })),
+            settings
+        );
+
+        await reminder.start();
+        vi.advanceTimersByTime(60_000);
+
+        expect(notifier.actions).toHaveBeenCalledWith("《今日番剧》 更新啦！", [
+            "打开周番表",
+            "不再提醒",
+        ]);
+        reminder.dispose();
+    });
+
+    it("turns the reminder off when the mute button is pressed", async () => {
+        const { reminder, notifier, settingsWriter } = createHarness(
+            () => Promise.resolve(today({ offsetSeconds: 60 })),
+            settings
+        );
+
+        notifier.actions.mockResolvedValue("不再提醒");
+
+        await reminder.start();
+        vi.advanceTimersByTime(60_000);
+
+        await vi.waitFor(() => {
+            expect(settingsWriter.disableReminder).toHaveBeenCalledTimes(1);
+        });
+
+        /* 状态栏不受影响：静音只针对弹窗。 */
+        expect(statusBar.text).not.toBe("");
+        reminder.dispose();
+    });
+
+    it("stops notifying after the reminder is muted", async () => {
+        const { reminder, notifier } = createHarness(
+            () => Promise.resolve(today({ offsetSeconds: 60 })),
+            settings
+        );
+
+        notifier.actions.mockResolvedValue("不再提醒");
+
+        await reminder.start();
+        vi.advanceTimersByTime(60_000);
+
+        await vi.waitFor(() => {
+            expect(notifier.info).toHaveBeenCalledWith(
+                "已关闭更新提醒，可在设置中重新开启。"
+            );
+        });
+
+        notifier.actions.mockClear();
+        vi.advanceTimersByTime(120_000);
+
+        expect(notifier.actions).not.toHaveBeenCalled();
+        reminder.dispose();
+    });
+
+    it("still opens the week table when the open action is pressed", async () => {
+        const { reminder, notifier, commands } = createHarness(
+            () => Promise.resolve(today({ offsetSeconds: 60 })),
+            settings
+        );
+
+        notifier.actions.mockResolvedValue("打开周番表");
+
+        await reminder.start();
+        vi.advanceTimersByTime(60_000);
+
+        await vi.waitFor(() => {
+            expect(commands.execute).toHaveBeenCalledWith("weekBangumi");
+        });
+        reminder.dispose();
+    });
+
+    it("keeps the reminder muted even if the setting cannot be written", async () => {
+        const { reminder, notifier, settingsWriter } = createHarness(
+            () => Promise.resolve(today({ offsetSeconds: 60 })),
+            settings
+        );
+
+        settingsWriter.disableReminder.mockRejectedValue(
+            new Error("read only")
+        );
+        notifier.actions.mockResolvedValue("不再提醒");
+
+        await reminder.start();
+        vi.advanceTimersByTime(60_000);
+
+        await vi.waitFor(() => {
+            expect(settingsWriter.disableReminder).toHaveBeenCalledTimes(1);
+        });
+
+        notifier.actions.mockClear();
+        vi.advanceTimersByTime(120_000);
+
+        expect(notifier.actions).not.toHaveBeenCalled();
+        reminder.dispose();
+    });
+
+    it("resumes the reminder when the user turns it back on", async () => {
+        const source = vi.fn(() =>
+            Promise.resolve(today({ offsetSeconds: 60 }))
+        );
+        const { reminder, notifier } = createHarness(source, settings);
+
+        notifier.actions.mockResolvedValue("不再提醒");
+
+        await reminder.start();
+        vi.advanceTimersByTime(60_000);
+
+        await vi.waitFor(() => {
+            expect(notifier.info).toHaveBeenCalled();
+        });
+
+        notifier.actions.mockClear();
+
+        /* 用户在设置里重新打开提醒，静音标记随之失效。 */
+        settings.values["bangumiOpen.EnableReminder"] = true;
+        const listener = vi.mocked(vscode.workspace.onDidChangeConfiguration)
+            .mock.calls[0][0];
+        listener({ affectsConfiguration: () => true } as never);
+
+        await vi.waitFor(() => {
+            expect(source).toHaveBeenCalled();
+        });
+
+        vi.advanceTimersByTime(120_000);
+
+        expect(notifier.actions).toHaveBeenCalled();
         reminder.dispose();
     });
 
@@ -695,6 +861,7 @@ describe("Reminder", () => {
         const listener = vi.mocked(vscode.workspace.onDidChangeConfiguration)
             .mock.calls[0][0];
         settings.values["bangumiOpen.EnableReminder"] = false;
+        settings.values["bangumiOpen.DisplayStatusBar"] = false;
         listener({ affectsConfiguration: () => true } as never);
         await vi.waitFor(() => {
             expect(vi.getTimerCount()).toBe(0);

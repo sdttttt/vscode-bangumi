@@ -1,6 +1,7 @@
 import { vi } from "vitest";
 import type { Commands, CommandId } from "@/commands";
 import type { Notifier } from "@/notifier";
+import type { SettingsWriter } from "@/configuration";
 
 /**
  * Notifier 替身，记录扩展本应展示的内容。
@@ -12,13 +13,13 @@ export interface NotifierStub {
     readonly error: ReturnType<typeof vi.fn<(message: string) => void>>;
     readonly ask: ReturnType<typeof vi.fn<Notifier["ask"]>>;
     readonly pick: ReturnType<typeof vi.fn<Notifier["pick"]>>;
-    readonly action: ReturnType<typeof vi.fn<Notifier["action"]>>;
+    readonly actions: ReturnType<typeof vi.fn<Notifier["actions"]>>;
     /** 该替身作为 `Notifier` 使用。 */
     readonly notifier: Notifier;
 }
 
 /**
- * 创建 Notifier 替身。除非用例自行设定返回值，`pick` 与 `action` 都返回 `undefined`，
+ * 创建 Notifier 替身。除非用例自行设定返回值，`pick` 与 `actions` 都返回 `undefined`，
  * 与用户取消选择的场景一致。
  *
  * @author sdttttt
@@ -28,15 +29,46 @@ export function createNotifierStub(): NotifierStub {
     const error = vi.fn<(message: string) => void>();
     const ask = vi.fn<Notifier["ask"]>(() => Promise.resolve(undefined));
     const pick = vi.fn<Notifier["pick"]>(() => Promise.resolve(undefined));
-    const action = vi.fn<Notifier["action"]>(() => Promise.resolve(undefined));
+    const actions = vi.fn<Notifier["actions"]>(() =>
+        Promise.resolve(undefined)
+    );
 
     return {
         info,
         error,
         ask,
         pick,
-        action,
-        notifier: { info, error, ask, pick, action },
+        actions,
+        notifier: { info, error, ask, pick, actions },
+    };
+}
+
+/**
+ * SettingsWriter 替身，记录扩展本应写入的设置。
+ *
+ * @author sdttttt
+ */
+export interface SettingsWriterStub {
+    readonly disableReminder: ReturnType<
+        typeof vi.fn<SettingsWriter["disableReminder"]>
+    >;
+    /** 该替身作为 `SettingsWriter` 使用。 */
+    readonly settingsWriter: SettingsWriter;
+}
+
+/**
+ * 创建 SettingsWriter 替身，默认写入成功。
+ *
+ * @author sdttttt
+ */
+export function createSettingsWriterStub(): SettingsWriterStub {
+    const disableReminder = vi.fn<SettingsWriter["disableReminder"]>(() =>
+        Promise.resolve()
+    );
+
+    return {
+        disableReminder,
+        settingsWriter: { disableReminder },
     };
 }
 

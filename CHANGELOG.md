@@ -235,6 +235,7 @@
 - Bangumi 模式的封面改用竖版画框，并按长度取更清晰的 `common` 尺寸：此前复用的是 B 站的方形画框与 48×48 的 `grid` 图，长条封面被裁成方块、放大后也很模糊。
 
 - 切换到 Bangumi 数据源时，更新提醒自动停用（该来源没有播出时刻），状态栏改为显示当日更新的番剧概要：一部时显示剧名，多部时显示数量，悬浮提示可看当天完整列表。概览同样跟随设置项 `DisplayStatusBar`，并会在跨日后自动刷新。
+- 更新提醒的通知新增「不再提醒」按钮：按下后关闭更新提醒（写入 `bangumiOpen.EnableReminder` 的全局设置），状态栏的「下一场更新」不受影响，重新打开该设置即可恢复。
 
 ### 内部
 
@@ -242,6 +243,8 @@
 - 新增统一模型 `src/request/schedule.ts`（`WeeklySchedule` / `ScheduleDay` / `ScheduleItem`）与两个纯适配器，把两种原始响应归一成同一份数据；`hasSlots` 标记该来源是否带播出时刻。
 - 新增 `src/request/index.ts` 作为应用端口，暴露 `getIndexPage` / `getBilibiliSchedule` / `getBgmTvSchedule`；番剧索引与更新提醒仍只消费 Bilibili 实现。
 - 新增纯函数 `weekDayOf`（UTC+8 的 1–7 星期）与 `toHttpsUrl`（把接口返回的 `http://` 封面与页面地址升级为 https）。
+- `Notifier` 的 `action`（单按钮）改为 `actions`（多按钮）；新增 `SettingsWriter` 端口，把「写入设置」与「读取设置」分开，`src/configuration.ts` 提供 `useSettingsWriter()`。
+- `EnableReminder` 现在只控制弹窗提醒，状态栏条目改由 `DisplayStatusBar` 单独控制：关掉提醒后状态栏仍会显示「下一场更新」。
 
 ## [3.0.0] - 2026-10-31
 

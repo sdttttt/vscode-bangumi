@@ -39,6 +39,42 @@ export interface Settings {
 }
 
 /**
+ * 写入用户设置的端口。
+ *
+ * 读取与写入分成两个端口：绝大多数模块只需要读，`Settings` 因此保持只读；
+ * 只有「不再提醒」这类需要改写配置的动作才依赖本接口。
+ *
+ * @author sdttttt
+ */
+export interface SettingsWriter {
+    /** 关闭更新提醒，写入全局设置。 */
+    disableReminder(): Promise<void>;
+}
+
+/**
+ * 创建一次扩展会话的设置写入器。
+ *
+ * 写入的是全局设置而不是工作区设置：提醒属于用户个人偏好，不该跟着某个
+ * 项目走。
+ *
+ * @author sdttttt
+ */
+export function useSettingsWriter(): SettingsWriter {
+    return {
+        disableReminder: () =>
+            Promise.resolve(
+                vscode.workspace
+                    .getConfiguration()
+                    .update(
+                        ConfigKey.EnableReminder,
+                        false,
+                        vscode.ConfigurationTarget.Global
+                    )
+            ),
+    };
+}
+
+/**
  * 影响提醒的设置是否发生了变化。
  *
  * 数据来源也在其中：切换来源会让提醒在「装载通知」与「今日概览」两种形态之间切换。
