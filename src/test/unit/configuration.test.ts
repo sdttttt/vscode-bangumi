@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 import {
     affectsReminder,
     ConfigKey,
-    useSettings,
+    createSettings,
     type Settings,
 } from "@/configuration";
 
@@ -18,11 +18,11 @@ function stubConfig(values: Record<string, unknown>): void {
     } as unknown as ReturnType<typeof vscode.workspace.getConfiguration>);
 }
 
-describe("useSettings", () => {
+describe("createSettings", () => {
     let settings: Settings;
 
     beforeEach(() => {
-        settings = useSettings();
+        settings = createSettings();
         vi.mocked(vscode.workspace.getConfiguration).mockClear();
     });
 
@@ -90,6 +90,22 @@ describe("useSettings", () => {
         stubConfig({ [ConfigKey.WeekSource]: "bangumi.tv" });
 
         expect(settings.weekSource()).toBe("bilibili");
+    });
+
+    it("writes the reminder switch to the global settings", async () => {
+        const update = vi.fn(() => Promise.resolve());
+        vi.mocked(vscode.workspace.getConfiguration).mockReturnValue({
+            get: vi.fn(),
+            update,
+        } as unknown as ReturnType<typeof vscode.workspace.getConfiguration>);
+
+        await settings.disableReminder();
+
+        expect(update).toHaveBeenCalledWith(
+            ConfigKey.EnableReminder,
+            false,
+            vscode.ConfigurationTarget.Global
+        );
     });
 
     it("reads the live setting on every call", () => {

@@ -12,6 +12,10 @@ import type { Settings } from "@/configuration";
 export interface SettingsStub extends Settings {
     /** 下一次读取将要返回的值。 */
     readonly values: Record<string, unknown>;
+    /** 关闭提醒的写入动作，记录调用次数并同步改写 `values`。 */
+    readonly disableReminder: ReturnType<
+        typeof vi.fn<Settings["disableReminder"]>
+    >;
 }
 
 /**
@@ -50,5 +54,14 @@ export function createSettingsStub(
                 ? "bangumi"
                 : "bilibili"
         ),
+        /*
+         * 真实的写入会改动设置本身，因此替身也要照做：否则「不再提醒」之后的
+         * 静音判定会读到过期的值。
+         */
+        disableReminder: vi.fn(() => {
+            values["bangumiOpen.EnableReminder"] = false;
+
+            return Promise.resolve();
+        }),
     };
 }

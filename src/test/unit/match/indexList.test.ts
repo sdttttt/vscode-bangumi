@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { buildBangumiUrl, DEFAULT_QUERY } from "@/request/bilibili/query";
 import { useAppState, type AppStore } from "@/state/app";
-import { useFilterMenu, type FilterMenu } from "@/match/indexList";
-import { MENU_LABELS, useIndexCommand } from "@/match/index";
+import { createFilterMenu, type FilterMenu } from "@/match/indexList";
+import { MENU_LABELS, createIndexCommand } from "@/match/index";
 import { valueFilter } from "@/match/filterSpec";
 import AreaList from "@/match/areaList";
 import StyleList from "@/match/styleList";
@@ -41,7 +41,7 @@ function harness(): Harness {
     });
     const notifier = createNotifierStub();
     const commands = createCommandsStub();
-    const menu = useFilterMenu({
+    const menu = createFilterMenu({
         state,
         settings,
         notifier: notifier.notifier,
@@ -80,7 +80,7 @@ async function pickFrom(
 async function pickIndex(h: Harness, label: string): Promise<void> {
     h.notifier.pick.mockResolvedValue(label);
 
-    useIndexCommand({
+    createIndexCommand({
         state: h.state,
         menu: h.menu,
         notifier: h.notifier.notifier,
@@ -104,7 +104,7 @@ function parameterOf(state: AppStore, name: string): string | null {
     return new URLSearchParams(url.split("?")[1]).get(name);
 }
 
-describe("useIndexCommand", () => {
+describe("createIndexCommand", () => {
     let h: Harness;
 
     beforeEach(() => {
@@ -114,7 +114,7 @@ describe("useIndexCommand", () => {
     it("offers every filter in menu order, with the restore entry last", async () => {
         h.notifier.pick.mockResolvedValue(undefined);
 
-        useIndexCommand({
+        createIndexCommand({
             state: h.state,
             menu: h.menu,
             notifier: h.notifier.notifier,
@@ -131,7 +131,7 @@ describe("useIndexCommand", () => {
             .mockResolvedValueOnce("时间")
             .mockResolvedValueOnce("2020");
 
-        useIndexCommand({
+        createIndexCommand({
             state: h.state,
             menu: h.menu,
             notifier: h.notifier.notifier,
@@ -147,7 +147,7 @@ describe("useIndexCommand", () => {
             .mockResolvedValueOnce("地区")
             .mockResolvedValueOnce("日本");
 
-        useIndexCommand({
+        createIndexCommand({
             state: h.state,
             menu: h.menu,
             notifier: h.notifier.notifier,
@@ -185,7 +185,7 @@ describe("useIndexCommand", () => {
     });
 });
 
-describe("useFilterMenu", () => {
+describe("createFilterMenu", () => {
     let h: Harness;
 
     beforeEach(() => {

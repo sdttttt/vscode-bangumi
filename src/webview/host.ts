@@ -54,7 +54,7 @@ export interface WebviewHost {
  * @param extensionPath 已安装扩展的根目录
  * @author sdttttt
  */
-export function useWebviewHost(extensionPath: string): WebviewHost {
+export function createWebviewHost(extensionPath: string): WebviewHost {
     /**
      * 把 Webview 产物中的文件解析为 Webview 可安全访问的 Uri。
      */

@@ -29,7 +29,7 @@ export interface Notifier {
  *
  * @author sdttttt
  */
-export function useNotifier(): Notifier {
+export function createNotifier(): Notifier {
     return {
         info: message => {
             void vscode.window.showInformationMessage(message);

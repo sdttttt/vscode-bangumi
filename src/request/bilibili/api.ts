@@ -53,7 +53,7 @@ export interface BilibiliApi {
  * @param notifier 会话面向用户的输出
  * @author sdttttt
  */
-export function useBilibiliApi(
+export function createBilibiliApi(
     caches: RequestCaches,
     notifier: Notifier
 ): BilibiliApi {

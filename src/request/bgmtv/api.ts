@@ -30,7 +30,7 @@ export interface BgmTvApi {
  * @param notifier 会话面向用户的输出
  * @author sdttttt
  */
-export function useBgmTvApi(
+export function createBgmTvApi(
     caches: RequestCaches,
     notifier: Notifier
 ): BgmTvApi {

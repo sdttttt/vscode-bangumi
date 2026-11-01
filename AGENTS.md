@@ -40,15 +40,15 @@
 
 - `src/extension.ts` —— 激活入口，注册 `package.json` 中声明的所有命令。
 - `src/state/` —— 会话状态的唯一归宿：`store.ts`（`createStore`）、`app.ts`（`AppState`、纯变换、`useAppState`）。
-- `src/configuration.ts` —— `ConfigKey`、`useSettings()`（只读）与 `useSettingsWriter()`（写入）：设置以 `Settings` / `SettingsWriter` 两个接口（端口）对外暴露，消费者接收注入而不是自己读 workspace。读取与写入分成两个端口，只有「不再提醒」这类需要改写配置的动作才依赖 `SettingsWriter`。
-- `src/notifier.ts` —— `Notifier` 端口（`info` / `error` / `ask` / `pick` / `actions`）与 `useNotifier()`，所有面向用户的消息与选择框都经由它。`actions` 接受一组按钮文案并回传用户选中的那个，多按钮场景用它，不要再为第二个按钮另开端口。
-- `src/commands.ts` —— `COMMAND_IDS`、`Commands` 端口与 `useCommands()`，跨视图跳转通过它而不是直接调 `vscode.commands`。
-- `src/views/` —— `panel.ts` 的 `usePanel` 用闭包承载 Webview 面板生命周期与消息通道；`bangumi.ts` / `weekBangumi.ts` 导出 `useBangumiView` / `useWeekBangumiView`。周番视图按 `Settings.weekSource()` 选择统一模型的来源；索引视图与提醒只消费 Bilibili 实现。
+- `src/configuration.ts` —— `ConfigKey` 与 `createSettings()`：设置以 `Settings` 接口（端口）对外暴露，消费者接收注入而不是自己读 workspace。读与写都在这个接口里 —— 两者是同一个聚合的两面，拆成两个端口只会让消费者多背一个依赖。
+- `src/notifier.ts` —— `Notifier` 端口（`info` / `error` / `ask` / `pick` / `actions`）与 `createNotifier()`，所有面向用户的消息与选择框都经由它。`actions` 接受一组按钮文案并回传用户选中的那个，多按钮场景用它，不要再为第二个按钮另开端口。
+- `src/commands.ts` —— `COMMAND_IDS`、`Commands` 端口与 `createCommands()`，跨视图跳转通过它而不是直接调 `vscode.commands`。
+- `src/views/` —— `panel.ts` 的 `usePanel` 用闭包承载 Webview 面板生命周期与消息通道；`bangumi.ts` / `weekBangumi.ts` 导出 `createBangumiView` / `useWeekBangumiView`。周番视图按 `Settings.weekSource()` 选择统一模型的来源；索引视图与提醒只消费 Bilibili 实现。
 - `src/extension.ts` —— 组合根：`activate()` 里用 `use*` 建好一个会话的 state、host、视图与提醒，再把它们拼成命令表。
-- `src/webview/` —— 宿主侧 Webview 基础设施：`protocol.ts`（双向消息类型，两段共享）、`host.ts`（`useWebviewHost`：CSP、nonce、`localResourceRoots`、资源 URI）、`viewModel.ts`（API 原始数据 → 渲染载荷）。
+- `src/webview/` —— 宿主侧 Webview 基础设施：`protocol.ts`（双向消息类型，两段共享）、`host.ts`（`createWebviewHost`：CSP、nonce、`localResourceRoots`、资源 URI）、`viewModel.ts`（API 原始数据 → 渲染载荷）。
 - `webview/` —— 独立的前端工程（Preact + TypeScript + UnoCSS），源码在 `webview/src/`，样式配置在 `webview/uno.config.ts`，产物由 `vite.webview.mts` 输出到 `webview-dist/`。
-- `src/request/` —— 请求层按来源分组，再统一成一份周番模型：`http.ts`（`fetch` 封装与超时）、`cache.ts`（会话缓存与 `RequestCaches`）、`bilibili/`（`query.ts` 的 `BangumiQuery`/`DEFAULT_QUERY`/`buildBangumiUrl`、`structure.ts` 的响应类型与纯谓词、`api.ts` 的 `useBilibiliApi`：索引 + 周番原始数据）、`bgmtv/`（`query.ts` 的 `BANGUMI_CALENDAR`、`structure.ts` 的每日放送类型与 `isValidCalendar`、`api.ts` 的 `useBgmTvApi`）、`schedule.ts`（统一模型 `WeeklySchedule`/`ScheduleDay`/`ScheduleItem` 与两个纯适配器）、`index.ts`（`Sources` 端口与 `useBangumiApi`，暴露 `getIndexPage`/`getBilibiliSchedule`/`getBgmTvSchedule`）。
-- `src/match/` —— 索引菜单：`filterSpec.ts`（`FilterSpec` 类型与 `valueFilter` 工厂）、`indexList.ts`（`useFilterMenu`，负责 quick pick、标签与提示）、`index.ts`（`FILTERS` 表与 `useIndexCommand`）、其余模块是纯数据描述对象。
+- `src/request/` —— 请求层按来源分组，再统一成一份周番模型：`http.ts`（`fetch` 封装与超时）、`cache.ts`（会话缓存与 `RequestCaches`）、`bilibili/`（`query.ts` 的 `BangumiQuery`/`DEFAULT_QUERY`/`buildBangumiUrl`、`structure.ts` 的响应类型与纯谓词、`api.ts` 的 `createBilibiliApi`：索引 + 周番原始数据）、`bgmtv/`（`query.ts` 的 `BANGUMI_CALENDAR`、`structure.ts` 的每日放送类型与 `isValidCalendar`、`api.ts` 的 `createBgmTvApi`）、`schedule.ts`（统一模型 `WeeklySchedule`/`ScheduleDay`/`ScheduleItem` 与两个纯适配器）、`index.ts`（`Sources` 端口与 `createBangumiApi`，暴露 `getIndexPage`/`getBilibiliSchedule`/`getBgmTvSchedule`）。
+- `src/match/` —— 索引菜单：`filterSpec.ts`（`FilterSpec` 类型与 `valueFilter` 工厂）、`indexList.ts`（`createFilterMenu`，负责 quick pick、标签与提示）、`index.ts`（`FILTERS` 表与 `createIndexCommand`）、其余模块是纯数据描述对象。
 - `src/reminder/` —— 更新提醒：`schedule.ts`（周番数据 → 触发事件，纯函数）、`notice.ts`（事件 → 通知形态，纯函数）、`summary.ts`（当日概览的文案，纯函数）、`scheduler.ts`（`useScheduler`，单定时器，可注入时钟）、`statusBar.ts`（`useStatusBar`，两种形态共用同一个条目）、`index.ts`（`useReminder`，按数据来源在「事件提醒」与「今日概览」之间切换）。
 - `src/utils/` —— 纯函数工具（`strings`、`type`、`file`、`display`、`clock`（UTC+8 日界）、`titles`（通知文案））。
 - `src/test/` —— 单元测试目录，布局见下方「测试约定」。
@@ -123,11 +123,11 @@ Vitest 配置了两个 project，互不干扰：
 - `src/test/mocks/vscode.ts` —— `vscode` 桩工厂。新增用到的 API 时在这里补，不要在各用例里就地 mock。
 - `src/test/mocks/fixtures/` —— 响应夹具（`bangumi.ts`、`weekBangumi.ts`），用带 `overrides` 的工厂函数构造，不要在用例里手写完整对象。
 - `src/test/mocks/panel.ts` —— `WebviewPanel` 桩，记录 `postMessage` 的每一份 state，并支持 `receive()` 模拟 Webview 发来的命令。视图测试一律用它，不要再手工拼 `webview` 对象。
-- 每个用例自己装配依赖（`useAppState`、`usePanel`、`useBangumiApi` …），状态互不共享，不需要 `vi.resetModules()`，也不需要任何全局上下文；`vi.resetModules()` 只留在 `extension.test.ts`，用于验证 `activate()` 只建一个会话。
+- 每个用例自己装配依赖（`useAppState`、`usePanel`、`createBangumiApi` …），状态互不共享，不需要 `vi.resetModules()`，也不需要任何全局上下文；`vi.resetModules()` 只留在 `extension.test.ts`，用于验证 `activate()` 只建一个会话。
 - 断言统一用 Vitest 原生 matcher（`toBe`/`toEqual`/`toBeUndefined`/`toBeGreaterThanOrEqual`），**不要**用 chai 风格（`to.be.equal`、`to.be.exist`）——后者是裸表达式，会迫使 oxlint 关掉 `no-unused-expressions`。
 - 涉及时间、定时器、随机数的用例必须用假时钟（`vi.useFakeTimers()` + `vi.setSystemTime`）或 `vi.spyOn(Math, "random")`，不要依赖真实时钟。
 - 提醒相关的用例用 `useReminder({ source, overview, now })` 注入假数据源（`source` 是 B 站原始周番，`overview` 是周番统一模型）与时钟，不要共享实例；`src/reminder/*` 的纯函数（`schedule`、`notice`、`summary`）与调度器各自有独立用例，改动其中一处时同步补对应断言。
-- 提醒通知有两个按钮：「打开周番表」与「不再提醒」。「不再提醒」写入 `bangumiOpen.EnableReminder` 的全局设置（`SettingsWriter` 端口），并置上本地静音标记：写入是异步的，关闭必须立刻生效，因此本地先记一笔；静音只由用户显式重新打开设置才解除。**静音只针对弹窗，状态栏条目不受影响**：`EnableReminder` 只控制弹窗，状态栏由 `DisplayStatusBar` 单独控制。关闭过程必须**完全静默**——用户按下「不再提醒」就是要清净，「已关闭…」之类的确认提示本身也是弹窗，不要加。
+- 提醒通知有两个按钮：「打开周番表」与「不再提醒」。「不再提醒」写入 `bangumiOpen.EnableReminder` 的全局设置（`Settings.disableReminder()`），并置上本地静音标记：写入是异步的，关闭必须立刻生效，因此本地先记一笔；静音只由用户显式重新打开设置才解除。**静音只针对弹窗，状态栏条目不受影响**：`EnableReminder` 只控制弹窗，状态栏由 `DisplayStatusBar` 单独控制。关闭过程必须**完全静默**——用户按下「不再提醒」就是要清净，「已关闭…」之类的确认提示本身也是弹窗，不要加。
 - 请求层测试 `vi.mock("@/request/http")`，每个用例传入自己 `useCache(...)` 组出的缓存，不要共享实例；缓存的 TTL 行为单独用 `useCache(...)` 覆盖。
 - `src/test/unit/manifest.test.ts` 校验 `package.json` 的 commands 与 `src/commands.ts` 的 `COMMAND_IDS` 一致、`@types/vscode` 不高于 `engines.vscode`。新增命令时先改 `src/commands.ts`，TypeScript 会强制 `extension.ts` 补上处理函数。
 - Webview 用例需要在 `acquireVsCodeApi` 存在的前提下运行；`webview/src/test/setup.ts` 已注入桩，断言消息用其中的 `vsCodeApi`。Preact 的 effect 清理是异步刷新的，涉及卸载的断言要先 `await new Promise(r => setTimeout(r, 0))`，否则会读到未清理的监听器。
@@ -154,8 +154,12 @@ Vitest 配置了两个 project，互不干扰：
 - `.today` / `.delay` 用 `!` 前缀（如 `!border-accent`）压过同一元素的其它颜色工具类：UnoCSS 的输出顺序不按 class 书写顺序，不加 `!` 时结果不可预测。
 - `@unocss/vite` 会自动扫描 `.tsx`，但也会把源码里的普通英文单词当成候选类名（例如注释里出现 `tab` 之类的英文单词会生成 `.tab`）。这些多出来的规则无害，不要为了消除它们而下调 `content` 的扫描范围：关掉 pipeline 会让 Vite 引入的虚拟样式表解析失败。
 - **`src/` 下不写 class，也不用 `this`。** 可变状态只有两个去处：`src/state/` 的 store，或 `use*()` 工厂的闭包。
-- **状态与方法一律封装进 `use*()` 工厂，不要写成模块级单例。** 现有工厂：`useAppState`、`useCache`、`useBilibiliApi`、`useBgmTvApi`、`useBangumiApi`、`useWebviewHost`、`usePanel`、`useBangumiView`、`useWeekBangumiView`、`useFilterMenu`、`useIndexCommand`、`useScheduler`、`useStatusBar`、`useReminder`。模块顶层只允许放不可变的纯数据（`FILTERS`、`DEFAULT_QUERY`、`MENU_LABELS` 之类）和纯函数。
-- **`use*()` 工厂里不许再调用别的 `use*()`。** 工厂只创建自己那份状态，需要别的模块的实例（面板、调度器、状态栏、缓存、API）时一律通过参数从外部注入，由组合根 `createSession()` 负责装配。同理，`onCommand` 之类把两个对象连起来的接线也只能在组合根里做。
+- **工厂的命名按「是否持有状态」区分，不要混用。**
+    - `use*()` —— **持有可变状态**（闭包里的 `let`、会被修改的集合）：`useAppState`、`useCache`、`usePanel`、`useWeekBangumiView`、`useScheduler`、`useStatusBar`、`useReminder`。前缀的意义是「这次调用创建了一份状态」。
+    - `create*()` —— **不持有状态**，只是把一段逻辑包成对象返回：`createSettings`、`createNotifier`、`createCommands`、`createWebviewHost`、`createBilibiliApi`、`createBgmTvApi`、`createBangumiApi`、`createFilterMenu`、`createIndexCommand`、`createBangumiView`，以及 `createStore`。
+    - 判别方法：函数体里有没有会被修改的 `let` 变量或集合。没有就用 `create*` —— 写成 `use*` 只是为了「看起来一致」，反而让前缀失去判别力。与已有的 `createStore` 保持一致。
+- **状态与方法一律封装进工厂，不要写成模块级单例。** 模块顶层只允许放不可变的纯数据（`FILTERS`、`DEFAULT_QUERY`、`MENU_LABELS` 之类）和纯函数。
+- **工厂里不许再调用别的工厂。** 工厂只创建自己那份状态，需要别的模块的实例（面板、调度器、状态栏、缓存、API）时一律通过参数从外部注入，由组合根 `createSession()` 负责装配。同理，`onCommand` 之类把两个对象连起来的接线也只能在组合根里做。
 - **状态一律通过端口注入，不许在工厂里读环境。** 依赖方向是「组合根 → 工厂 → 端口接口」：`Settings`（用户配置）、`Notifier`（消息与选择框）、`Commands`（命令调用）、`Commands`/`Panel`/`WebviewHost`（宿主能力）都由 `src/extension.ts` 建好后传入。工厂只依赖这些接口，测试传 double 即可，不需要 `vi.mock("vscode")` 去改环境状态。
 - **控制反转的边界在 `src/extension.ts`。** 谁创建、谁持有、谁释放（`context.subscriptions`、`deactivate()`）都写在组合根；工厂只接收并使用，不自己注册监听、不自己读配置、不自己弹窗。
 - 组合根在 `src/extension.ts` 的 `createSession()`：只有它能同时拿到 state、缓存、api、host、面板、视图、菜单与提醒，负责把它们装配起来；其他模块通过参数接收依赖，不许自己去取，也不许自己 new。

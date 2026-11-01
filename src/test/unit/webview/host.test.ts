@@ -1,6 +1,10 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import type { Webview } from "vscode";
-import { useWebviewHost, WEBVIEW_DIST, type WebviewHost } from "@/webview/host";
+import {
+    createWebviewHost,
+    WEBVIEW_DIST,
+    type WebviewHost,
+} from "@/webview/host";
 
 /**
  * 构建一个 Webview 替身，其 `asWebviewUri` 返回可读的字符串。
@@ -17,10 +21,10 @@ function makeWebview(): Webview {
 let host: WebviewHost;
 
 beforeEach(() => {
-    host = useWebviewHost("/extension");
+    host = createWebviewHost("/extension");
 });
 
-describe("useWebviewHost", () => {
+describe("createWebviewHost", () => {
     it("enables the bundled scripts", () => {
         expect(host.options().enableScripts).toBe(true);
     });

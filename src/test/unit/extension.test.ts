@@ -29,7 +29,7 @@ vi.mock("@/reminder", () => ({
 }));
 
 vi.mock("@/views/bangumi", () => ({
-    useBangumiView: vi.fn(() => bangumiView),
+    createBangumiView: vi.fn(() => bangumiView),
 }));
 
 vi.mock("@/views/weekBangumi", () => ({
@@ -37,7 +37,7 @@ vi.mock("@/views/weekBangumi", () => ({
 }));
 
 vi.mock("@/match/index", () => ({
-    useIndexCommand: vi.fn(() => indexCommand),
+    createIndexCommand: vi.fn(() => indexCommand),
 }));
 
 /**

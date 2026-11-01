@@ -1,21 +1,21 @@
 import * as vscode from "vscode";
 import { useAppState } from "./state/app";
-import { useSettings, useSettingsWriter } from "./configuration";
+import { createSettings } from "./configuration";
 import { useCache, type RequestCaches } from "./request/cache";
-import { useBangumiApi, type Sources } from "./request";
-import { useBilibiliApi } from "./request/bilibili/api";
-import { useBgmTvApi } from "./request/bgmtv/api";
-import { useWebviewHost } from "./webview/host";
+import { createBangumiApi, type Sources } from "./request";
+import { createBilibiliApi } from "./request/bilibili/api";
+import { createBgmTvApi } from "./request/bgmtv/api";
+import { createWebviewHost } from "./webview/host";
 import { usePanel } from "./views/panel";
-import { useIndexCommand } from "./match/index";
-import { useFilterMenu } from "./match/indexList";
-import { useBangumiView } from "./views/bangumi";
+import { createIndexCommand } from "./match/index";
+import { createFilterMenu } from "./match/indexList";
+import { createBangumiView } from "./views/bangumi";
 import { useWeekBangumiView } from "./views/weekBangumi";
 import { useReminder, type Reminder } from "./reminder";
 import { useStatusBar } from "./reminder/statusBar";
 import { useScheduler } from "./reminder/scheduler";
-import { useCommands, type CommandId } from "./commands";
-import { useNotifier } from "./notifier";
+import { createCommands, type CommandId } from "./commands";
+import { createNotifier } from "./notifier";
 
 /**
  * 一次激活创建的全部内容，供 `deactivate()` 释放。
@@ -43,10 +43,9 @@ function createSession(
     const subscriptions = context.subscriptions;
 
     const state = useAppState();
-    const settings = useSettings();
-    const settingsWriter = useSettingsWriter();
-    const notifier = useNotifier();
-    const commands = useCommands();
+    const settings = createSettings();
+    const notifier = createNotifier();
+    const commands = createCommands();
     const caches: RequestCaches = {
         bangumi: useCache(600),
         week: useCache(60),
@@ -54,11 +53,11 @@ function createSession(
     };
     /* 两个来源由组合根装配：提醒拿 B 站实现，视图拿统一端口。 */
     const sources: Sources = {
-        bilibili: useBilibiliApi(caches, notifier),
-        bgmtv: useBgmTvApi(caches, notifier),
+        bilibili: createBilibiliApi(caches, notifier),
+        bgmtv: createBgmTvApi(caches, notifier),
     };
-    const api = useBangumiApi(sources);
-    const host = useWebviewHost(context.extensionPath);
+    const api = createBangumiApi(sources);
+    const host = createWebviewHost(context.extensionPath);
 
     /**
      * 在用户最近活动的编辑器列中打开面板。
@@ -74,7 +73,7 @@ function createSession(
             host.options()
         );
 
-    const menu = useFilterMenu({ state, settings, notifier, commands });
+    const menu = createFilterMenu({ state, settings, notifier, commands });
     const statusBar = useStatusBar("weekBangumi");
 
     const bangumiPanel = usePanel({
@@ -92,7 +91,7 @@ function createSession(
         createPanel: createViewPanel,
     });
 
-    const bangumi = useBangumiView({
+    const bangumi = createBangumiView({
         state,
         api,
         panel: bangumiPanel,
@@ -103,7 +102,7 @@ function createSession(
         panel: weekPanel,
         settings,
     });
-    const index = useIndexCommand({ state, menu, notifier });
+    const index = createIndexCommand({ state, menu, notifier });
     const reminder = useReminder({
         /* 提醒直接消费 B 站周番：它需要 `pub_ts`，Bangumi 没有这个字段。 */
         source: sources.bilibili.getWeekBangumi,
@@ -111,7 +110,6 @@ function createSession(
         overview: api.getBgmTvSchedule,
         statusBar,
         settings,
-        settingsWriter,
         notifier,
         commands,
         onSettingsChanged: listener =>

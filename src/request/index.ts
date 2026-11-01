@@ -47,7 +47,7 @@ export interface BangumiApi {
  * @param sources 两个来源的实现
  * @author sdttttt
  */
-export function useBangumiApi(sources: Sources): BangumiApi {
+export function createBangumiApi(sources: Sources): BangumiApi {
     return {
         getIndexPage: url => sources.bilibili.getAllBangumi(url),
 

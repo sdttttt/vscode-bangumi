@@ -36,7 +36,7 @@ export interface Commands {
  *
  * @author sdttttt
  */
-export function useCommands(): Commands {
+export function createCommands(): Commands {
     return {
         /* 失败对调用方没有可操作的信息，因此直接吞掉。 */
         execute: id => {

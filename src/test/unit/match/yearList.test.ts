@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { decodeYear } from "@/match/yearList";
 import YearList from "@/match/yearList";
-import { useFilterMenu } from "@/match/indexList";
+import { createFilterMenu } from "@/match/indexList";
 import { useAppState, type AppStore } from "@/state/app";
 import { createSettingsStub, type SettingsStub } from "@/test/mocks/settings";
 import {
@@ -22,7 +22,7 @@ interface Harness {
     readonly settings: SettingsStub;
     readonly notifier: NotifierStub;
     readonly commands: CommandsStub;
-    readonly menu: ReturnType<typeof useFilterMenu>;
+    readonly menu: ReturnType<typeof createFilterMenu>;
 }
 
 function harness(): Harness {
@@ -32,7 +32,7 @@ function harness(): Harness {
     });
     const notifier = createNotifierStub();
     const commands = createCommandsStub();
-    const menu = useFilterMenu({
+    const menu = createFilterMenu({
         state,
         settings,
         notifier: notifier.notifier,

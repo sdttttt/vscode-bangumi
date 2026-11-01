@@ -79,5 +79,6 @@ export function createVSCodeMock() {
         },
         ViewColumn: { Active: -1, Beside: -2, One: 1, Two: 2, Three: 3 },
         StatusBarAlignment: { Left: 1, Right: 2 },
+        ConfigurationTarget: { Global: 1, Workspace: 2, WorkspaceFolder: 3 },
     };
 }

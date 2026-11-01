@@ -21,6 +21,9 @@ export enum ConfigKey {
  * 使用方把它作为依赖接收，而不是自己去读 workspace；调用方可以传入别的实现，
  * 工厂也不会去读环境状态。
  *
+ * 读与写都在这里：两者是同一个聚合的两面，拆成两个端口只会让消费者多背
+ * 一个依赖。
+ *
  * @author sdttttt
  */
 export interface Settings {
@@ -36,42 +39,13 @@ export interface Settings {
     isDisplayHistory(): boolean;
     /** 周番表使用的数据来源。 */
     weekSource(): WeekSourceKind;
-}
-
-/**
- * 写入用户设置的端口。
- *
- * 读取与写入分成两个端口：绝大多数模块只需要读，`Settings` 因此保持只读；
- * 只有「不再提醒」这类需要改写配置的动作才依赖本接口。
- *
- * @author sdttttt
- */
-export interface SettingsWriter {
-    /** 关闭更新提醒，写入全局设置。 */
+    /**
+     * 关闭更新提醒。
+     *
+     * 写入的是全局设置而不是工作区设置：提醒属于用户个人偏好，不该跟着
+     * 某个项目走。
+     */
     disableReminder(): Promise<void>;
-}
-
-/**
- * 创建一次扩展会话的设置写入器。
- *
- * 写入的是全局设置而不是工作区设置：提醒属于用户个人偏好，不该跟着某个
- * 项目走。
- *
- * @author sdttttt
- */
-export function useSettingsWriter(): SettingsWriter {
-    return {
-        disableReminder: () =>
-            Promise.resolve(
-                vscode.workspace
-                    .getConfiguration()
-                    .update(
-                        ConfigKey.EnableReminder,
-                        false,
-                        vscode.ConfigurationTarget.Global
-                    )
-            ),
-    };
 }
 
 /**
@@ -101,7 +75,7 @@ export function affectsReminder(
  *
  * @author sdttttt
  */
-export function useSettings(): Settings {
+export function createSettings(): Settings {
     const read = (key: ConfigKey): unknown =>
         vscode.workspace.getConfiguration().get(key);
 
@@ -130,5 +104,16 @@ export function useSettings(): Settings {
 
             return "bangumi" === source ? "bangumi" : "bilibili";
         },
+
+        disableReminder: () =>
+            Promise.resolve(
+                vscode.workspace
+                    .getConfiguration()
+                    .update(
+                        ConfigKey.EnableReminder,
+                        false,
+                        vscode.ConfigurationTarget.Global
+                    )
+            ),
     };
 }

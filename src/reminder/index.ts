@@ -1,10 +1,6 @@
 import * as vscode from "vscode";
 import type { Notifier } from "../notifier";
-import {
-    affectsReminder,
-    type Settings,
-    type SettingsWriter,
-} from "../configuration";
+import { affectsReminder, type Settings } from "../configuration";
 import type { Commands } from "../commands";
 import type { WeekBangumiData } from "../request/bilibili/structure";
 import type { WeeklySchedule } from "../request/schedule";
@@ -86,8 +82,6 @@ export interface ReminderOptions {
     readonly scheduler: Scheduler;
     /** 本次会话的设置。 */
     readonly settings: Settings;
-    /** 写入用户设置，用于「不再提醒」。 */
-    readonly settingsWriter: SettingsWriter;
     /** 面向用户的输出。 */
     readonly notifier: Notifier;
     /** 执行扩展命令。 */
@@ -115,7 +109,6 @@ export function useReminder(options: ReminderOptions): Reminder {
     const statusBar = options.statusBar;
     const scheduler = options.scheduler;
     const settings = options.settings;
-    const settingsWriter = options.settingsWriter;
     const notifier = options.notifier;
     const onSettingsChanged = options.onSettingsChanged;
     const commands = options.commands;
@@ -206,7 +199,7 @@ export function useReminder(options: ReminderOptions): Reminder {
         muted = true;
 
         try {
-            await settingsWriter.disableReminder();
+            await settings.disableReminder();
         } catch {
             /* 写不进去也不能让提醒继续弹窗。 */
         }

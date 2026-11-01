@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { useBangumiApi, type Sources } from "@/request";
+import { createBangumiApi, type Sources } from "@/request";
 import { bangumisData } from "@/test/mocks/fixtures/bangumi";
 import { bgmCalendar } from "@/test/mocks/fixtures/bgm";
 import { weekBangumi } from "@/test/mocks/fixtures/weekBangumi";
@@ -17,12 +17,12 @@ function makeSources(): Sources {
     };
 }
 
-describe("useBangumiApi", () => {
+describe("createBangumiApi", () => {
     it("forwards the index url to the bilibili implementation", async () => {
         const sources = makeSources();
         const page = bangumisData();
         vi.mocked(sources.bilibili.getAllBangumi).mockResolvedValue(page);
-        const api = useBangumiApi(sources);
+        const api = createBangumiApi(sources);
         const url = buildBangumiUrl(DEFAULT_QUERY, 2);
 
         await expect(api.getIndexPage(url)).resolves.toEqual(page);
@@ -34,7 +34,7 @@ describe("useBangumiApi", () => {
         vi.mocked(sources.bilibili.getWeekBangumi).mockResolvedValue(
             weekBangumi()
         );
-        const api = useBangumiApi(sources);
+        const api = createBangumiApi(sources);
 
         const schedule = await api.getBilibiliSchedule();
 
@@ -45,7 +45,7 @@ describe("useBangumiApi", () => {
     it("returns undefined when the bilibili week is missing", async () => {
         const sources = makeSources();
         vi.mocked(sources.bilibili.getWeekBangumi).mockResolvedValue(undefined);
-        const api = useBangumiApi(sources);
+        const api = createBangumiApi(sources);
 
         await expect(api.getBilibiliSchedule()).resolves.toBeUndefined();
     });
@@ -53,7 +53,7 @@ describe("useBangumiApi", () => {
     it("hands the calendar over to the adapter", async () => {
         const sources = makeSources();
         vi.mocked(sources.bgmtv.getCalendar).mockResolvedValue(bgmCalendar());
-        const api = useBangumiApi(sources);
+        const api = createBangumiApi(sources);
 
         const schedule = await api.getBgmTvSchedule();
 
@@ -65,7 +65,7 @@ describe("useBangumiApi", () => {
     it("returns undefined when the calendar is missing", async () => {
         const sources = makeSources();
         vi.mocked(sources.bgmtv.getCalendar).mockResolvedValue(undefined);
-        const api = useBangumiApi(sources);
+        const api = createBangumiApi(sources);
 
         await expect(api.getBgmTvSchedule()).resolves.toBeUndefined();
     });

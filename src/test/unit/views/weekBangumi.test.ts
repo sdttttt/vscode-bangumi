@@ -13,7 +13,7 @@ import {
 } from "@/test/mocks/fixtures/weekBangumi";
 import { bgmCalendar } from "@/test/mocks/fixtures/bgm";
 import { createPanelStub, PanelStub } from "@/test/mocks/panel";
-import { useWebviewHost } from "@/webview/host";
+import { createWebviewHost } from "@/webview/host";
 import { usePanel } from "@/views/panel";
 import { useWeekBangumiView, type WeekBangumiView } from "@/views/weekBangumi";
 
@@ -34,7 +34,7 @@ function loadView(
     const panel = usePanel({
         viewType: "bangumiOpen.week",
         title: "周番表",
-        host: useWebviewHost("/extension"),
+        host: createWebviewHost("/extension"),
         subscriptions: [],
         createPanel: () => stub.panel,
     });

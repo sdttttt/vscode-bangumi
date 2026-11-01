@@ -45,7 +45,7 @@ export interface BangumiView {
  *
  * @author sdttttt
  */
-export function useBangumiView(options: BangumiViewOptions): BangumiView {
+export function createBangumiView(options: BangumiViewOptions): BangumiView {
     const { state, api, panel, notifier } = options;
 
     /**

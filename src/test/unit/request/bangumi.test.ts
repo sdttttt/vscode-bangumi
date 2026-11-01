@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getJson } from "@/request/http";
 import { buildBangumiUrl, DEFAULT_QUERY } from "@/request/bilibili/query";
-import { useBilibiliApi, type BilibiliApi } from "@/request/bilibili/api";
+import { createBilibiliApi, type BilibiliApi } from "@/request/bilibili/api";
 import { useCache } from "@/request/cache";
 import { createNotifierStub, type NotifierStub } from "@/test/mocks/ports";
 import { bangumisData } from "@/test/mocks/fixtures/bangumi";
@@ -17,7 +17,7 @@ describe("getAllBangumi", () => {
 
     beforeEach(() => {
         notifier = createNotifierStub();
-        api = useBilibiliApi(
+        api = createBilibiliApi(
             {
                 bangumi: useCache(600),
                 week: useCache(60),
@@ -114,7 +114,7 @@ describe("getWeekBangumi", () => {
 
     beforeEach(() => {
         notifier = createNotifierStub();
-        api = useBilibiliApi(
+        api = createBilibiliApi(
             {
                 bangumi: useCache(600),
                 week: useCache(60),

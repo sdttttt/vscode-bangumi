@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getJson } from "@/request/http";
-import { useBgmTvApi, type BgmTvApi } from "@/request/bgmtv/api";
+import { createBgmTvApi, type BgmTvApi } from "@/request/bgmtv/api";
 import { BANGUMI_CALENDAR } from "@/request/bgmtv/query";
 import { useCache } from "@/request/cache";
 import { createNotifierStub, type NotifierStub } from "@/test/mocks/ports";
@@ -16,7 +16,7 @@ describe("getCalendar", () => {
 
     beforeEach(() => {
         notifier = createNotifierStub();
-        api = useBgmTvApi(
+        api = createBgmTvApi(
             {
                 bangumi: useCache(600),
                 week: useCache(60),

@@ -62,7 +62,7 @@ export interface IndexCommandOptions {
  *
  * @author sdttttt
  */
-export function useIndexCommand(options: IndexCommandOptions): {
+export function createIndexCommand(options: IndexCommandOptions): {
     openIndex(): void;
 } {
     const filters = options.filters ?? FILTERS;

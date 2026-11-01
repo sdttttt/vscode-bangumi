@@ -37,7 +37,7 @@ export interface FilterMenu {
  *
  * @author sdttttt
  */
-export function useFilterMenu(options: FilterMenuOptions): FilterMenu {
+export function createFilterMenu(options: FilterMenuOptions): FilterMenu {
     const { state, settings, notifier, commands } = options;
 
     /**

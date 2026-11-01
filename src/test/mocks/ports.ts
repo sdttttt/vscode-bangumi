@@ -1,7 +1,6 @@
 import { vi } from "vitest";
 import type { Commands, CommandId } from "@/commands";
 import type { Notifier } from "@/notifier";
-import type { SettingsWriter } from "@/configuration";
 
 /**
  * Notifier 替身，记录扩展本应展示的内容。
@@ -40,35 +39,6 @@ export function createNotifierStub(): NotifierStub {
         pick,
         actions,
         notifier: { info, error, ask, pick, actions },
-    };
-}
-
-/**
- * SettingsWriter 替身，记录扩展本应写入的设置。
- *
- * @author sdttttt
- */
-export interface SettingsWriterStub {
-    readonly disableReminder: ReturnType<
-        typeof vi.fn<SettingsWriter["disableReminder"]>
-    >;
-    /** 该替身作为 `SettingsWriter` 使用。 */
-    readonly settingsWriter: SettingsWriter;
-}
-
-/**
- * 创建 SettingsWriter 替身，默认写入成功。
- *
- * @author sdttttt
- */
-export function createSettingsWriterStub(): SettingsWriterStub {
-    const disableReminder = vi.fn<SettingsWriter["disableReminder"]>(() =>
-        Promise.resolve()
-    );
-
-    return {
-        disableReminder,
-        settingsWriter: { disableReminder },
     };
 }
 

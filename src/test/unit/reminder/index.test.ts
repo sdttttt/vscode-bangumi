@@ -4,10 +4,8 @@ import { createSettingsStub, type SettingsStub } from "@/test/mocks/settings";
 import {
     createCommandsStub,
     createNotifierStub,
-    createSettingsWriterStub,
     type CommandsStub,
     type NotifierStub,
-    type SettingsWriterStub,
 } from "@/test/mocks/ports";
 import {
     useReminder,
@@ -92,7 +90,7 @@ interface ReminderHarness {
     readonly reminder: Reminder;
     readonly notifier: NotifierStub;
     readonly commands: CommandsStub;
-    readonly settingsWriter: SettingsWriterStub;
+    readonly settings: SettingsStub;
 }
 
 function createHarness(
@@ -103,16 +101,6 @@ function createHarness(
     const statusBar = useStatusBar("weekBangumi");
     const notifier = createNotifierStub();
     const commands = createCommandsStub();
-    const settingsWriter = createSettingsWriterStub();
-    /*
-     * 真实的写入会改动设置本身，因此替身也要照做：否则「不再提醒」之后的
-     * 静音判定会读到过期的值。
-     */
-    settingsWriter.disableReminder.mockImplementation(() => {
-        settings.values["bangumiOpen.EnableReminder"] = false;
-
-        return Promise.resolve();
-    });
     const now = (): number => Date.now();
 
     const reminder = useReminder({
@@ -120,7 +108,6 @@ function createHarness(
         overview,
         statusBar,
         settings,
-        settingsWriter: settingsWriter.settingsWriter,
         notifier: notifier.notifier,
         commands: commands.commands,
         onSettingsChanged: listener =>
@@ -137,7 +124,7 @@ function createHarness(
         now,
     });
 
-    return { reminder, notifier, commands, settingsWriter };
+    return { reminder, notifier, commands, settings };
 }
 
 function createReminder(source: WeekSource, settings: SettingsStub): Reminder {
@@ -620,7 +607,7 @@ describe("Reminder", () => {
     });
 
     it("turns the reminder off when the mute button is pressed", async () => {
-        const { reminder, notifier, settingsWriter } = createHarness(
+        const { reminder, notifier } = createHarness(
             () => Promise.resolve(today({ offsetSeconds: 60 })),
             settings
         );
@@ -631,7 +618,7 @@ describe("Reminder", () => {
         vi.advanceTimersByTime(60_000);
 
         await vi.waitFor(() => {
-            expect(settingsWriter.disableReminder).toHaveBeenCalledTimes(1);
+            expect(settings.disableReminder).toHaveBeenCalledTimes(1);
         });
 
         /* 状态栏不受影响：静音只针对弹窗。 */
@@ -703,21 +690,19 @@ describe("Reminder", () => {
     });
 
     it("keeps the reminder muted even if the setting cannot be written", async () => {
-        const { reminder, notifier, settingsWriter } = createHarness(
+        const { reminder, notifier } = createHarness(
             () => Promise.resolve(today({ offsetSeconds: 60 })),
             settings
         );
 
-        settingsWriter.disableReminder.mockRejectedValue(
-            new Error("read only")
-        );
+        settings.disableReminder.mockRejectedValue(new Error("read only"));
         notifier.actions.mockResolvedValue("不再提醒");
 
         await reminder.start();
         vi.advanceTimersByTime(60_000);
 
         await vi.waitFor(() => {
-            expect(settingsWriter.disableReminder).toHaveBeenCalledTimes(1);
+            expect(settings.disableReminder).toHaveBeenCalledTimes(1);
         });
 
         notifier.actions.mockClear();
@@ -731,10 +716,7 @@ describe("Reminder", () => {
         const source = vi.fn(() =>
             Promise.resolve(today({ offsetSeconds: 60 }))
         );
-        const { reminder, notifier, settingsWriter } = createHarness(
-            source,
-            settings
-        );
+        const { reminder, notifier } = createHarness(source, settings);
 
         notifier.actions.mockResolvedValue("不再提醒");
 
@@ -742,7 +724,7 @@ describe("Reminder", () => {
         vi.advanceTimersByTime(60_000);
 
         await vi.waitFor(() => {
-            expect(settingsWriter.disableReminder).toHaveBeenCalledTimes(1);
+            expect(settings.disableReminder).toHaveBeenCalledTimes(1);
         });
 
         notifier.actions.mockClear();

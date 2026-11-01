@@ -5,9 +5,9 @@ import { bangumisData } from "@/test/mocks/fixtures/bangumi";
 import { createPanelStub, PanelStub } from "@/test/mocks/panel";
 import { createNotifierStub, type NotifierStub } from "@/test/mocks/ports";
 import { useAppState, type AppStore } from "@/state/app";
-import { useWebviewHost } from "@/webview/host";
+import { createWebviewHost } from "@/webview/host";
 import { usePanel } from "@/views/panel";
-import { useBangumiView, type BangumiView } from "@/views/bangumi";
+import { createBangumiView, type BangumiView } from "@/views/bangumi";
 
 /**
  * 构建独立的视图实例，每个用例因此都从关闭的面板开始。
@@ -31,7 +31,7 @@ function loadView(stubs: ReadonlyArray<PanelStub>): {
     const panel = usePanel({
         viewType: "bangumiOpen.list",
         title: "番剧列表",
-        host: useWebviewHost("/extension"),
+        host: createWebviewHost("/extension"),
         subscriptions: [],
         createPanel: () => {
             const next = stubs[created.mock.calls.length];
@@ -40,7 +40,7 @@ function loadView(stubs: ReadonlyArray<PanelStub>): {
         },
     });
     const notifier = createNotifierStub();
-    const view = useBangumiView({
+    const view = createBangumiView({
         state,
         api,
         panel,

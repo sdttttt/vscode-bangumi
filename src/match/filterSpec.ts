@@ -4,7 +4,7 @@ import type { BangumiQuery } from "../request/bilibili/query";
  * 索引菜单中的一个筛选项。
  *
  * 筛选是纯数据：它提供的选项，以及每个选项产生的 query 补丁。所有带副作用的
- * 部分——选择框、标签记录、打开列表——都归 `useFilterMenu` 负责。
+ * 部分——选择框、标签记录、打开列表——都归 `createFilterMenu` 负责。
  *
  * @author sdttttt
  */
