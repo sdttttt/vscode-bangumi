@@ -15,8 +15,11 @@ export interface Notifier {
     error(message: string): void;
     /** 让用户输入一行文本。 */
     ask(options: vscode.InputBoxOptions): Promise<string | undefined>;
-    /** 让用户从给定标签中选择一项。 */
-    pick(labels: ReadonlyArray<string>): Promise<string | undefined>;
+    /** 让用户从给定标签中选择一项，`title` 作为选择框的标题。 */
+    pick(
+        labels: ReadonlyArray<string>,
+        title?: string
+    ): Promise<string | undefined>;
     /** 展示带操作按钮的消息，并回传用户选择的动作。 */
     actions(
         message: string,
@@ -38,8 +41,13 @@ export function createNotifier(): Notifier {
             void vscode.window.showErrorMessage(message);
         },
         ask: options => Promise.resolve(vscode.window.showInputBox(options)),
-        pick: labels =>
-            Promise.resolve(vscode.window.showQuickPick([...labels])),
+        pick: (labels, title) =>
+            Promise.resolve(
+                vscode.window.showQuickPick(
+                    [...labels],
+                    title ? { title } : undefined
+                )
+            ),
         actions: (message, actions) =>
             Promise.resolve(
                 vscode.window.showInformationMessage(message, ...actions)

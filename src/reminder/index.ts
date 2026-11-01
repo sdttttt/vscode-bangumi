@@ -234,7 +234,10 @@ export function useReminder(options: ReminderOptions): Reminder {
         let chosen: string | undefined;
 
         try {
-            chosen = await notifier.pick(options.map(option => option.label));
+            chosen = await notifier.pick(
+                options.map(option => option.label),
+                "不再提醒哪部番剧？"
+            );
         } catch {
             return;
         }

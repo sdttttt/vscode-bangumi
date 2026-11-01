@@ -705,12 +705,15 @@ describe("Reminder", () => {
         vi.advanceTimersByTime(60_000);
 
         await vi.waitFor(() => {
-            expect(notifier.pick).toHaveBeenCalledWith([
-                "不再提醒《甲》",
-                "不再提醒《乙》",
-                "该时段 2 部都不再提醒",
-                "关闭全部番剧的更新提醒",
-            ]);
+            expect(notifier.pick).toHaveBeenCalledWith(
+                [
+                    "不再提醒《甲》",
+                    "不再提醒《乙》",
+                    "该时段 2 部都不再提醒",
+                    "关闭全部番剧的更新提醒",
+                ],
+                "不再提醒哪部番剧？"
+            );
         });
         reminder.dispose();
     });
