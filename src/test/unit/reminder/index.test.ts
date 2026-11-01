@@ -651,15 +651,37 @@ describe("Reminder", () => {
         vi.advanceTimersByTime(60_000);
 
         await vi.waitFor(() => {
-            expect(notifier.info).toHaveBeenCalledWith(
-                "已关闭更新提醒，可在设置中重新开启。"
-            );
+            expect(notifier.actions).toHaveBeenCalledTimes(1);
         });
 
         notifier.actions.mockClear();
         vi.advanceTimersByTime(120_000);
 
         expect(notifier.actions).not.toHaveBeenCalled();
+        reminder.dispose();
+    });
+
+    it("mutes the reminder without any further notification", async () => {
+        const { reminder, notifier } = createHarness(
+            () => Promise.resolve(today({ offsetSeconds: 60 })),
+            settings
+        );
+
+        notifier.actions.mockResolvedValue("不再提醒");
+
+        await reminder.start();
+        vi.advanceTimersByTime(60_000);
+
+        await vi.waitFor(() => {
+            expect(notifier.actions).toHaveBeenCalledTimes(1);
+        });
+
+        /*
+         * 用户按下「不再提醒」就是要清净：确认提示本身也是弹窗，
+         * 因此关闭过程必须完全静默。
+         */
+        expect(notifier.info).not.toHaveBeenCalled();
+        expect(notifier.error).not.toHaveBeenCalled();
         reminder.dispose();
     });
 
@@ -709,7 +731,10 @@ describe("Reminder", () => {
         const source = vi.fn(() =>
             Promise.resolve(today({ offsetSeconds: 60 }))
         );
-        const { reminder, notifier } = createHarness(source, settings);
+        const { reminder, notifier, settingsWriter } = createHarness(
+            source,
+            settings
+        );
 
         notifier.actions.mockResolvedValue("不再提醒");
 
@@ -717,7 +742,7 @@ describe("Reminder", () => {
         vi.advanceTimersByTime(60_000);
 
         await vi.waitFor(() => {
-            expect(notifier.info).toHaveBeenCalled();
+            expect(settingsWriter.disableReminder).toHaveBeenCalledTimes(1);
         });
 
         notifier.actions.mockClear();

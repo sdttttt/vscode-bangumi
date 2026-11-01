@@ -198,7 +198,9 @@ export function useReminder(options: ReminderOptions): Reminder {
     /**
      * 关闭更新提醒：写入全局设置，并立刻停掉后续的通知。
      *
-     * 状态栏不受影响：静音只针对弹窗，「下一场更新」仍然照常显示。
+     * 整个过程不弹任何提示：用户按下「不再提醒」就是要清净，任何附加的弹窗
+     * 都与意图相悖。状态栏也不受影响——静音只针对弹窗，「下一场更新」仍然
+     * 照常显示。
      */
     const disableReminder = async (): Promise<void> => {
         muted = true;
@@ -209,7 +211,6 @@ export function useReminder(options: ReminderOptions): Reminder {
             /* 写不进去也不能让提醒继续弹窗。 */
         }
 
-        notifier.info("已关闭更新提醒，可在设置中重新开启。");
         await apply();
     };
 
