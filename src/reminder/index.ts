@@ -12,6 +12,8 @@ import {
 } from "../utils/display";
 import { nextDayStart } from "../utils/clock";
 import { describeNotice } from "./notice";
+import { isIgnoredIn } from "./ignored";
+import { buildMuteOptions, matchMuteOption } from "./mute";
 import {
     buildSchedule,
     ROLLOVER_DELAY_MS,
@@ -207,6 +209,53 @@ export function useReminder(options: ReminderOptions): Reminder {
         await apply();
     };
 
+    /**
+     * 本次提醒里还需要播报的番剧。
+     *
+     * 忽略列表每次实时读取，因此用户手工编辑 settings.json 后不必重启扩展。
+     */
+    const pendingTitles = (
+        titles: ReadonlyArray<string>
+    ): ReadonlyArray<string> => {
+        const ignored = settings.ignoredReminders();
+
+        return titles.filter(title => !isIgnoredIn(ignored, title));
+    };
+
+    /**
+     * 打开「不再提醒」的二级菜单。
+     *
+     * 通知上的按钮只能平铺，超过三个就会被折叠进「...」，用户看不到剧名；
+     * QuickPick 才能把每一部番剧逐条列出。选择过程与关闭提醒一样保持静默：
+     * 用户点这个按钮就是要清净，任何附加提示都是多余的弹窗。
+     */
+    const mute = async (titles: ReadonlyArray<string>): Promise<void> => {
+        const options = buildMuteOptions(titles);
+        let chosen: string | undefined;
+
+        try {
+            chosen = await notifier.pick(options.map(option => option.label));
+        } catch {
+            return;
+        }
+
+        const option = matchMuteOption(options, chosen);
+        if (!option) {
+            return;
+        }
+
+        if ("global" === option.kind) {
+            await disableReminder();
+            return;
+        }
+
+        try {
+            await settings.ignoreReminders(option.titles);
+        } catch {
+            /* 写不进去也只能算了：提醒本身不受影响，下次仍会弹出。 */
+        }
+    };
+
     const fire = (event: ScheduleEvent): void => {
         const at = now();
 
@@ -221,18 +270,25 @@ export function useReminder(options: ReminderOptions): Reminder {
             return;
         }
 
+        const titles = pendingTitles(event.titles);
+
+        /* 这一组全被忽略：连弹窗都不该出现。 */
+        if (0 === titles.length) {
+            return;
+        }
+
         const notice = describeNotice(event, now());
 
         const message =
             "published" === notice.kind
-                ? updatedMessage(event.titles)
-                : upcomingMessage(event.titles, notice.minutes);
+                ? updatedMessage(titles)
+                : upcomingMessage(titles, notice.minutes);
 
         void notifier
             .actions(message, [REMIND_ACTION, REMIND_MUTE_ACTION])
             .then(chosen => {
                 if (REMIND_MUTE_ACTION === chosen) {
-                    void disableReminder();
+                    void mute(titles);
                     return;
                 }
 
@@ -397,6 +453,16 @@ export function useReminder(options: ReminderOptions): Reminder {
                     void apply();
                 }
             });
+
+            /*
+             * 忽略列表可能已经攒了很旧的记录，启动时清一次。这不是用户操作，
+             * 失败也不必打扰他，提醒照常启动。
+             */
+            try {
+                await settings.pruneIgnoredReminders();
+            } catch {
+                /* 清理失败不影响提醒本身。 */
+            }
 
             await apply();
         },

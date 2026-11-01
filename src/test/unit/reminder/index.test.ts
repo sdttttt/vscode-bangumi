@@ -606,13 +606,14 @@ describe("Reminder", () => {
         reminder.dispose();
     });
 
-    it("turns the reminder off when the mute button is pressed", async () => {
+    it("turns every reminder off from the mute menu", async () => {
         const { reminder, notifier } = createHarness(
             () => Promise.resolve(today({ offsetSeconds: 60 })),
             settings
         );
 
         notifier.actions.mockResolvedValue("不再提醒");
+        notifier.pick.mockResolvedValue("关闭全部番剧的更新提醒");
 
         await reminder.start();
         vi.advanceTimersByTime(60_000);
@@ -633,6 +634,7 @@ describe("Reminder", () => {
         );
 
         notifier.actions.mockResolvedValue("不再提醒");
+        notifier.pick.mockResolvedValue("关闭全部番剧的更新提醒");
 
         await reminder.start();
         vi.advanceTimersByTime(60_000);
@@ -655,20 +657,275 @@ describe("Reminder", () => {
         );
 
         notifier.actions.mockResolvedValue("不再提醒");
+        notifier.pick.mockResolvedValue(undefined);
 
         await reminder.start();
         vi.advanceTimersByTime(60_000);
 
         await vi.waitFor(() => {
-            expect(notifier.actions).toHaveBeenCalledTimes(1);
+            expect(notifier.pick).toHaveBeenCalled();
         });
 
         /*
          * 用户按下「不再提醒」就是要清净：确认提示本身也是弹窗，
-         * 因此关闭过程必须完全静默。
+         * 因此关闭与忽略的过程都必须完全静默。
          */
         expect(notifier.info).not.toHaveBeenCalled();
         expect(notifier.error).not.toHaveBeenCalled();
+        reminder.dispose();
+    });
+
+    it("opens the mute menu with one entry per bangumi", async () => {
+        const pubTs = Math.floor(Date.now() / 1000) + 60;
+        const { reminder, notifier } = createHarness(
+            () =>
+                Promise.resolve(
+                    today({
+                        seasons: [
+                            wBangumi({
+                                title: "甲",
+                                pub_time: "20:00",
+                                pub_ts: pubTs,
+                            }),
+                            wBangumi({
+                                title: "乙",
+                                pub_time: "20:00",
+                                pub_ts: pubTs,
+                            }),
+                        ],
+                    })
+                ),
+            settings
+        );
+
+        notifier.actions.mockResolvedValue("不再提醒");
+        notifier.pick.mockResolvedValue(undefined);
+
+        await reminder.start();
+        vi.advanceTimersByTime(60_000);
+
+        await vi.waitFor(() => {
+            expect(notifier.pick).toHaveBeenCalledWith([
+                "不再提醒《甲》",
+                "不再提醒《乙》",
+                "该时段 2 部都不再提醒",
+                "关闭全部番剧的更新提醒",
+            ]);
+        });
+        reminder.dispose();
+    });
+
+    it("ignores a single bangumi from the mute menu", async () => {
+        const { reminder, notifier } = createHarness(
+            () => Promise.resolve(today({ offsetSeconds: 60 })),
+            settings
+        );
+
+        notifier.actions.mockResolvedValue("不再提醒");
+        notifier.pick.mockResolvedValue("不再提醒《今日番剧》");
+
+        await reminder.start();
+        vi.advanceTimersByTime(60_000);
+
+        await vi.waitFor(() => {
+            expect(settings.ignoreReminders).toHaveBeenCalledWith(["今日番剧"]);
+        });
+
+        /* 忽略单部不等于关闭提醒，全局开关不该被动到。 */
+        expect(settings.disableReminder).not.toHaveBeenCalled();
+        expect(settings.values["bangumiOpen.IgnoredReminders"]).toEqual([
+            {
+                title: "今日番剧",
+                ignoredAt: expect.any(String) as unknown as string,
+            },
+        ]);
+        reminder.dispose();
+    });
+
+    it("stops notifying about an ignored bangumi", async () => {
+        const { reminder, notifier } = createHarness(
+            () => Promise.resolve(today({ offsetSeconds: 60 })),
+            settings
+        );
+
+        notifier.actions.mockResolvedValue("不再提醒");
+        notifier.pick.mockResolvedValue("不再提醒《今日番剧》");
+
+        await reminder.start();
+        vi.advanceTimersByTime(60_000);
+
+        await vi.waitFor(() => {
+            expect(settings.ignoreReminders).toHaveBeenCalled();
+        });
+
+        notifier.actions.mockClear();
+        await reminder.refresh();
+        vi.advanceTimersByTime(120_000);
+
+        expect(notifier.actions).not.toHaveBeenCalled();
+        reminder.dispose();
+    });
+
+    it("ignores the whole slot from the mute menu", async () => {
+        const pubTs = Math.floor(Date.now() / 1000) + 60;
+        const { reminder, notifier } = createHarness(
+            () =>
+                Promise.resolve(
+                    today({
+                        seasons: [
+                            wBangumi({
+                                title: "甲",
+                                pub_time: "20:00",
+                                pub_ts: pubTs,
+                            }),
+                            wBangumi({
+                                title: "乙",
+                                pub_time: "20:00",
+                                pub_ts: pubTs,
+                            }),
+                        ],
+                    })
+                ),
+            settings
+        );
+
+        notifier.actions.mockResolvedValue("不再提醒");
+        notifier.pick.mockResolvedValue("该时段 2 部都不再提醒");
+
+        await reminder.start();
+        vi.advanceTimersByTime(60_000);
+
+        await vi.waitFor(() => {
+            expect(settings.ignoreReminders).toHaveBeenCalledWith(["甲", "乙"]);
+        });
+        reminder.dispose();
+    });
+
+    it("holds the whole notification back when every title is ignored", async () => {
+        settings.values["bangumiOpen.IgnoredReminders"] = [
+            {
+                title: "今日番剧",
+                ignoredAt: new Date(Date.now()).toISOString(),
+            },
+        ];
+        const { reminder, notifier } = createHarness(
+            () => Promise.resolve(today({ offsetSeconds: 60 })),
+            settings
+        );
+
+        await reminder.start();
+        vi.advanceTimersByTime(60_000);
+
+        expect(notifier.actions).not.toHaveBeenCalled();
+
+        /* 状态栏仍然照常工作：忽略只针对弹窗。 */
+        expect(statusBar.text).toContain("今日番剧");
+        reminder.dispose();
+    });
+
+    it("announces only the titles that are still relevant", async () => {
+        settings.values["bangumiOpen.IgnoredReminders"] = [
+            { title: "甲", ignoredAt: new Date(Date.now()).toISOString() },
+        ];
+        const pubTs = Math.floor(Date.now() / 1000) + 60;
+        const { reminder, notifier } = createHarness(
+            () =>
+                Promise.resolve(
+                    today({
+                        seasons: [
+                            wBangumi({
+                                title: "甲",
+                                pub_time: "20:00",
+                                pub_ts: pubTs,
+                            }),
+                            wBangumi({
+                                title: "乙",
+                                pub_time: "20:00",
+                                pub_ts: pubTs,
+                            }),
+                        ],
+                    })
+                ),
+            settings
+        );
+
+        await reminder.start();
+        vi.advanceTimersByTime(60_000);
+
+        expect(notifier.actions).toHaveBeenCalledWith("《乙》 更新啦！", [
+            "打开周番表",
+            "不再提醒",
+        ]);
+        reminder.dispose();
+    });
+
+    it("leaves everything alone when the mute menu is dismissed", async () => {
+        const { reminder, notifier } = createHarness(
+            () => Promise.resolve(today({ offsetSeconds: 60 })),
+            settings
+        );
+
+        notifier.actions.mockResolvedValue("不再提醒");
+        notifier.pick.mockResolvedValue(undefined);
+
+        await reminder.start();
+        vi.advanceTimersByTime(60_000);
+
+        await vi.waitFor(() => {
+            expect(notifier.pick).toHaveBeenCalled();
+        });
+
+        expect(settings.ignoreReminders).not.toHaveBeenCalled();
+        expect(settings.disableReminder).not.toHaveBeenCalled();
+        reminder.dispose();
+    });
+
+    it("keeps the reminder alive when the mute menu fails", async () => {
+        const { reminder, notifier } = createHarness(
+            () => Promise.resolve(today({ offsetSeconds: 60 })),
+            settings
+        );
+
+        notifier.actions.mockResolvedValue("不再提醒");
+        notifier.pick.mockRejectedValue(new Error("no quick pick"));
+
+        await reminder.start();
+        vi.advanceTimersByTime(60_000);
+
+        await vi.waitFor(() => {
+            expect(notifier.pick).toHaveBeenCalled();
+        });
+
+        expect(settings.ignoreReminders).not.toHaveBeenCalled();
+        expect(settings.disableReminder).not.toHaveBeenCalled();
+        reminder.dispose();
+    });
+
+    it("prunes the ignored list when it starts", async () => {
+        const reminder = createReminder(
+            () => Promise.resolve(today({})),
+            settings
+        );
+
+        await reminder.start();
+
+        expect(settings.pruneIgnoredReminders).toHaveBeenCalledTimes(1);
+        reminder.dispose();
+    });
+
+    it("still starts when the ignored list cannot be pruned", async () => {
+        settings.pruneIgnoredReminders.mockRejectedValue(
+            new Error("read only")
+        );
+        const { reminder, notifier } = createHarness(
+            () => Promise.resolve(today({ offsetSeconds: 60 })),
+            settings
+        );
+
+        await reminder.start();
+        vi.advanceTimersByTime(60_000);
+
+        expect(notifier.actions).toHaveBeenCalled();
         reminder.dispose();
     });
 
@@ -697,6 +954,7 @@ describe("Reminder", () => {
 
         settings.disableReminder.mockRejectedValue(new Error("read only"));
         notifier.actions.mockResolvedValue("不再提醒");
+        notifier.pick.mockResolvedValue("关闭全部番剧的更新提醒");
 
         await reminder.start();
         vi.advanceTimersByTime(60_000);
@@ -719,6 +977,7 @@ describe("Reminder", () => {
         const { reminder, notifier } = createHarness(source, settings);
 
         notifier.actions.mockResolvedValue("不再提醒");
+        notifier.pick.mockResolvedValue("关闭全部番剧的更新提醒");
 
         await reminder.start();
         vi.advanceTimersByTime(60_000);

@@ -36,6 +36,7 @@
 | `bangumiOpen.DisplayHistory`    | `false`    | 显示过去几天的更新 |
 | `bangumiOpen.EnableReminder`    | `true`     | 开启更新提醒       |
 | `bangumiOpen.ReminderAheadTime` | `0`        | 提前提醒的秒数     |
+| `bangumiOpen.IgnoredReminders`  | `[]`       | 不提醒的番剧列表   |
 | `bangumiOpen.DisplayIndexTags`  | `true`     | 显示已选标签       |
 | `bangumiOpen.DisplayStatusBar`  | `true`     | 显示状态栏提示     |
 
@@ -46,7 +47,11 @@
 - **`bilibili`** —— B 站时间表，带具体播出时刻，因此支持更新提醒、状态栏提示与「显示过去的更新」。
 - **`bangumi`** —— [Bangumi 每日放送](https://api.bgm.tv/calendar)，收录比 B 站全，还带评分与原作名；但它只按星期分组、没有播出时刻，因此**不提供更新提醒**（`EnableReminder` 与 `ReminderAheadTime` 在该模式下不生效）。状态栏改为显示**当日更新的番剧概要**（「今日 N 部番」，悬浮可看完整列表），`DisplayHistory` 对它也不生效，始终展示完整七天。
 
-更新提醒的通知里有两个按钮：「打开周番表」打开周番表，「不再提醒」关闭更新提醒（写入 `bangumiOpen.EnableReminder` 的全局设置）。「不再提醒」只关掉弹窗，状态栏的「下一场更新」仍然照常显示；想恢复提醒，在设置里把 `bangumiOpen.EnableReminder` 重新打开即可。
+更新提醒的通知里有两个按钮：「打开周番表」打开周番表，「不再提醒」打开一个下拉菜单，可以逐部选择不再提醒的番剧。同一个时段有多部番剧更新时，菜单里会出现「该时段 N 部都不再提醒」；菜单最后一项「关闭全部番剧的更新提醒」等价于把 `bangumiOpen.EnableReminder` 关掉。
+
+选中的番剧名会记进 `bangumiOpen.IgnoredReminders`（全局设置），每项带一个忽略时间，超过 6 个月的记录会在扩展启动时自动清除。想恢复某部番剧的提醒，把列表里对应的那一项删掉即可。
+
+忽略与关闭都只影响弹窗：状态栏的「下一场更新」与周番表仍然照常显示被忽略的番剧。
 
 周番表顶部的「切换到 bgm.tv」/「切换到 bilibili」按钮可以在**当前面板内**临时换到另一个来源，不会改动上面的配置项；关闭面板后再次打开，仍会回到设置项指定的来源。提醒与状态栏始终按设置项工作。
 

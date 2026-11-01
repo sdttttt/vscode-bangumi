@@ -1,5 +1,11 @@
 import * as vscode from "vscode";
 import type { WeekSourceKind } from "./request/schedule";
+import {
+    addIgnored,
+    normalizeIgnored,
+    pruneIgnored,
+    type IgnoredReminder,
+} from "./reminder/ignored";
 
 /**
  * 本扩展读取的设置键。
@@ -13,6 +19,7 @@ export enum ConfigKey {
     DisplayHistory = "bangumiOpen.DisplayHistory",
     DisplayStatusBar = "bangumiOpen.DisplayStatusBar",
     WeekSource = "bangumiOpen.WeekSource",
+    IgnoredReminders = "bangumiOpen.IgnoredReminders",
 }
 
 /**
@@ -46,6 +53,16 @@ export interface Settings {
      * 某个项目走。
      */
     disableReminder(): Promise<void>;
+    /** 被排除在更新提醒之外的番剧。 */
+    ignoredReminders(): ReadonlyArray<IgnoredReminder>;
+    /**
+     * 把番剧加入忽略列表。
+     *
+     * 同样写入全局设置：忽略哪部番剧只与用户自己有关。
+     */
+    ignoreReminders(titles: ReadonlyArray<string>): Promise<void>;
+    /** 清理超过保留时长的忽略记录，内容有变化时才写回设置。 */
+    pruneIgnoredReminders(): Promise<void>;
 }
 
 /**
@@ -79,6 +96,13 @@ export function createSettings(): Settings {
     const read = (key: ConfigKey): unknown =>
         vscode.workspace.getConfiguration().get(key);
 
+    const write = (key: ConfigKey, value: unknown): Promise<void> =>
+        Promise.resolve(
+            vscode.workspace
+                .getConfiguration()
+                .update(key, value, vscode.ConfigurationTarget.Global)
+        );
+
     return {
         reminderAheadTime: () => {
             const aheadTime = read(ConfigKey.ReminderAheadTime);
@@ -105,15 +129,34 @@ export function createSettings(): Settings {
             return "bangumi" === source ? "bangumi" : "bilibili";
         },
 
-        disableReminder: () =>
-            Promise.resolve(
-                vscode.workspace
-                    .getConfiguration()
-                    .update(
-                        ConfigKey.EnableReminder,
-                        false,
-                        vscode.ConfigurationTarget.Global
-                    )
+        disableReminder: () => write(ConfigKey.EnableReminder, false),
+
+        ignoredReminders: () =>
+            normalizeIgnored(read(ConfigKey.IgnoredReminders)),
+
+        /*
+         * 每次写入前重新读一遍：用户可能在扩展运行期间手工编辑过 settings.json，
+         * 用会话开始时捕获的副本合并会把那些改动覆盖掉。
+         */
+        ignoreReminders: titles =>
+            write(
+                ConfigKey.IgnoredReminders,
+                addIgnored(
+                    normalizeIgnored(read(ConfigKey.IgnoredReminders)),
+                    titles,
+                    Date.now()
+                )
             ),
+
+        pruneIgnoredReminders: () => {
+            const { kept, changed } = pruneIgnored(
+                read(ConfigKey.IgnoredReminders),
+                Date.now()
+            );
+
+            return changed
+                ? write(ConfigKey.IgnoredReminders, kept)
+                : Promise.resolve();
+        },
     };
 }

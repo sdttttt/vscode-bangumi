@@ -236,6 +236,8 @@
 
 - 切换到 Bangumi 数据源时，更新提醒自动停用（该来源没有播出时刻），状态栏改为显示当日更新的番剧概要：一部时显示剧名，多部时显示数量，悬浮提示可看当天完整列表。概览同样跟随设置项 `DisplayStatusBar`，并会在跨日后自动刷新。
 - 更新提醒的通知新增「不再提醒」按钮：按下后关闭更新提醒（写入 `bangumiOpen.EnableReminder` 的全局设置），状态栏的「下一场更新」不受影响，重新打开该设置即可恢复。
+- 「不再提醒」改为打开一个下拉菜单，可以逐部选择不再提醒的番剧；同一时段有多部番剧时提供「该时段 N 部都不再提醒」，并保留「关闭全部番剧的更新提醒」。
+- 新增配置项 `bangumiOpen.IgnoredReminders`：记录被排除在提醒之外的番剧与忽略时间，超过 6 个月的记录在扩展启动时自动清除。忽略只影响弹窗，状态栏与周番表照常显示这些番剧。
 
 ### 内部
 
@@ -247,6 +249,7 @@
 - `EnableReminder` 现在只控制弹窗提醒，状态栏条目改由 `DisplayStatusBar` 单独控制：关掉提醒后状态栏仍会显示「下一场更新」。
 - 工厂的命名按「是否持有状态」重新对齐：持有闭包状态的保留 `use*`（`useAppState`、`useCache`、`usePanel`、`useWeekBangumiView`、`useScheduler`、`useStatusBar`、`useReminder`），不持有状态的改为 `create*`（`createSettings`、`createNotifier`、`createCommands`、`createWebviewHost`、`createBilibiliApi`、`createBgmTvApi`、`createBangumiApi`、`createFilterMenu`、`createIndexCommand`、`createBangumiView`）。`use*` 前缀此前失去了「持有状态」的判别力。
 - 「不再提醒」所需的写设置能力合并回 `Settings` 端口（`disableReminder()`）：读与写是同一个聚合的两面，拆成 `SettingsWriter` 只会让提醒多背一个依赖。
+- 新增 `src/reminder/ignored.ts`（忽略列表的归一化、去重、按 180 天剪枝）与 `src/reminder/mute.ts`（二级菜单的构造与匹配），两者都是纯函数。
 
 ## [3.0.0] - 2026-10-31
 

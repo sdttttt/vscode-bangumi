@@ -49,7 +49,7 @@
 - `webview/` —— 独立的前端工程（Preact + TypeScript + UnoCSS），源码在 `webview/src/`，样式配置在 `webview/uno.config.ts`，产物由 `vite.webview.mts` 输出到 `webview-dist/`。
 - `src/request/` —— 请求层按来源分组，再统一成一份周番模型：`http.ts`（`fetch` 封装与超时）、`cache.ts`（会话缓存与 `RequestCaches`）、`bilibili/`（`query.ts` 的 `BangumiQuery`/`DEFAULT_QUERY`/`buildBangumiUrl`、`structure.ts` 的响应类型与纯谓词、`api.ts` 的 `createBilibiliApi`：索引 + 周番原始数据）、`bgmtv/`（`query.ts` 的 `BANGUMI_CALENDAR`、`structure.ts` 的每日放送类型与 `isValidCalendar`、`api.ts` 的 `createBgmTvApi`）、`schedule.ts`（统一模型 `WeeklySchedule`/`ScheduleDay`/`ScheduleItem` 与两个纯适配器）、`index.ts`（`Sources` 端口与 `createBangumiApi`，暴露 `getIndexPage`/`getBilibiliSchedule`/`getBgmTvSchedule`）。
 - `src/match/` —— 索引菜单：`filterSpec.ts`（`FilterSpec` 类型与 `valueFilter` 工厂）、`indexList.ts`（`createFilterMenu`，负责 quick pick、标签与提示）、`index.ts`（`FILTERS` 表与 `createIndexCommand`）、其余模块是纯数据描述对象。
-- `src/reminder/` —— 更新提醒：`schedule.ts`（周番数据 → 触发事件，纯函数）、`notice.ts`（事件 → 通知形态，纯函数）、`summary.ts`（当日概览的文案，纯函数）、`scheduler.ts`（`useScheduler`，单定时器，可注入时钟）、`statusBar.ts`（`useStatusBar`，两种形态共用同一个条目）、`index.ts`（`useReminder`，按数据来源在「事件提醒」与「今日概览」之间切换）。
+- `src/reminder/` —— 更新提醒：`schedule.ts`（周番数据 → 触发事件，纯函数）、`notice.ts`（事件 → 通知形态，纯函数）、`summary.ts`（当日概览的文案，纯函数）、`ignored.ts`（忽略列表的归一化、去重与按 180 天剪枝，纯函数）、`mute.ts`（「不再提醒」二级菜单的构造与匹配，纯函数）、`scheduler.ts`（`useScheduler`，单定时器，可注入时钟）、`statusBar.ts`（`useStatusBar`，两种形态共用同一个条目）、`index.ts`（`useReminder`，按数据来源在「事件提醒」与「今日概览」之间切换）。
 - `src/utils/` —— 纯函数工具（`strings`、`type`、`file`、`display`、`clock`（UTC+8 日界）、`titles`（通知文案））。
 - `src/test/` —— 单元测试目录，布局见下方「测试约定」。
 - `resources/` —— 占位图片，由宿主通过 `asWebviewUri` 注入给 Webview，不参与打包。
@@ -127,7 +127,8 @@ Vitest 配置了两个 project，互不干扰：
 - 断言统一用 Vitest 原生 matcher（`toBe`/`toEqual`/`toBeUndefined`/`toBeGreaterThanOrEqual`），**不要**用 chai 风格（`to.be.equal`、`to.be.exist`）——后者是裸表达式，会迫使 oxlint 关掉 `no-unused-expressions`。
 - 涉及时间、定时器、随机数的用例必须用假时钟（`vi.useFakeTimers()` + `vi.setSystemTime`）或 `vi.spyOn(Math, "random")`，不要依赖真实时钟。
 - 提醒相关的用例用 `useReminder({ source, overview, now })` 注入假数据源（`source` 是 B 站原始周番，`overview` 是周番统一模型）与时钟，不要共享实例；`src/reminder/*` 的纯函数（`schedule`、`notice`、`summary`）与调度器各自有独立用例，改动其中一处时同步补对应断言。
-- 提醒通知有两个按钮：「打开周番表」与「不再提醒」。「不再提醒」写入 `bangumiOpen.EnableReminder` 的全局设置（`Settings.disableReminder()`），并置上本地静音标记：写入是异步的，关闭必须立刻生效，因此本地先记一笔；静音只由用户显式重新打开设置才解除。**静音只针对弹窗，状态栏条目不受影响**：`EnableReminder` 只控制弹窗，状态栏由 `DisplayStatusBar` 单独控制。关闭过程必须**完全静默**——用户按下「不再提醒」就是要清净，「已关闭…」之类的确认提示本身也是弹窗，不要加。
+- 提醒通知有两个按钮：「打开周番表」与「不再提醒」。点「不再提醒」会再弹一个 QuickPick 二级菜单（`buildMuteOptions`）：逐部忽略、忽略整个时段、关闭全部提醒。前两项写入 `bangumiOpen.IgnoredReminders` 的全局设置（`Settings.ignoreReminders()`），最后一项沿用 `Settings.disableReminder()` 关闭 `bangumiOpen.EnableReminder`，并置上本地静音标记：写入是异步的，关闭必须立刻生效，因此本地先记一笔；静音只由用户显式重新打开设置才解除。**静音只针对弹窗，状态栏条目不受影响**：`EnableReminder` 只控制弹窗，状态栏由 `DisplayStatusBar` 单独控制。关闭与忽略过程必须**完全静默**——用户按下「不再提醒」就是要清净，「已关闭…」之类的确认提示本身也是弹窗，不要加。
+- 忽略列表在 `fire()` 时实时读取，因此不进 `affectsReminder`：手工编辑设置无需重新拉数据，加进去只会多一次网络请求。列表项带 `ignoredAt`，`start()` 时按 180 天剪枝并在内容变化时写回（未配置过该项则不写，避免新装扩展平白多出一个空数组）。
 - 请求层测试 `vi.mock("@/request/http")`，每个用例传入自己 `useCache(...)` 组出的缓存，不要共享实例；缓存的 TTL 行为单独用 `useCache(...)` 覆盖。
 - `src/test/unit/manifest.test.ts` 校验 `package.json` 的 commands 与 `src/commands.ts` 的 `COMMAND_IDS` 一致、`@types/vscode` 不高于 `engines.vscode`。新增命令时先改 `src/commands.ts`，TypeScript 会强制 `extension.ts` 补上处理函数。
 - Webview 用例需要在 `acquireVsCodeApi` 存在的前提下运行；`webview/src/test/setup.ts` 已注入桩，断言消息用其中的 `vsCodeApi`。Preact 的 effect 清理是异步刷新的，涉及卸载的断言要先 `await new Promise(r => setTimeout(r, 0))`，否则会读到未清理的监听器。

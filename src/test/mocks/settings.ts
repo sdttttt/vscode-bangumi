@@ -1,5 +1,11 @@
 import { vi } from "vitest";
 import type { Settings } from "@/configuration";
+import {
+    addIgnored,
+    normalizeIgnored,
+    pruneIgnored,
+    type IgnoredReminder,
+} from "@/reminder/ignored";
 
 /**
  * 由可变记录支撑的 Settings 替身。
@@ -15,6 +21,14 @@ export interface SettingsStub extends Settings {
     /** 关闭提醒的写入动作，记录调用次数并同步改写 `values`。 */
     readonly disableReminder: ReturnType<
         typeof vi.fn<Settings["disableReminder"]>
+    >;
+    /** 写入忽略列表的动作，同样会同步改写 `values`。 */
+    readonly ignoreReminders: ReturnType<
+        typeof vi.fn<Settings["ignoreReminders"]>
+    >;
+    /** 清理忽略列表的动作。 */
+    readonly pruneIgnoredReminders: ReturnType<
+        typeof vi.fn<Settings["pruneIgnoredReminders"]>
     >;
 }
 
@@ -60,6 +74,35 @@ export function createSettingsStub(
          */
         disableReminder: vi.fn(() => {
             values["bangumiOpen.EnableReminder"] = false;
+
+            return Promise.resolve();
+        }),
+
+        ignoredReminders: vi.fn(() =>
+            normalizeIgnored(read("bangumiOpen.IgnoredReminders"))
+        ),
+
+        ignoreReminders: vi.fn((titles: ReadonlyArray<string>) => {
+            values["bangumiOpen.IgnoredReminders"] = addIgnored(
+                normalizeIgnored(read("bangumiOpen.IgnoredReminders")),
+                titles,
+                Date.now()
+            );
+
+            return Promise.resolve();
+        }),
+
+        /* 与真实实现一致：没有配置过该项时不写。 */
+        pruneIgnoredReminders: vi.fn(() => {
+            const { kept, changed } = pruneIgnored(
+                read("bangumiOpen.IgnoredReminders"),
+                Date.now()
+            );
+
+            if (changed) {
+                values["bangumiOpen.IgnoredReminders"] =
+                    kept as Array<IgnoredReminder>;
+            }
 
             return Promise.resolve();
         }),

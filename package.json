@@ -105,6 +105,29 @@
                     ],
                     "default": "bilibili",
                     "description": "周番表使用的数据源。Bilibili 收录可能不全；Bangumi（bgm.tv）收录更全，但不提供播出时间，因此无法提醒。"
+                },
+                "bangumiOpen.IgnoredReminders": {
+                    "type": "array",
+                    "default": [],
+                    "title": "被忽略提醒的番剧",
+                    "description": "被排除在更新提醒之外的番剧。每项带忽略时间，超过 6 个月的记录会在插件启动时自动清除；把某一项从这里删掉即可恢复提醒。",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "title",
+                            "ignoredAt"
+                        ],
+                        "properties": {
+                            "title": {
+                                "type": "string",
+                                "description": "被忽略的番剧名。"
+                            },
+                            "ignoredAt": {
+                                "type": "string",
+                                "description": "写入该记录的时间，ISO 8601 格式。"
+                            }
+                        }
+                    }
                 }
             }
         }

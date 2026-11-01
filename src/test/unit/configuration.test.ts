@@ -108,6 +108,113 @@ describe("createSettings", () => {
         );
     });
 
+    it("reads the ignored reminder list", () => {
+        const kept = {
+            title: "甲",
+            ignoredAt: new Date().toISOString(),
+        };
+        stubConfig({ [ConfigKey.IgnoredReminders]: [kept] });
+
+        expect(settings.ignoredReminders()).toEqual([kept]);
+    });
+
+    it("collapses an unparsable ignored list into nothing", () => {
+        stubConfig({ [ConfigKey.IgnoredReminders]: "甲" });
+
+        expect(settings.ignoredReminders()).toEqual([]);
+    });
+
+    it("writes a new ignored title to the global settings", async () => {
+        const update = vi.fn(() => Promise.resolve());
+        vi.mocked(vscode.workspace.getConfiguration).mockReturnValue({
+            get: vi.fn(() => []),
+            update,
+        } as unknown as ReturnType<typeof vscode.workspace.getConfiguration>);
+
+        await settings.ignoreReminders(["甲"]);
+
+        expect(update).toHaveBeenCalledWith(
+            ConfigKey.IgnoredReminders,
+            [
+                {
+                    title: "甲",
+                    ignoredAt: expect.any(String) as unknown as string,
+                },
+            ],
+            vscode.ConfigurationTarget.Global
+        );
+    });
+
+    it("merges the ignored title into the current list", async () => {
+        const existing = {
+            title: "乙",
+            ignoredAt: new Date().toISOString(),
+        };
+        const update = vi.fn(
+            (_key: string, _value: unknown, _target?: unknown) =>
+                Promise.resolve()
+        );
+        vi.mocked(vscode.workspace.getConfiguration).mockReturnValue({
+            get: vi.fn(() => [existing]),
+            update,
+        } as unknown as ReturnType<typeof vscode.workspace.getConfiguration>);
+
+        await settings.ignoreReminders(["甲"]);
+
+        const written = update.mock.calls[0][1] as Array<{ title: string }>;
+        expect(written.map(item => item.title)).toEqual(["乙", "甲"]);
+    });
+
+    it("drops expired ignored records on prune", async () => {
+        const stale = {
+            title: "甲",
+            ignoredAt: new Date(
+                Date.now() - 200 * 24 * 60 * 60 * 1000
+            ).toISOString(),
+        };
+        const update = vi.fn(() => Promise.resolve());
+        vi.mocked(vscode.workspace.getConfiguration).mockReturnValue({
+            get: vi.fn(() => [stale]),
+            update,
+        } as unknown as ReturnType<typeof vscode.workspace.getConfiguration>);
+
+        await settings.pruneIgnoredReminders();
+
+        expect(update).toHaveBeenCalledWith(
+            ConfigKey.IgnoredReminders,
+            [],
+            vscode.ConfigurationTarget.Global
+        );
+    });
+
+    it("skips the write when every ignored record is still fresh", async () => {
+        const fresh = {
+            title: "甲",
+            ignoredAt: new Date().toISOString(),
+        };
+        const update = vi.fn(() => Promise.resolve());
+        vi.mocked(vscode.workspace.getConfiguration).mockReturnValue({
+            get: vi.fn(() => [fresh]),
+            update,
+        } as unknown as ReturnType<typeof vscode.workspace.getConfiguration>);
+
+        await settings.pruneIgnoredReminders();
+
+        expect(update).not.toHaveBeenCalled();
+    });
+
+    it("skips the write when the list was never configured", async () => {
+        const update = vi.fn(() => Promise.resolve());
+        vi.mocked(vscode.workspace.getConfiguration).mockReturnValue({
+            get: vi.fn(() => undefined),
+            update,
+        } as unknown as ReturnType<typeof vscode.workspace.getConfiguration>);
+
+        await settings.pruneIgnoredReminders();
+
+        expect(update).not.toHaveBeenCalled();
+    });
+
     it("reads the live setting on every call", () => {
         stubConfig({ [ConfigKey.DisplayHistory]: true });
         expect(settings.isDisplayHistory()).toBe(true);
