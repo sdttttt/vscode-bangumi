@@ -1,6 +1,6 @@
-import type { BangumiApi } from "../request/bangumi";
-import type { WeekBangumiData } from "../request/structure";
+import type { BangumiApi } from "../request";
 import type { Settings } from "../configuration";
+import type { WeeklySchedule } from "../request/schedule";
 import { toWeekDayPayloads } from "../webview/viewModel";
 import type { WebviewCommand } from "../webview/protocol";
 import type { Panel } from "./panel";
@@ -39,26 +39,33 @@ export function useWeekBangumiView(
     const { api, panel, settings } = options;
 
     /**
-     * 渲染接口返回的周番数据。
+     * 渲染统一模型。
      */
-    const createWeekBangumiView = (data: Array<WeekBangumiData>): void => {
+    const createWeekBangumiView = (schedule: WeeklySchedule): void => {
         panel.show({
             kind: "weekBangumi",
-            days: toWeekDayPayloads(data, settings.isDisplayHistory()),
+            source: schedule.source,
+            days: toWeekDayPayloads(schedule, settings.isDisplayHistory()),
         });
     };
+
+    /**
+     * 按设置项选择数据源。Bangumi 的收录更全，但没有播出时刻，因此不能用于提醒。
+     */
+    const loadSchedule = (): Promise<WeeklySchedule | undefined> =>
+        "bangumi" === settings.weekSource()
+            ? api.getBgmTvSchedule()
+            : api.getBilibiliSchedule();
 
     const view: WeekBangumiView = {
         openWeekBangumi: () => {
             panel.showLoading();
 
-            api.getWeekBangumi().then(
-                (result: Array<WeekBangumiData> | undefined) => {
-                    if (result) {
-                        createWeekBangumiView(result);
-                    }
+            loadSchedule().then(schedule => {
+                if (schedule) {
+                    createWeekBangumiView(schedule);
                 }
-            );
+            });
         },
 
         handleCommand: command => {

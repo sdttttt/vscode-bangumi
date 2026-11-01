@@ -74,6 +74,24 @@ describe("useSettings", () => {
         expect(settings.isDisplayHistory()).toBe(true);
     });
 
+    it("defaults the week source to bilibili", () => {
+        stubConfig({});
+
+        expect(settings.weekSource()).toBe("bilibili");
+    });
+
+    it("reads the bangumi week source", () => {
+        stubConfig({ [ConfigKey.WeekSource]: "bangumi" });
+
+        expect(settings.weekSource()).toBe("bangumi");
+    });
+
+    it("falls back to bilibili for an unknown week source", () => {
+        stubConfig({ [ConfigKey.WeekSource]: "bangumi.tv" });
+
+        expect(settings.weekSource()).toBe("bilibili");
+    });
+
     it("reads the live setting on every call", () => {
         stubConfig({ [ConfigKey.DisplayHistory]: true });
         expect(settings.isDisplayHistory()).toBe(true);

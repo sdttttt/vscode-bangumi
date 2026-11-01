@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { isSuccess, isValidBangumisRequest } from "@/request/structure";
+import {
+    isSuccess,
+    isValidBangumisRequest,
+} from "@/request/bilibili/structure";
+import { isValidCalendar } from "@/request/bgmtv/structure";
+import { bgmCalendar, bgmCalendarDay } from "@/test/mocks/fixtures/bgm";
 import { bangumisData } from "@/test/mocks/fixtures/bangumi";
 
 describe("isSuccess", () => {
@@ -44,6 +49,28 @@ describe("isValidBangumisRequest", () => {
                 message: "success",
                 data: bangumisData({ list: [] }),
             })
+        ).toBe(false);
+    });
+});
+
+describe("isValidCalendar", () => {
+    it("accepts a calendar with at least one item", () => {
+        expect(isValidCalendar(bgmCalendar())).toBe(true);
+    });
+
+    it("rejects a calendar whose days are all empty", () => {
+        expect(isValidCalendar([bgmCalendarDay({ items: [] })])).toBe(false);
+    });
+
+    it("rejects a value that is not an array", () => {
+        expect(isValidCalendar(undefined)).toBe(false);
+        expect(isValidCalendar(null)).toBe(false);
+        expect(isValidCalendar({})).toBe(false);
+    });
+
+    it("rejects a day without an items array", () => {
+        expect(
+            isValidCalendar([{ weekday: { cn: "", en: "", id: 1, ja: "" } }])
         ).toBe(false);
     });
 });

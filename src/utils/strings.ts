@@ -52,3 +52,21 @@ export function numberOfStringPlus(str: string, num: number): string {
 export function randomInteger(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min)) + min;
 }
+
+/**
+ * 把 `http://` 地址升级为 `https://`。
+ *
+ * Bangumi 接口返回的封面与页面地址都是明文 http：http 资源会触发混合内容拦截，
+ * 而 Webview 的内容安全策略也只放行 https 图片。其余内容原样返回。
+ *
+ * @param url 原始地址
+ * @returns 升级后的地址；空值时返回空串
+ * @author sdttttt
+ */
+export function toHttpsUrl(url: string | null | undefined): string {
+    if (!url) {
+        return "";
+    }
+
+    return url.replace(/^http:\/\//i, "https://");
+}

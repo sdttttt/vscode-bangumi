@@ -1,4 +1,5 @@
-import type { BangumisData, WeekBangumiData } from "./structure";
+import type { BangumisData, WeekBangumiData } from "./bilibili/structure";
+import type { BgmCalendarDay } from "./bgmtv/structure";
 
 /**
  * 带时效的键值缓存。
@@ -63,4 +64,6 @@ export interface RequestCaches {
     readonly bangumi: Cache<BangumisData>;
     /** 周番数据，缓存一分钟。 */
     readonly week: Cache<Array<WeekBangumiData>>;
+    /** Bangumi 每日放送，缓存一小时：它一周才变一次，且响应远大于周番数据。 */
+    readonly calendar: Cache<Array<BgmCalendarDay>>;
 }

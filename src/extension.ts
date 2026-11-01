@@ -2,7 +2,9 @@ import * as vscode from "vscode";
 import { useAppState } from "./state/app";
 import { useSettings } from "./configuration";
 import { useCache, type RequestCaches } from "./request/cache";
-import { useBangumiApi } from "./request/bangumi";
+import { useBangumiApi, type Sources } from "./request";
+import { useBilibiliApi } from "./request/bilibili/api";
+import { useBgmTvApi } from "./request/bgmtv/api";
 import { useWebviewHost } from "./webview/host";
 import { usePanel } from "./views/panel";
 import { useIndexCommand } from "./match/index";
@@ -47,8 +49,14 @@ function createSession(
     const caches: RequestCaches = {
         bangumi: useCache(600),
         week: useCache(60),
+        calendar: useCache(3600),
     };
-    const api = useBangumiApi(caches, notifier);
+    /* 两个来源由组合根装配：提醒拿 B 站实现，视图拿统一端口。 */
+    const sources: Sources = {
+        bilibili: useBilibiliApi(caches, notifier),
+        bgmtv: useBgmTvApi(caches, notifier),
+    };
+    const api = useBangumiApi(sources);
     const host = useWebviewHost(context.extensionPath);
 
     /**
@@ -96,7 +104,8 @@ function createSession(
     });
     const index = useIndexCommand({ state, menu, notifier });
     const reminder = useReminder({
-        source: api.getWeekBangumi,
+        /* 提醒直接消费 B 站周番：它需要 `pub_ts`，Bangumi 没有这个字段。 */
+        source: sources.bilibili.getWeekBangumi,
         statusBar,
         settings,
         notifier,

@@ -1,4 +1,4 @@
-import type { Bangumi, BangumisData } from "@/request/structure";
+import type { Bangumi, BangumisData } from "@/request/bilibili/structure";
 
 /**
  * 一条已完结、带徽标的番剧数据。

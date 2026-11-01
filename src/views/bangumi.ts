@@ -1,7 +1,7 @@
 import type { Notifier } from "../notifier";
-import type { BangumiApi } from "../request/bangumi";
-import { buildBangumiUrl } from "../request/query";
-import type { BangumisData } from "../request/structure";
+import type { BangumiApi } from "../request";
+import { buildBangumiUrl } from "../request/bilibili/query";
+import type { BangumisData } from "../request/bilibili/structure";
 import type { AppStore } from "../state/app";
 import { toNumber } from "../utils/type";
 import { toBangumiPayloads } from "../webview/viewModel";
@@ -74,7 +74,7 @@ export function useBangumiView(options: BangumiViewOptions): BangumiView {
     const openBangumi = (): void => {
         panel.showLoading();
 
-        api.getAllBangumi(
+        api.getIndexPage(
             buildBangumiUrl(state.getQuery(), state.getPage())
         ).then(createBangumiView);
     };

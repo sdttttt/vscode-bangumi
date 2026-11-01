@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { BangumiApi } from "@/request/bangumi";
+import type { BangumiApi } from "@/request";
 import { bangumisData } from "@/test/mocks/fixtures/bangumi";
 import { createPanelStub, PanelStub } from "@/test/mocks/panel";
 import { createNotifierStub, type NotifierStub } from "@/test/mocks/ports";
@@ -23,8 +23,9 @@ function loadView(stubs: ReadonlyArray<PanelStub>): {
 } {
     const state = useAppState();
     const api: BangumiApi = {
-        getAllBangumi: vi.fn(),
-        getWeekBangumi: vi.fn(),
+        getIndexPage: vi.fn(),
+        getBilibiliSchedule: vi.fn(),
+        getBgmTvSchedule: vi.fn(),
     };
     const created = vi.fn();
     const panel = usePanel({
@@ -56,7 +57,7 @@ function loadView(stubs: ReadonlyArray<PanelStub>): {
  * @author sdttttt
  */
 function requestedParameter(api: BangumiApi, name: string): string | null {
-    const url = vi.mocked(api.getAllBangumi).mock.calls.at(-1)?.[0] ?? "";
+    const url = vi.mocked(api.getIndexPage).mock.calls.at(-1)?.[0] ?? "";
 
     return new URLSearchParams(url.split("?")[1]).get(name);
 }
@@ -75,7 +76,7 @@ describe("Bangumi view", () => {
     });
 
     it("opens a panel that boots the bundled webview", () => {
-        vi.mocked(api.getAllBangumi).mockReturnValue(new Promise(() => {}));
+        vi.mocked(api.getIndexPage).mockReturnValue(new Promise(() => {}));
 
         view.openBangumi();
 
@@ -85,7 +86,7 @@ describe("Bangumi view", () => {
     });
 
     it("enables scripts and restricts local resources", () => {
-        vi.mocked(api.getAllBangumi).mockReturnValue(new Promise(() => {}));
+        vi.mocked(api.getIndexPage).mockReturnValue(new Promise(() => {}));
 
         view.openBangumi();
 
@@ -93,7 +94,7 @@ describe("Bangumi view", () => {
     });
 
     it("posts the loading state first", () => {
-        vi.mocked(api.getAllBangumi).mockReturnValue(new Promise(() => {}));
+        vi.mocked(api.getIndexPage).mockReturnValue(new Promise(() => {}));
 
         view.openBangumi();
 
@@ -101,7 +102,7 @@ describe("Bangumi view", () => {
     });
 
     it("renders the bangumi list once the request resolves", async () => {
-        vi.mocked(api.getAllBangumi).mockResolvedValue(bangumisData());
+        vi.mocked(api.getIndexPage).mockResolvedValue(bangumisData());
 
         view.openBangumi();
 
@@ -113,7 +114,7 @@ describe("Bangumi view", () => {
     });
 
     it("passes the current page to the webview", async () => {
-        vi.mocked(api.getAllBangumi).mockResolvedValue(bangumisData());
+        vi.mocked(api.getIndexPage).mockResolvedValue(bangumisData());
 
         view.openBangumi();
 
@@ -123,7 +124,7 @@ describe("Bangumi view", () => {
     });
 
     it("maps the api fields into render payloads", async () => {
-        vi.mocked(api.getAllBangumi).mockResolvedValue(
+        vi.mocked(api.getIndexPage).mockResolvedValue(
             bangumisData({ list: [] })
         );
 
@@ -135,7 +136,7 @@ describe("Bangumi view", () => {
     });
 
     it("renders the not found view when the request fails", async () => {
-        vi.mocked(api.getAllBangumi).mockResolvedValue(undefined);
+        vi.mocked(api.getIndexPage).mockResolvedValue(undefined);
 
         view.openBangumi();
 
@@ -145,7 +146,7 @@ describe("Bangumi view", () => {
     });
 
     it("replays the last state when the webview asks to be ready", async () => {
-        vi.mocked(api.getAllBangumi).mockResolvedValue(bangumisData());
+        vi.mocked(api.getIndexPage).mockResolvedValue(bangumisData());
         view.openBangumi();
         await vi.waitFor(() => {
             expect(stub.posted().at(-1)?.kind).toBe("bangumi");
@@ -157,7 +158,7 @@ describe("Bangumi view", () => {
     });
 
     it("requests the first page of the unfiltered query by default", () => {
-        vi.mocked(api.getAllBangumi).mockReturnValue(new Promise(() => {}));
+        vi.mocked(api.getIndexPage).mockReturnValue(new Promise(() => {}));
 
         view.openBangumi();
 
@@ -166,7 +167,7 @@ describe("Bangumi view", () => {
     });
 
     it("increments the page on nextPage", () => {
-        vi.mocked(api.getAllBangumi).mockReturnValue(new Promise(() => {}));
+        vi.mocked(api.getIndexPage).mockReturnValue(new Promise(() => {}));
 
         view.nextPage();
 
@@ -175,7 +176,7 @@ describe("Bangumi view", () => {
     });
 
     it("decrements the page on backPage", () => {
-        vi.mocked(api.getAllBangumi).mockReturnValue(new Promise(() => {}));
+        vi.mocked(api.getIndexPage).mockReturnValue(new Promise(() => {}));
         view.nextPage();
         notifier.info.mockClear();
 
@@ -186,7 +187,7 @@ describe("Bangumi view", () => {
     });
 
     it("stays on the first page when going back", () => {
-        vi.mocked(api.getAllBangumi).mockReturnValue(new Promise(() => {}));
+        vi.mocked(api.getIndexPage).mockReturnValue(new Promise(() => {}));
 
         view.backPage();
 
@@ -195,7 +196,7 @@ describe("Bangumi view", () => {
     });
 
     it("jumps to the page entered by the user", async () => {
-        vi.mocked(api.getAllBangumi).mockReturnValue(new Promise(() => {}));
+        vi.mocked(api.getIndexPage).mockReturnValue(new Promise(() => {}));
         notifier.ask.mockResolvedValue("9");
 
         await view.jumpPage();
@@ -204,7 +205,7 @@ describe("Bangumi view", () => {
     });
 
     it("rejects a non numeric page and keeps the current one", async () => {
-        vi.mocked(api.getAllBangumi).mockReturnValue(new Promise(() => {}));
+        vi.mocked(api.getIndexPage).mockReturnValue(new Promise(() => {}));
         notifier.ask.mockResolvedValue("abc");
 
         await view.jumpPage();
@@ -216,7 +217,7 @@ describe("Bangumi view", () => {
     });
 
     it("reuses the open panel instead of creating a second one", () => {
-        vi.mocked(api.getAllBangumi).mockReturnValue(new Promise(() => {}));
+        vi.mocked(api.getIndexPage).mockReturnValue(new Promise(() => {}));
 
         view.openBangumi();
         view.nextPage();
@@ -225,7 +226,7 @@ describe("Bangumi view", () => {
     });
 
     it("opens a fresh panel after the previous one was closed", () => {
-        vi.mocked(api.getAllBangumi).mockReturnValue(new Promise(() => {}));
+        vi.mocked(api.getIndexPage).mockReturnValue(new Promise(() => {}));
 
         view.openBangumi();
         stub.dispose();
@@ -235,7 +236,7 @@ describe("Bangumi view", () => {
     });
 
     it("routes the pager commands sent by the webview", () => {
-        vi.mocked(api.getAllBangumi).mockReturnValue(new Promise(() => {}));
+        vi.mocked(api.getIndexPage).mockReturnValue(new Promise(() => {}));
         view.openBangumi();
         notifier.info.mockClear();
 
@@ -245,7 +246,7 @@ describe("Bangumi view", () => {
     });
 
     it("ignores the back command while on the first page", () => {
-        vi.mocked(api.getAllBangumi).mockReturnValue(new Promise(() => {}));
+        vi.mocked(api.getIndexPage).mockReturnValue(new Promise(() => {}));
         view.openBangumi();
         notifier.info.mockClear();
 

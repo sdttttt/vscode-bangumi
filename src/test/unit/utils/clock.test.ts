@@ -8,6 +8,7 @@ import {
     minuteOfDay,
     nextDayStart,
     toBilibiliTime,
+    weekDayOf,
 } from "@/utils/clock";
 
 /**
@@ -141,5 +142,20 @@ describe("formatMinuteOfDay", () => {
         const epoch = atUtc8(2026, 10, 31, 17, 12);
 
         expect(formatMinuteOfDay(minuteOfDay(epoch))).toBe("17:12");
+    });
+});
+
+describe("weekDayOf", () => {
+    it("maps monday to 1 and sunday to 7", () => {
+        /* 2026-10-26 是周一，11-1 是周日。 */
+        expect(weekDayOf(Date.UTC(2026, 9, 26, 4, 0))).toBe(1);
+        expect(weekDayOf(Date.UTC(2026, 10, 1, 4, 0))).toBe(7);
+    });
+
+    it("uses the UTC+8 day boundary", () => {
+        /* UTC 的 10-31 17:00 已经是 UTC+8 的 11-1 周日。 */
+        expect(weekDayOf(Date.UTC(2026, 9, 31, 17, 0))).toBe(7);
+        /* 往前一小时仍属于周六。 */
+        expect(weekDayOf(Date.UTC(2026, 9, 31, 15, 59))).toBe(6);
     });
 });

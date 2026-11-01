@@ -67,6 +67,19 @@ export function formatMinuteOfDay(minute: number): string {
 }
 
 /**
+ * 给定时刻所在的 UTC+8 星期，范围为 `1`（周一）–`7`（周日）。
+ *
+ * Bangumi 的每日放送按星期分组，`weekday.id` 与 `air_weekday` 都用这套序号，
+ * 因此不能沿用 JavaScript 的 `0`–`6`。
+ *
+ * @author sdttttt
+ */
+export function weekDayOf(epochMs: number): number {
+    const day = new Date(toBilibiliTime(epochMs)).getUTCDay();
+    return 0 === day ? 7 : day;
+}
+
+/**
  * 给定时刻之后最近的 UTC+8 午夜的毫秒时间戳。
  *
  * @author sdttttt

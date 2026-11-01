@@ -1,5 +1,5 @@
 import { createStore } from "./store";
-import { DEFAULT_QUERY, type BangumiQuery } from "../request/query";
+import { DEFAULT_QUERY, type BangumiQuery } from "../request/bilibili/query";
 
 /**
  * 扩展在命令之间需要记住的全部内容。

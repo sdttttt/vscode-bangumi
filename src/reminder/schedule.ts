@@ -1,4 +1,4 @@
-import type { WBangumi, WeekBangumiData } from "../request/structure";
+import type { WBangumi, WeekBangumiData } from "../request/bilibili/structure";
 import { dayDistance, isCurrentDay, nextDayStart } from "../utils/clock";
 import { truncateToColumns } from "../utils/titles";
 

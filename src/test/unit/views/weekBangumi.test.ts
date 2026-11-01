@@ -1,11 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { BangumiApi } from "@/request/bangumi";
+import type { BangumiApi } from "@/request";
+import {
+    toScheduleFromBgmTv,
+    toScheduleFromBilibili,
+    type WeeklySchedule,
+} from "@/request/schedule";
 import { createSettingsStub, type SettingsStub } from "@/test/mocks/settings";
 import {
     weekBangumi,
     weekBangumiData,
 } from "@/test/mocks/fixtures/weekBangumi";
+import { bgmCalendar } from "@/test/mocks/fixtures/bgm";
 import { createPanelStub, PanelStub } from "@/test/mocks/panel";
 import { useWebviewHost } from "@/webview/host";
 import { usePanel } from "@/views/panel";
@@ -21,8 +27,9 @@ function loadView(
     stub: PanelStub
 ): { view: WeekBangumiView; api: BangumiApi } {
     const api: BangumiApi = {
-        getAllBangumi: vi.fn(),
-        getWeekBangumi: vi.fn(),
+        getIndexPage: vi.fn(),
+        getBilibiliSchedule: vi.fn(),
+        getBgmTvSchedule: vi.fn(),
     };
     const panel = usePanel({
         viewType: "bangumiOpen.week",
@@ -51,7 +58,9 @@ describe("Week bangumi view", () => {
     });
 
     it("posts the loading state before the schedule arrives", () => {
-        vi.mocked(api.getWeekBangumi).mockReturnValue(new Promise(() => {}));
+        vi.mocked(api.getBilibiliSchedule).mockReturnValue(
+            new Promise(() => {})
+        );
 
         view.openWeekBangumi();
 
@@ -59,7 +68,9 @@ describe("Week bangumi view", () => {
     });
 
     it("renders every day when history is enabled", async () => {
-        vi.mocked(api.getWeekBangumi).mockResolvedValue(weekBangumi());
+        vi.mocked(api.getBilibiliSchedule).mockResolvedValue(
+            toScheduleFromBilibili(weekBangumi())
+        );
 
         view.openWeekBangumi();
 
@@ -68,16 +79,34 @@ describe("Week bangumi view", () => {
             expect(state?.kind).toBe("weekBangumi");
             expect(state?.days).toHaveLength(7);
             expect(state?.days?.[0].dayOfWeek).toBe(1);
+            expect(state?.source).toBe("bilibili");
         });
     });
 
     it("hides the past days when history is disabled", async () => {
         settings.values["bangumiOpen.DisplayHistory"] = false;
-        vi.mocked(api.getWeekBangumi).mockResolvedValue([
-            weekBangumiData({ date: "10-30", day_of_week: 5, is_today: 0 }),
-            weekBangumiData({ date: "10-31", day_of_week: 6, is_today: 1 }),
-            weekBangumiData({ date: "11-1", day_of_week: 7, is_today: 0 }),
-        ]);
+        vi.mocked(api.getBilibiliSchedule).mockResolvedValue(
+            toScheduleFromBilibili(
+                [
+                    weekBangumiData({
+                        date: "10-30",
+                        day_of_week: 5,
+                        is_today: 0,
+                    }),
+                    weekBangumiData({
+                        date: "10-31",
+                        day_of_week: 6,
+                        is_today: 1,
+                    }),
+                    weekBangumiData({
+                        date: "11-1",
+                        day_of_week: 7,
+                        is_today: 0,
+                    }),
+                ],
+                Date.UTC(2026, 9, 31, 4, 0)
+            )
+        );
 
         view.openWeekBangumi();
 
@@ -91,7 +120,9 @@ describe("Week bangumi view", () => {
 
     it("keeps the whole schedule when today is missing", async () => {
         settings.values["bangumiOpen.DisplayHistory"] = false;
-        vi.mocked(api.getWeekBangumi).mockResolvedValue(weekBangumi());
+        vi.mocked(api.getBilibiliSchedule).mockResolvedValue(
+            toScheduleFromBilibili(weekBangumi())
+        );
 
         view.openWeekBangumi();
 
@@ -101,7 +132,9 @@ describe("Week bangumi view", () => {
     });
 
     it("converts the season fields into render payloads", async () => {
-        vi.mocked(api.getWeekBangumi).mockResolvedValue(weekBangumi());
+        vi.mocked(api.getBilibiliSchedule).mockResolvedValue(
+            toScheduleFromBilibili(weekBangumi())
+        );
 
         view.openWeekBangumi();
 
@@ -116,7 +149,7 @@ describe("Week bangumi view", () => {
     });
 
     it("keeps the loading state when the request fails", async () => {
-        vi.mocked(api.getWeekBangumi).mockResolvedValue(undefined);
+        vi.mocked(api.getBilibiliSchedule).mockResolvedValue(undefined);
 
         view.openWeekBangumi();
         await Promise.resolve();
@@ -125,20 +158,24 @@ describe("Week bangumi view", () => {
     });
 
     it("reloads the schedule when the webview asks to refresh", async () => {
-        vi.mocked(api.getWeekBangumi).mockResolvedValue(weekBangumi());
+        vi.mocked(api.getBilibiliSchedule).mockResolvedValue(
+            toScheduleFromBilibili(weekBangumi())
+        );
         view.openWeekBangumi();
         await vi.waitFor(() => {
             expect(stub.posted().at(-1)?.kind).toBe("weekBangumi");
         });
-        vi.mocked(api.getWeekBangumi).mockClear();
+        vi.mocked(api.getBilibiliSchedule).mockClear();
 
         stub.receive({ type: "weekBangumi:refresh" });
 
-        expect(api.getWeekBangumi).toHaveBeenCalledTimes(1);
+        expect(api.getBilibiliSchedule).toHaveBeenCalledTimes(1);
     });
 
     it("replays the last state when the webview asks to be ready", async () => {
-        vi.mocked(api.getWeekBangumi).mockResolvedValue(weekBangumi());
+        vi.mocked(api.getBilibiliSchedule).mockResolvedValue(
+            toScheduleFromBilibili(weekBangumi())
+        );
         view.openWeekBangumi();
         await vi.waitFor(() => {
             expect(stub.posted().at(-1)?.kind).toBe("weekBangumi");
@@ -149,5 +186,88 @@ describe("Week bangumi view", () => {
 
         expect(stub.posted()).toHaveLength(before + 1);
         expect(stub.posted().at(-1)?.kind).toBe("weekBangumi");
+    });
+});
+
+describe("Week bangumi view with the Bangumi source", () => {
+    let view: WeekBangumiView;
+    let api: BangumiApi;
+    let settings: SettingsStub;
+    let stub: PanelStub;
+
+    const now = Date.UTC(2026, 9, 31, 4, 0);
+
+    beforeEach(() => {
+        settings = createSettingsStub({
+            "bangumiOpen.WeekSource": "bangumi",
+            "bangumiOpen.DisplayHistory": false,
+        });
+        stub = createPanelStub();
+        ({ view, api } = loadView(settings, stub));
+    });
+
+    it("asks the Bangumi source when the setting selects it", async () => {
+        vi.mocked(api.getBgmTvSchedule).mockResolvedValue(
+            toScheduleFromBgmTv(bgmCalendar(), now)
+        );
+
+        view.openWeekBangumi();
+
+        await vi.waitFor(() => {
+            expect(api.getBgmTvSchedule).toHaveBeenCalledTimes(1);
+        });
+        expect(api.getBilibiliSchedule).not.toHaveBeenCalled();
+        expect(stub.posted().at(-1)?.source).toBe("bangumi");
+    });
+
+    it("keeps the source tag for the webview", async () => {
+        vi.mocked(api.getBgmTvSchedule).mockResolvedValue(
+            toScheduleFromBgmTv(bgmCalendar(), now)
+        );
+
+        view.openWeekBangumi();
+
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.kind).toBe("weekBangumi");
+        });
+        expect(stub.posted().at(-1)?.source).toBe("bangumi");
+    });
+
+    it("renders seven days even when history is disabled", async () => {
+        vi.mocked(api.getBgmTvSchedule).mockResolvedValue(
+            toScheduleFromBgmTv(bgmCalendar(), now)
+        );
+
+        view.openWeekBangumi();
+
+        await vi.waitFor(() => {
+            const days = stub.posted().at(-1)?.days ?? [];
+            expect(days).toHaveLength(7);
+        });
+    });
+
+    it("keeps the loading state when the Bangumi request fails", async () => {
+        vi.mocked(api.getBgmTvSchedule).mockResolvedValue(undefined);
+
+        view.openWeekBangumi();
+        await Promise.resolve();
+
+        expect(stub.posted().at(-1)?.kind).toBe("loading");
+    });
+});
+
+describe("WeeklySchedule construction", () => {
+    it("marks the bilibili schedule as carrying slots", () => {
+        const schedule: WeeklySchedule = toScheduleFromBilibili(weekBangumi());
+
+        expect(schedule.source).toBe("bilibili");
+        expect(schedule.hasSlots).toBe(true);
+    });
+
+    it("marks the Bangumi schedule as slot-less", () => {
+        const schedule = toScheduleFromBgmTv(bgmCalendar());
+
+        expect(schedule.source).toBe("bangumi");
+        expect(schedule.hasSlots).toBe(false);
     });
 });

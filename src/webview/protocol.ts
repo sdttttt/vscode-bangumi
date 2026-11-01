@@ -26,7 +26,19 @@ export interface WeekDayPayload {
     label: string;
     isToday: boolean;
     seasons: Array<SeasonPayload>;
+    /** 该天的数据来源，缺省按 B 站处理。 */
+    source?: WeekSourceKind;
 }
+
+/**
+ * 周番表的数据来源。
+ *
+ * 这个文件必须保持零运行时依赖，因此这里单独声明一份，
+ * 而不是从请求层引类型。
+ *
+ * @author sdttttt
+ */
+export type WeekSourceKind = "bilibili" | "bangumi";
 
 /**
  * 周番数据中的单部番剧。
@@ -42,6 +54,10 @@ export interface SeasonPayload {
     pubTime: string;
     title: string;
     url: string;
+    /** 原名；与中文名相同时省略。 */
+    originalTitle?: string;
+    /** 评分 0–10，只有 Bangumi 提供。 */
+    score?: number;
 }
 
 /**
@@ -70,6 +86,8 @@ export interface ViewState {
     page?: number;
     bangumis?: Array<BangumiPayload>;
     days?: Array<WeekDayPayload>;
+    /** 周番表的数据来源，供 Webview 决定是否显示来源提示。 */
+    source?: WeekSourceKind;
     /** Webview 无法自行推出的 Uri，由 `asWebviewUri` 解析。 */
     assets?: AssetUris;
 }

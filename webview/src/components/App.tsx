@@ -55,6 +55,7 @@ export function App({ state, onNextPage, onBackPage, onJumpPage }: AppProps) {
                 <WeekBangumiList
                     days={state.days ?? []}
                     assets={state.assets}
+                    source={state.source}
                 />
             );
         default:

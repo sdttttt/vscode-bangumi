@@ -1,4 +1,4 @@
-import { isEmptyArray, isEmptyObject } from "../utils/type";
+import { isEmptyArray, isEmptyObject } from "../../utils/type";
 
 /**
  * 判断接口响应是否成功。

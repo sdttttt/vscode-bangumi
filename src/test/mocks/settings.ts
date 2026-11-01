@@ -45,5 +45,10 @@ export function createSettingsStub(
         isDisplayHistory: vi.fn(
             () => true === read("bangumiOpen.DisplayHistory")
         ),
+        weekSource: vi.fn(() =>
+            "bangumi" === read("bangumiOpen.WeekSource")
+                ? "bangumi"
+                : "bilibili"
+        ),
     };
 }

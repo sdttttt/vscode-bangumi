@@ -1,4 +1,4 @@
-import type { BangumiQuery } from "../request/query";
+import type { BangumiQuery } from "../request/bilibili/query";
 
 /**
  * 索引菜单中的一个筛选项。

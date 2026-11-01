@@ -93,7 +93,11 @@ export default defineConfig({
         // 内边距与滚动由 `.board` 提供；周番视图还会把自己固定为视口高度，
         // 让各列可以横向滚动。
         "week-board":
-            "h-screen [scroll-padding-inline:12px] min-[600px]:[scroll-padding-inline:20px]",
+            "h-full [scroll-padding-inline:12px] min-[600px]:[scroll-padding-inline:20px]",
+        // 来源提示条占住高度后，剩下的空间才交给可滚动的日程。
+        "week-shell": "flex h-screen flex-col",
+        "week-source":
+            "flex-none m-0 px-3 py-1.5 text-[11px] leading-normal text-muted bg-tint border-b-1 border-b-solid border-line min-[600px]:px-5",
         week: "grid grid-flow-col auto-cols-[232px] min-[600px]:auto-cols-[252px] items-stretch gap-3 min-[600px]:gap-4 w-max m-0 p-0",
         item: "surface flex flex-col",
         // 无论工具类的输出顺序如何，`!` 都能压过 `item` 的颜色。
@@ -124,6 +128,10 @@ export default defineConfig({
         "season-cover": "block w-14 h-14 overflow-hidden bg-tint rounded-1.5",
         "season-cover-image": "block w-full h-full object-cover",
         "season-cover-delay": "grayscale opacity-85",
+        // Bangumi 的封面绝大多数是书封式的长条（约 1:1.4），套进方形画框会被上下裁掉一大半，
+        // 因此它单独用一套更高的画框，让封面本身的构图完整露出来。
+        "season-poster": "block w-14 h-20 overflow-hidden bg-tint rounded-1.5",
+        "season-poster-image": "block w-full h-full object-cover",
         "season-info": "flex flex-col gap-1 min-w-0",
         "season-title":
             "line-clamp-3 text-xs font-500 leading-[1.4] text-fg [overflow-wrap:anywhere] [.bangumi:hover_&]:text-accent",
@@ -131,5 +139,7 @@ export default defineConfig({
         "season-part":
             "block overflow-hidden text-[11px] text-accent tabular-nums leading-[1.4] text-ellipsis whitespace-nowrap",
         "season-part-delay": "!whitespace-normal !text-warning-text",
+        // Bangumi 才有评分，因此单独一行、靠左，不与首播日期抢位置。
+        "season-score": "self-start",
     },
 });

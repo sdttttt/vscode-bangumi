@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { DEFAULT_QUERY } from "@/request/query";
+import { DEFAULT_QUERY } from "@/request/bilibili/query";
 import {
     applyQuery,
     applyTag,

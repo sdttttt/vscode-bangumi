@@ -43,11 +43,11 @@
 - `src/configuration.ts` —— `ConfigKey` 与 `useSettings()`：设置以 `Settings` 接口（端口）对外暴露，消费者接收注入而不是自己读 workspace。
 - `src/notifier.ts` —— `Notifier` 端口（`info` / `error` / `ask` / `pick` / `action`）与 `useNotifier()`，所有面向用户的消息与选择框都经由它。
 - `src/commands.ts` —— `COMMAND_IDS`、`Commands` 端口与 `useCommands()`，跨视图跳转通过它而不是直接调 `vscode.commands`。
-- `src/views/` —— `panel.ts` 的 `usePanel` 用闭包承载 Webview 面板生命周期与消息通道；`bangumi.ts` / `weekBangumi.ts` 导出 `useBangumiView` / `useWeekBangumiView`。
+- `src/views/` —— `panel.ts` 的 `usePanel` 用闭包承载 Webview 面板生命周期与消息通道；`bangumi.ts` / `weekBangumi.ts` 导出 `useBangumiView` / `useWeekBangumiView`。周番视图按 `Settings.weekSource()` 选择统一模型的来源；索引视图与提醒只消费 Bilibili 实现。
 - `src/extension.ts` —— 组合根：`activate()` 里用 `use*` 建好一个会话的 state、host、视图与提醒，再把它们拼成命令表。
 - `src/webview/` —— 宿主侧 Webview 基础设施：`protocol.ts`（双向消息类型，两段共享）、`host.ts`（`useWebviewHost`：CSP、nonce、`localResourceRoots`、资源 URI）、`viewModel.ts`（API 原始数据 → 渲染载荷）。
 - `webview/` —— 独立的前端工程（Preact + TypeScript + UnoCSS），源码在 `webview/src/`，样式配置在 `webview/uno.config.ts`，产物由 `vite.webview.mts` 输出到 `webview-dist/`。
-- `src/request/` —— `http.ts`（`fetch` 封装与超时）、`query.ts`（`BangumiQuery`、`DEFAULT_QUERY`、纯函数 `buildBangumiUrl`）、响应类型与纯谓词（`structure.ts`）、会话缓存（`cache.ts` 的 `useCaches`）与接口调用（`bangumi.ts` 的 `useBangumiApi`）。
+- `src/request/` —— 请求层按来源分组，再统一成一份周番模型：`http.ts`（`fetch` 封装与超时）、`cache.ts`（会话缓存与 `RequestCaches`）、`bilibili/`（`query.ts` 的 `BangumiQuery`/`DEFAULT_QUERY`/`buildBangumiUrl`、`structure.ts` 的响应类型与纯谓词、`api.ts` 的 `useBilibiliApi`：索引 + 周番原始数据）、`bgmtv/`（`query.ts` 的 `BANGUMI_CALENDAR`、`structure.ts` 的每日放送类型与 `isValidCalendar`、`api.ts` 的 `useBgmTvApi`）、`schedule.ts`（统一模型 `WeeklySchedule`/`ScheduleDay`/`ScheduleItem` 与两个纯适配器）、`index.ts`（`Sources` 端口与 `useBangumiApi`，暴露 `getIndexPage`/`getBilibiliSchedule`/`getBgmTvSchedule`）。
 - `src/match/` —— 索引菜单：`filterSpec.ts`（`FilterSpec` 类型与 `valueFilter` 工厂）、`indexList.ts`（`useFilterMenu`，负责 quick pick、标签与提示）、`index.ts`（`FILTERS` 表与 `useIndexCommand`）、其余模块是纯数据描述对象。
 - `src/reminder/` —— 更新提醒：`schedule.ts`（周番数据 → 触发事件，纯函数）、`notice.ts`（事件 → 通知形态，纯函数）、`scheduler.ts`（`useScheduler`，单定时器，可注入时钟）、`statusBar.ts`（`useStatusBar`）、`index.ts`（`useReminder`）。
 - `src/utils/` —— 纯函数工具（`strings`、`type`、`file`、`display`、`clock`（UTC+8 日界）、`titles`（通知文案））。
@@ -142,11 +142,17 @@ Vitest 配置了两个 project，互不干扰：
 - 样式统一用 UnoCSS（`webview/uno.config.ts`）编写：单元素规则直接写原子类，多处复用的写成 shortcut。颜色只能来自 `theme.colors` 里映射的 `--vscode-*` 变量与 `--surface` / `--line` / `--accent` 等表面 token，不要硬编码色值，否则明暗主题下会看不清。
 - `webview/src/styles/main.css` 只保留原子类表达不了的部分：文档 reset、`:where(a)` 默认链接样式、共享表面 token（`--surface` / `--line` / `--tint` / `--hover` / `--accent` / `--muted` / `--warning-*` / `--card-shadow`），以及依赖祖先选择器的主题覆盖（`body.vscode-dark`、`vscode-high-contrast`、`vscode-reduce-motion`、滚动条）。它在 `uno.css` 之后导入，同权重时后者胜出，所以这里的规则可以放心覆盖工具类。
 - 三个页面（索引列表、周番、加载/空态）共用同一套 shortcut：`board`（滚动根）、`surface`（卡片表面）、`chip`（小标签）、`row-link`（整行链接）、`focus-ring`。新增页面优先复用它们，不要另造一套色值。
+- 周番页按来源拆成两个组件，`webview/src/components/` 下的 `WeekBangumiList.tsx` 只做分派：`week/BilibiliWeek.tsx`（按更新时段分组 + 「你在这里」标记）与 `week/BgmTvWeek.tsx`（没有时段，只有星期、首播日期、评分与原名）。新增来源时加一个组件并在分派处加一个分支，不要往现有组件里塞条件。
+- `week/SourceNote.tsx` 是顶部来源提示条的共用实现（`week-source`、`role="note"`），两个来源各自通过 `WeekBoard` 的 `source` 槽传入自己的文案：B 站说明「播出时刻为北京时间」，Bangumi 说明「不含播出时间，因此没有更新提醒」。
+- `week/marker.ts` 放两个来源共用的纯函数与 hooks（`pubTimeMinute`、`markerIndex`、`nextGapMinutes`、`describeGap`、`describeNow`、`groupByPubTime`、`useNow`）以及标记文案常量；`week/WeekBoard.tsx` 放两页共用的滚动网格（`week-shell` / `week-board`）与「今天」滚动锚点，Bangumi 页通过 `source` prop 传入来源提示条（`week-source`）。
+- Bangumi 页的条目没有播出时刻与延期概念，因此 `SeasonRow` 不渲染 `.time-point`、不画标记、不渲染空的进度行；首播日期占集数的位置，评分单独一枚 `chip`，原名放在 `.season-title` 的悬浮提示里。
+- 两个来源的封面尺寸不同：B 站是方图，用 `season-cover`（56×56）；Bangumi 多是约 1:1.4 的书封长条，用单独一套更高的 `season-poster`（56×80），否则方形画框会把构图裁掉大半。不要合并这两个 shortcut。
+- Bangumi 的封面地址在适配器里取 `images.common`（约 150 像素宽）而不是 `grid`（只有 48×48，放大后明显发糊）；`large` 常有 1500 像素以上、单张几百 KB，只作为 `common` 缺失时的回退。
 - 周番页的「你在这里」标记（`now-marker`）只画在 `isToday` 的那一列，位置由 `markerIndex()` 按 `HH:MM` 计算；时间来源是 `@shared/utils/clock` 的 `minuteOfDay()`（UTC+8，与接口一致），不要改用本地时区或新的 Date 计算。时钟只在当天那一列订阅（`useNow`），其余六列保持静态；`now` prop 用于测试冻结时间。标记用 `--gold`（`main.css` 中由警告色与前景色混合，保证明暗主题下都够对比度），高对比主题下回退到前景色。标记后缀是倒计时而不是墙钟：`nextGapMinutes()` 从 `markerIndex()` 的位置向后找第一场，`describeGap()` 负责文案（<60 分钟用分钟，否则小时+分钟），`describeNow()` 处理「今日已播完」与「今日没有更新」；墙钟只保留在 `aria-label` 里。
 - `.today` / `.delay` 用 `!` 前缀（如 `!border-accent`）压过同一元素的其它颜色工具类：UnoCSS 的输出顺序不按 class 书写顺序，不加 `!` 时结果不可预测。
 - `@unocss/vite` 会自动扫描 `.tsx`，但也会把源码里的普通英文单词当成候选类名（例如注释里出现 `tab` 之类的英文单词会生成 `.tab`）。这些多出来的规则无害，不要为了消除它们而下调 `content` 的扫描范围：关掉 pipeline 会让 Vite 引入的虚拟样式表解析失败。
 - **`src/` 下不写 class，也不用 `this`。** 可变状态只有两个去处：`src/state/` 的 store，或 `use*()` 工厂的闭包。
-- **状态与方法一律封装进 `use*()` 工厂，不要写成模块级单例。** 现有工厂：`useAppState`、`useCache`、`useBangumiApi`、`useWebviewHost`、`usePanel`、`useBangumiView`、`useWeekBangumiView`、`useFilterMenu`、`useIndexCommand`、`useScheduler`、`useStatusBar`、`useReminder`。模块顶层只允许放不可变的纯数据（`FILTERS`、`DEFAULT_QUERY`、`MENU_LABELS` 之类）和纯函数。
+- **状态与方法一律封装进 `use*()` 工厂，不要写成模块级单例。** 现有工厂：`useAppState`、`useCache`、`useBilibiliApi`、`useBgmTvApi`、`useBangumiApi`、`useWebviewHost`、`usePanel`、`useBangumiView`、`useWeekBangumiView`、`useFilterMenu`、`useIndexCommand`、`useScheduler`、`useStatusBar`、`useReminder`。模块顶层只允许放不可变的纯数据（`FILTERS`、`DEFAULT_QUERY`、`MENU_LABELS` 之类）和纯函数。
 - **`use*()` 工厂里不许再调用别的 `use*()`。** 工厂只创建自己那份状态，需要别的模块的实例（面板、调度器、状态栏、缓存、API）时一律通过参数从外部注入，由组合根 `createSession()` 负责装配。同理，`onCommand` 之类把两个对象连起来的接线也只能在组合根里做。
 - **状态一律通过端口注入，不许在工厂里读环境。** 依赖方向是「组合根 → 工厂 → 端口接口」：`Settings`（用户配置）、`Notifier`（消息与选择框）、`Commands`（命令调用）、`Commands`/`Panel`/`WebviewHost`（宿主能力）都由 `src/extension.ts` 建好后传入。工厂只依赖这些接口，测试传 double 即可，不需要 `vi.mock("vscode")` 去改环境状态。
 - **控制反转的边界在 `src/extension.ts`。** 谁创建、谁持有、谁释放（`context.subscriptions`、`deactivate()`）都写在组合根；工厂只接收并使用，不自己注册监听、不自己读配置、不自己弹窗。

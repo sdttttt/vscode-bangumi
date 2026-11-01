@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import type { WeekSourceKind } from "./request/schedule";
 
 /**
  * 本扩展读取的设置键。
@@ -11,6 +12,7 @@ export enum ConfigKey {
     DisplayIndexTags = "bangumiOpen.DisplayIndexTags",
     DisplayHistory = "bangumiOpen.DisplayHistory",
     DisplayStatusBar = "bangumiOpen.DisplayStatusBar",
+    WeekSource = "bangumiOpen.WeekSource",
 }
 
 /**
@@ -32,6 +34,8 @@ export interface Settings {
     isDisplayStatusBar(): boolean;
     /** 是否展示周番表中过去的几天。 */
     isDisplayHistory(): boolean;
+    /** 周番表使用的数据来源。 */
+    weekSource(): WeekSourceKind;
 }
 
 /**
@@ -77,5 +81,15 @@ export function useSettings(): Settings {
         isDisplayStatusBar: () => read(ConfigKey.DisplayStatusBar) as boolean,
 
         isDisplayHistory: () => read(ConfigKey.DisplayHistory) as boolean,
+
+        weekSource: () => {
+            /*
+             * 只接受已知的取值：设置项可能被手工写错，也可能来自旧版本，
+             * 这时应当回退到 B 站，而不是让番剧表变成空的。
+             */
+            const source = read(ConfigKey.WeekSource);
+
+            return "bangumi" === source ? "bangumi" : "bilibili";
+        },
     };
 }

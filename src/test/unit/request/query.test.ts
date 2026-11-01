@@ -4,7 +4,7 @@ import {
     buildBangumiUrl,
     DEFAULT_QUERY,
     type BangumiQuery,
-} from "@/request/query";
+} from "@/request/bilibili/query";
 
 /**
  * 把已构建地址的查询参数提取为普通记录。

@@ -8,6 +8,7 @@
 ## 功能
 
 - **周番表** —— 按星期排布的更新时间表，「今天」那一列标出当前时刻与距下一场更新的倒计时
+- **两个数据源** —— 周番表可在 B 站时间表与 Bangumi 每日放送之间切换，后者收录更全
 - **番剧索引** —— 可按类型、地区、状态、版权、付费、季度、时间、风格多级筛选
 - **更新提醒** —— 状态栏显示下一场更新，更新时弹通知，支持提前提醒
 
@@ -28,13 +29,23 @@
 
 ## 配置
 
-| 配置项                          | 默认值  | 说明               |
-| ------------------------------- | ------- | ------------------ |
-| `bangumiOpen.DisplayHistory`    | `false` | 显示过去几天的更新 |
-| `bangumiOpen.EnableReminder`    | `true`  | 开启更新提醒       |
-| `bangumiOpen.ReminderAheadTime` | `0`     | 提前提醒的秒数     |
-| `bangumiOpen.DisplayIndexTags`  | `true`  | 显示已选标签       |
-| `bangumiOpen.DisplayStatusBar`  | `true`  | 显示状态栏提示     |
+| 配置项                          | 默认值     | 说明               |
+| ------------------------------- | ---------- | ------------------ |
+| `bangumiOpen.WeekSource`        | `bilibili` | 周番表的数据源     |
+| `bangumiOpen.DisplayHistory`    | `false`    | 显示过去几天的更新 |
+| `bangumiOpen.EnableReminder`    | `true`     | 开启更新提醒       |
+| `bangumiOpen.ReminderAheadTime` | `0`        | 提前提醒的秒数     |
+| `bangumiOpen.DisplayIndexTags`  | `true`     | 显示已选标签       |
+| `bangumiOpen.DisplayStatusBar`  | `true`     | 显示状态栏提示     |
+
+### 数据源
+
+周番表可以在两个数据源之间切换：
+
+- **`bilibili`** —— B 站时间表，带具体播出时刻，因此支持更新提醒、状态栏提示与「显示过去的更新」。
+- **`bangumi`** —— [Bangumi 每日放送](https://api.bgm.tv/calendar)，收录比 B 站全，还带评分与原作名；但它只按星期分组、没有播出时刻，因此**不提供提醒与状态栏提示**，`DisplayHistory` 对它也不生效，始终展示完整七天。
+
+番剧索引与更新提醒始终使用 B 站的数据，不受该设置影响。
 
 ## 贡献
 
@@ -48,4 +59,4 @@
 
 图标与界面插图为《日常》的同人素材，版权归原作者所有，不在本项目授权范围内（`Icon.png`、`resources/` 下的图片、`resources/b2.png`）。
 
-数据来自 B 站公开接口，本项目与 B 站无隶属关系。
+数据来自 B 站与 [Bangumi](https://bgm.tv) 的公开接口，本项目与两者均无隶属关系。

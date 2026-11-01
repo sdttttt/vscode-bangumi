@@ -224,6 +224,21 @@
 
 - 修复 Match 模块循环依赖问题.
 
+## [未发布]
+
+### 新增
+
+- **新增 Bangumi（bgm.tv）数据源**：周番表可以在 B 站时间表与 [Bangumi 每日放送](https://api.bgm.tv/calendar) 之间切换，由新配置项 `bangumiOpen.WeekSource` 控制，默认仍为 `bilibili`。Bangumi 收录比 B 站全，还带评分与原作名；但它只按星期分组、没有播出时刻，因此在该模式下不提供更新提醒与状态栏提示，`DisplayHistory` 也不生效，始终展示完整七天。
+- 周番表在 Bangumi 模式下顶部显示数据来源提示，番剧行显示评分与首播日期，鼠标悬浮可看到原名。
+- Bangumi 模式的封面改用竖版画框，并按长度取更清晰的 `common` 尺寸：此前复用的是 B 站的方形画框与 48×48 的 `grid` 图，长条封面被裁成方块、放大后也很模糊。
+
+### 内部
+
+- 请求层按来源分组：`src/request/bilibili/` 与 `src/request/bgmtv/` 各自持有查询常量、响应类型、校验谓词与接口调用，互不引用。
+- 新增统一模型 `src/request/schedule.ts`（`WeeklySchedule` / `ScheduleDay` / `ScheduleItem`）与两个纯适配器，把两种原始响应归一成同一份数据；`hasSlots` 标记该来源是否带播出时刻。
+- 新增 `src/request/index.ts` 作为应用端口，暴露 `getIndexPage` / `getBilibiliSchedule` / `getBgmTvSchedule`；番剧索引与更新提醒仍只消费 Bilibili 实现。
+- 新增纯函数 `weekDayOf`（UTC+8 的 1–7 星期）与 `toHttpsUrl`（把接口返回的 `http://` 封面与页面地址升级为 https）。
+
 ## [3.0.0] - 2026-10-31
 
 自 2.2.8 以来的第一次发布。这四年里扩展的内部实现、构建工具链与界面都被彻底重写，因此直接跳到 3.0.0；日常使用的命令、快捷键与配置项保持不变。

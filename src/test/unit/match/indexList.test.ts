@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { buildBangumiUrl, DEFAULT_QUERY } from "@/request/query";
+import { buildBangumiUrl, DEFAULT_QUERY } from "@/request/bilibili/query";
 import { useAppState, type AppStore } from "@/state/app";
 import { useFilterMenu, type FilterMenu } from "@/match/indexList";
 import { MENU_LABELS, useIndexCommand } from "@/match/index";

@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { numberOfStringPlus, randomInteger, toWeekDay } from "@/utils/strings";
+import {
+    numberOfStringPlus,
+    randomInteger,
+    toHttpsUrl,
+    toWeekDay,
+} from "@/utils/strings";
 
 describe("toWeekDay", () => {
     it.each([
@@ -52,5 +57,25 @@ describe("randomInteger", () => {
         }
 
         expect([...values].sort()).toEqual([0, 1]);
+    });
+});
+
+describe("toHttpsUrl", () => {
+    it("upgrades a plain http address", () => {
+        expect(toHttpsUrl("http://bgm.tv/subject/1")).toBe(
+            "https://bgm.tv/subject/1"
+        );
+    });
+
+    it("keeps an https address untouched", () => {
+        expect(toHttpsUrl("https://lain.bgm.tv/a.jpg")).toBe(
+            "https://lain.bgm.tv/a.jpg"
+        );
+    });
+
+    it("returns an empty string for a missing address", () => {
+        expect(toHttpsUrl(null)).toBe("");
+        expect(toHttpsUrl(undefined)).toBe("");
+        expect(toHttpsUrl("")).toBe("");
     });
 });

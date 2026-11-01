@@ -1,8 +1,8 @@
 import { BANGUMI_WEEK } from "./query";
-import { getJson } from "./http";
-import type { Notifier } from "../notifier";
-import { isEmptyArray } from "../utils/type";
-import type { RequestCaches } from "./cache";
+import { getJson } from "../http";
+import type { Notifier } from "../../notifier";
+import { isEmptyArray } from "../../utils/type";
+import type { RequestCaches } from "../cache";
 import {
     BangumisResponse,
     WeekBangumiData,
@@ -30,11 +30,11 @@ const BROKEN_RESPONSE_MESSAGE = `
 const MISSING_SCHEDULE_MESSAGE = "咦？没有找到番剧时间表……";
 
 /**
- * 一次扩展会话使用的番剧接口。
+ * 一次扩展会话使用的 Bilibili 接口。
  *
  * @author sdttttt
  */
-export interface BangumiApi {
+export interface BilibiliApi {
     /**
      * 获取某一页的全部番剧。
      *
@@ -47,16 +47,16 @@ export interface BangumiApi {
 }
 
 /**
- * 创建一次扩展会话使用的番剧接口。
+ * 创建一次扩展会话使用的 Bilibili 接口。
  *
  * @param caches 由组合根持有的会话缓存
  * @param notifier 会话面向用户的输出
  * @author sdttttt
  */
-export function useBangumiApi(
+export function useBilibiliApi(
     caches: RequestCaches,
     notifier: Notifier
-): BangumiApi {
+): BilibiliApi {
     return {
         getAllBangumi: async url => {
             const cached = caches.bangumi.get(url);
