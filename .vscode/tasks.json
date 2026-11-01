@@ -7,6 +7,9 @@
             "type": "npm",
             "script": "watch",
             "label": "npm: watch",
+            // `pnpm watch` 并行跑扩展与 Webview 两条监听构建，二者的输出都带
+            // `built in`，因此「任一条首次完成」就会判定任务就绪。扩展构建只有
+            // 几十毫秒、几乎总在前面，抢跑窗口可以忽略。
             "problemMatcher": {
                 "owner": "vite",
                 "pattern": [],
@@ -18,6 +21,7 @@
             },
             "isBackground": true,
             "presentation": {
+                // 后台常驻，不抢占终端面板；构建报错仍可在「终端 → 任务」里翻到。
                 "reveal": "never"
             },
             "group": {

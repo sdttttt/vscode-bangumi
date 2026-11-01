@@ -8,9 +8,18 @@
             "name": "Run Extension",
             "type": "extensionHost",
             "request": "launch",
-            "runtimeExecutable": "${execPath}",
-            "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+            // 不额外指定 runtimeExecutable：`extensionHost` 的默认值就是当前 VS Code。
+            "args": [
+                // 只加载正在开发的本扩展，调试窗口启动更快，也不受本机其它扩展干扰。
+                // 通过 --extensionDevelopmentPath 加载的扩展不受这条开关影响。
+                "--disable-extensions",
+                "--extensionDevelopmentPath=${workspaceFolder}"
+            ],
             "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+            // skipFiles 不写：`extensionHost` 的默认值已经跳过 `<node_internals>/**`，
+            // 并自动追加 `node_modules.asar` 与 `bootstrap-fork.js`。
+            // Webview 前端能断进 `webview/src/**`，是因为 `watch:webview` 带
+            // `--sourcemap inline`；打包产物不带 sourcemap。
             "preLaunchTask": "npm: watch"
         }
     ]

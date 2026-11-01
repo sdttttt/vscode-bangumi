@@ -150,7 +150,7 @@
         "build:extension": "vite build",
         "build:webview": "vite build --config vite.webview.mts",
         "watch:extension": "vite build --sourcemap inline --watch",
-        "watch:webview": "vite build --config vite.webview.mts --watch",
+        "watch:webview": "vite build --config vite.webview.mts --sourcemap inline --watch",
         "package": "vsce package --no-dependencies",
         "publish:vsce": "vsce publish --no-dependencies",
         "publish:ovsx": "ovsx publish"
