@@ -125,7 +125,7 @@ export function addIgnored(
             result.push({ title, ignoredAt });
             continue;
         }
-        result[index] = { title, ignoredAt };
+        result[index] = { ...result[index], title, ignoredAt };
     }
 
     return result;

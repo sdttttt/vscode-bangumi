@@ -46,6 +46,9 @@ export function useWeekBangumiView(
      */
     let currentSource: WeekSourceKind | undefined;
 
+    /* 每次渲染自增，用于丢弃后到的旧响应。 */
+    let renderToken = 0;
+
     /**
      * 渲染统一模型。
      */
@@ -77,11 +80,31 @@ export function useWeekBangumiView(
     const render = (): void => {
         panel.showLoading();
 
-        loadSchedule().then(schedule => {
-            if (schedule) {
-                createWeekBangumiView(schedule);
-            }
-        });
+        /*
+         * 每次渲染自增，后到的旧响应因此不会覆盖新选择：切源之后先发的请求
+         * 可能晚于新请求返回，若直接渲染，面板内容会与按钮上的来源不一致。
+         */
+        const token = ++renderToken;
+
+        loadSchedule()
+            .then(schedule => {
+                if (token !== renderToken) {
+                    return;
+                }
+
+                if (schedule) {
+                    createWeekBangumiView(schedule);
+                    return;
+                }
+
+                /* 没有数据时给出「未找到」，否则面板会一直停在加载态。 */
+                panel.showNotFound();
+            })
+            .catch(() => {
+                if (token === renderToken) {
+                    panel.showNotFound();
+                }
+            });
     };
 
     const view: WeekBangumiView = {

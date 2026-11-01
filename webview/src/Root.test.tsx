@@ -107,6 +107,18 @@ describe("Root", () => {
         });
     });
 
+    it("forwards the source switch to the host", () => {
+        render(<Root />);
+        push(schedule());
+
+        screen.getByText("切换到 bilibili").click();
+
+        expect(vsCodeApi.postMessage).toHaveBeenCalledWith({
+            type: "weekBangumi:switchSource",
+            source: "bilibili",
+        });
+    });
+
     it("replaces the previous state instead of appending", () => {
         render(<Root />);
         push(schedule());

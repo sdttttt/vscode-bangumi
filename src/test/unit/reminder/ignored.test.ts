@@ -102,6 +102,18 @@ describe("addIgnored", () => {
         expect(after).toEqual([entry(0, "甲")]);
     });
 
+    it("keeps fields the user added to a known entry", () => {
+        const before = [
+            { title: "甲", ignoredAt: entry(5).ignoredAt, note: "手写备注" },
+        ] as unknown as Array<IgnoredReminder>;
+        const [kept] = addIgnored(before, ["甲"], NOW) as Array<
+            IgnoredReminder & { note?: string }
+        >;
+
+        expect(kept.ignoredAt).toBe(new Date(NOW).toISOString());
+        expect(kept.note).toBe("手写备注");
+    });
+
     it("keeps the order of the existing list", () => {
         const before = [entry(1, "甲"), entry(1, "乙")];
         const after = addIgnored(before, ["丙"], NOW);

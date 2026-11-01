@@ -37,6 +37,23 @@ describe("toScheduleFromBilibili", () => {
         expect(schedule.days[0].items[0].title).toBe("第1天的番剧");
     });
 
+    it("falls back to the wide cover when the square one is missing", () => {
+        const schedule = toScheduleFromBilibili([
+            weekBangumiData({
+                seasons: [
+                    wBangumi({
+                        square_cover: "",
+                        cover: "https://i0.hdslb.com/bfs/cover/wide.jpg",
+                    }),
+                ],
+            }),
+        ]);
+
+        expect(schedule.days[0].items[0].cover).toBe(
+            "https://i0.hdslb.com/bfs/cover/wide.jpg"
+        );
+    });
+
     it("keeps the publication slot of each season", () => {
         const schedule = toScheduleFromBilibili([weekBangumiData()]);
 

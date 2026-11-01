@@ -104,11 +104,21 @@ export function isValidCalendar(days: unknown): days is Array<BgmCalendarDay> {
         return false;
     }
 
-    return days.some(
-        day =>
-            undefined !== day &&
-            null !== day &&
-            Array.isArray((day as BgmCalendarDay).items) &&
-            0 < (day as BgmCalendarDay).items.length
-    );
+    return days.some(day => {
+        if (undefined === day || null === day) {
+            return false;
+        }
+
+        const entry = day as BgmCalendarDay;
+
+        /*
+         * 星期是分组依据：适配器无条件读 `weekday.id`，缺了它会让归一过程抛错，
+         * 而那时响应已经写进缓存，面板会一直停在「加载中」。
+         */
+        return (
+            Array.isArray(entry.items) &&
+            0 < entry.items.length &&
+            "number" === typeof entry.weekday?.id
+        );
+    });
 }

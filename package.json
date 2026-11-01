@@ -4,9 +4,9 @@
     "author": "SDTTTTT",
     "repository": "https://github.com/sdttttt/vscode-Bangumi",
     "displayName": "Bangumi Open",
-    "description": "在 VS Code 中查看 B 站番剧时间表与番剧索引。",
+    "description": "在 VS Code 中查看 Bangumi（bgm.tv）与 B 站的番剧时间表与番剧索引，并在番剧更新时提醒你。",
     "preview": false,
-    "version": "3.0.0",
+    "version": "3.1.0",
     "license": "0BSD",
     "icon": "Icon.png",
     "engines": {

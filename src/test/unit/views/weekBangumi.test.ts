@@ -151,13 +151,44 @@ describe("Week bangumi view", () => {
         });
     });
 
-    it("keeps the loading state when the request fails", async () => {
+    it("shows the not found state when the request returns nothing", async () => {
         vi.mocked(api.getBilibiliSchedule).mockResolvedValue(undefined);
 
         view.openWeekBangumi();
         await Promise.resolve();
 
-        expect(stub.posted().at(-1)?.kind).toBe("loading");
+        expect(stub.posted().at(-1)?.kind).toBe("notFound");
+    });
+
+    it("shows the not found state when the request rejects", async () => {
+        vi.mocked(api.getBilibiliSchedule).mockRejectedValue(
+            new Error("offline")
+        );
+
+        view.openWeekBangumi();
+
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.kind).toBe("notFound");
+        });
+    });
+
+    it("ignores a response that arrives after a newer render", async () => {
+        let resolveFirst: (value: never) => void = () => undefined;
+        const first = new Promise<never>(resolve => {
+            resolveFirst = resolve;
+        });
+        vi.mocked(api.getBilibiliSchedule)
+            .mockReturnValueOnce(first)
+            .mockResolvedValue(toScheduleFromBilibili(weekBangumi()));
+
+        view.openWeekBangumi();
+        view.openWeekBangumi();
+        resolveFirst([] as never);
+
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.kind).toBe("weekBangumi");
+            expect(stub.posted().at(-1)?.days).toHaveLength(7);
+        });
     });
 
     it("reloads the schedule when the webview asks to refresh", async () => {
@@ -249,13 +280,13 @@ describe("Week bangumi view with the Bangumi source", () => {
         });
     });
 
-    it("keeps the loading state when the Bangumi request fails", async () => {
+    it("shows the not found state when the Bangumi request fails", async () => {
         vi.mocked(api.getBgmTvSchedule).mockResolvedValue(undefined);
 
         view.openWeekBangumi();
         await Promise.resolve();
 
-        expect(stub.posted().at(-1)?.kind).toBe("loading");
+        expect(stub.posted().at(-1)?.kind).toBe("notFound");
     });
 });
 

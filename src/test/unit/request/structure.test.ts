@@ -73,4 +73,23 @@ describe("isValidCalendar", () => {
             isValidCalendar([{ weekday: { cn: "", en: "", id: 1, ja: "" } }])
         ).toBe(false);
     });
+
+    it("rejects a day without a weekday", () => {
+        const day = bgmCalendarDay();
+        delete (day as { weekday?: unknown }).weekday;
+
+        expect(isValidCalendar([day])).toBe(false);
+    });
+
+    it("rejects a weekday without a numeric id", () => {
+        const day = bgmCalendarDay();
+        (day.weekday as { id?: unknown }).id = undefined;
+
+        expect(isValidCalendar([day])).toBe(false);
+    });
+
+    it("skips null entries while looking for a usable day", () => {
+        expect(isValidCalendar([null, bgmCalendarDay()])).toBe(true);
+        expect(isValidCalendar([null, undefined])).toBe(false);
+    });
 });
