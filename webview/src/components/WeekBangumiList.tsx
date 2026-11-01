@@ -14,7 +14,7 @@ import { BilibiliWeek } from "./week/BilibiliWeek";
 export interface WeekBangumiListProps {
     days: Array<WeekDayPayload>;
     assets: AssetUris | undefined;
-    /** 数据来源，缺省按 B 站处理。 */
+    /** 数据来源，缺省按默认的 Bangumi 处理。 */
     source?: WeekSourceKind;
     /** 覆盖走动的时钟；测试用它把时间固定住。 */
     now?: number;
@@ -41,17 +41,21 @@ export function WeekBangumiList({
     now,
     onSwitchSource,
 }: WeekBangumiListProps) {
-    return "bangumi" === source ? (
-        <BgmTvWeek
-            days={days}
-            assets={assets}
-            onSwitchSource={onSwitchSource}
-        />
-    ) : (
+    /*
+     * 设置项的默认来源是 Bangumi，因此缺省值必须与之一致：预览页与测试在
+     * 不传 `source` 时也能看到真实的默认界面。
+     */
+    return "bilibili" === source ? (
         <BilibiliWeek
             days={days}
             assets={assets}
             now={now}
+            onSwitchSource={onSwitchSource}
+        />
+    ) : (
+        <BgmTvWeek
+            days={days}
+            assets={assets}
             onSwitchSource={onSwitchSource}
         />
     );

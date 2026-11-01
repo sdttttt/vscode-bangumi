@@ -143,6 +143,8 @@ describe("Reminder", () => {
             "bangumiOpen.DisplayStatusBar": true,
             "bangumiOpen.ReminderAheadTime": 0,
             "bangumiOpen.EnableReminder": true,
+            /* 提醒只属于 B 站来源，默认来源是 Bangumi，因此这里显式指定。 */
+            "bangumiOpen.WeekSource": "bilibili",
         });
     });
 

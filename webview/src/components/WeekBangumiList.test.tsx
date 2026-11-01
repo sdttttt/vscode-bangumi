@@ -5,11 +5,23 @@ import { assets } from "@webview/test/fixtures";
 import { AT_09_30, bgmDay, day, season } from "@webview/test/week";
 
 describe("WeekBangumiList", () => {
-    it("renders the bilibili schedule by default", () => {
+    it("renders the Bangumi schedule by default", () => {
+        const { container } = render(
+            <WeekBangumiList days={[bgmDay()]} assets={assets} />
+        );
+
+        expect(container.querySelector(".time-point")).toBeNull();
+        expect(container.querySelector(".week-source")?.textContent).toContain(
+            "Bangumi"
+        );
+    });
+
+    it("renders the bilibili schedule when the source says so", () => {
         const { container } = render(
             <WeekBangumiList
                 days={[day({ seasons: [season({ pubTime: "20:00" })] })]}
                 assets={assets}
+                source="bilibili"
                 now={AT_09_30}
             />
         );

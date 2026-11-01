@@ -226,9 +226,13 @@
 
 ## [未发布]
 
+### 变更
+
+- **默认数据源改为 Bangumi（bgm.tv）**：`bangumiOpen.WeekSource` 的默认值从 `bilibili` 改为 `bangumi`，新装用户打开周番表看到的是收录更全的 Bangumi 每日放送。需要在番剧更新时收到提醒的用户，把该设置切到 `bilibili` 即可——Bangumi 不提供播出时刻，因此没有更新提醒。此前设置过该项的配置不受影响。
+
 ### 新增
 
-- **新增 Bangumi（bgm.tv）数据源**：周番表可以在 B 站时间表与 [Bangumi 每日放送](https://api.bgm.tv/calendar) 之间切换，由新配置项 `bangumiOpen.WeekSource` 控制，默认仍为 `bilibili`。Bangumi 收录比 B 站全，还带评分与原作名；但它只按星期分组、没有播出时刻，因此在该模式下不提供更新提醒与状态栏提示，`DisplayHistory` 也不生效，始终展示完整七天。
+- **新增 Bangumi（bgm.tv）数据源**：周番表可以在 B 站时间表与 [Bangumi 每日放送](https://api.bgm.tv/calendar) 之间切换，由新配置项 `bangumiOpen.WeekSource` 控制（默认值见上方的「变更」）。Bangumi 收录比 B 站全，还带评分与原作名；但它只按星期分组、没有播出时刻，因此在该模式下不提供更新提醒与状态栏提示，`DisplayHistory` 也不生效，始终展示完整七天。
 - 周番表在 Bangumi 模式下顶部显示数据来源提示，番剧行显示评分与首播日期，鼠标悬浮可看到原名。
 - 周番表顶部新增「切换到 …」按钮，可以在当前面板内临时换到另一个数据源，不改写 `bangumiOpen.WeekSource`，也不影响提醒与状态栏；重新打开面板会回到设置项指定的来源。
 - Bangumi 模式的首播日期加上「首播」前缀，避免被读成本周的更新日期。

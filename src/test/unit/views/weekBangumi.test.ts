@@ -51,7 +51,10 @@ describe("Week bangumi view", () => {
     let stub: PanelStub;
 
     beforeEach(() => {
-        settings = createSettingsStub({ "bangumiOpen.DisplayHistory": true });
+        settings = createSettingsStub({
+            "bangumiOpen.WeekSource": "bilibili",
+            "bangumiOpen.DisplayHistory": true,
+        });
 
         stub = createPanelStub();
         ({ view, api } = loadView(settings, stub));
@@ -269,6 +272,26 @@ describe("WeeklySchedule construction", () => {
 
         expect(schedule.source).toBe("bangumi");
         expect(schedule.hasSlots).toBe(false);
+    });
+});
+
+describe("Week bangumi view default source", () => {
+    it("falls back to the Bangumi source when the setting is missing", async () => {
+        const settings = createSettingsStub({});
+        const stub = createPanelStub();
+        const { view, api } = loadView(settings, stub);
+
+        vi.mocked(api.getBgmTvSchedule).mockResolvedValue(
+            toScheduleFromBgmTv(bgmCalendar(), Date.UTC(2026, 9, 31, 4, 0))
+        );
+
+        view.openWeekBangumi();
+
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.source).toBe("bangumi");
+        });
+        expect(api.getBgmTvSchedule).toHaveBeenCalledTimes(1);
+        expect(api.getBilibiliSchedule).not.toHaveBeenCalled();
     });
 });
 

@@ -96,15 +96,15 @@
                 "bangumiOpen.WeekSource": {
                     "type": "string",
                     "enum": [
-                        "bilibili",
-                        "bangumi"
+                        "bangumi",
+                        "bilibili"
                     ],
                     "enumDescriptions": [
-                        "Bilibili：带播出时刻，支持更新提醒与「显示过去的更新」。",
-                        "Bangumi：收录更全、番剧信息更丰富，但没有播出时刻，因此不会提醒。"
+                        "Bangumi（bgm.tv）：收录更全、番剧信息更丰富，也是默认来源；但不提供播出时刻，因此不会提醒。",
+                        "Bilibili：带播出时刻，支持更新提醒与「显示过去的更新」。"
                     ],
-                    "default": "bilibili",
-                    "description": "周番表使用的数据源。Bilibili 收录可能不全；Bangumi（bgm.tv）收录更全，但不提供播出时间，因此无法提醒。"
+                    "default": "bangumi",
+                    "description": "周番表使用的数据源，默认为 Bangumi（bgm.tv）：收录更全，但不提供播出时间，因此无法提醒。需要更新提醒时切到 Bilibili。"
                 },
                 "bangumiOpen.IgnoredReminders": {
                     "type": "array",

@@ -26,7 +26,7 @@ export interface WeekDayPayload {
     label: string;
     isToday: boolean;
     seasons: Array<SeasonPayload>;
-    /** 该天的数据来源，缺省按 B 站处理。 */
+    /** 该天的数据来源，缺省按默认的 Bangumi 处理。 */
     source?: WeekSourceKind;
 }
 

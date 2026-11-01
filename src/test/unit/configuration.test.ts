@@ -74,22 +74,22 @@ describe("createSettings", () => {
         expect(settings.isDisplayHistory()).toBe(true);
     });
 
-    it("defaults the week source to bilibili", () => {
+    it("defaults the week source to bangumi", () => {
         stubConfig({});
-
-        expect(settings.weekSource()).toBe("bilibili");
-    });
-
-    it("reads the bangumi week source", () => {
-        stubConfig({ [ConfigKey.WeekSource]: "bangumi" });
 
         expect(settings.weekSource()).toBe("bangumi");
     });
 
-    it("falls back to bilibili for an unknown week source", () => {
-        stubConfig({ [ConfigKey.WeekSource]: "bangumi.tv" });
+    it("reads the bilibili week source", () => {
+        stubConfig({ [ConfigKey.WeekSource]: "bilibili" });
 
         expect(settings.weekSource()).toBe("bilibili");
+    });
+
+    it("falls back to bangumi for an unknown week source", () => {
+        stubConfig({ [ConfigKey.WeekSource]: "bangumi.tv" });
+
+        expect(settings.weekSource()).toBe("bangumi");
     });
 
     it("writes the reminder switch to the global settings", async () => {

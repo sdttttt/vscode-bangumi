@@ -43,7 +43,7 @@
 - `src/configuration.ts` —— `ConfigKey` 与 `createSettings()`：设置以 `Settings` 接口（端口）对外暴露，消费者接收注入而不是自己读 workspace。读与写都在这个接口里 —— 两者是同一个聚合的两面，拆成两个端口只会让消费者多背一个依赖。
 - `src/notifier.ts` —— `Notifier` 端口（`info` / `error` / `ask` / `pick` / `actions`）与 `createNotifier()`，所有面向用户的消息与选择框都经由它。`actions` 接受一组按钮文案并回传用户选中的那个，多按钮场景用它，不要再为第二个按钮另开端口。
 - `src/commands.ts` —— `COMMAND_IDS`、`Commands` 端口与 `createCommands()`，跨视图跳转通过它而不是直接调 `vscode.commands`。
-- `src/views/` —— `panel.ts` 的 `usePanel` 用闭包承载 Webview 面板生命周期与消息通道；`bangumi.ts` / `weekBangumi.ts` 导出 `createBangumiView` / `useWeekBangumiView`。周番视图按 `Settings.weekSource()` 选择统一模型的来源；索引视图与提醒只消费 Bilibili 实现。
+- `src/views/` —— `panel.ts` 的 `usePanel` 用闭包承载 Webview 面板生命周期与消息通道；`bangumi.ts` / `weekBangumi.ts` 导出 `createBangumiView` / `useWeekBangumiView`。周番视图按 `Settings.weekSource()` 选择统一模型的来源（默认 `bangumi`）；索引视图与提醒只消费 Bilibili 实现。
 - `src/extension.ts` —— 组合根：`activate()` 里用 `use*` 建好一个会话的 state、host、视图与提醒，再把它们拼成命令表。
 - `src/webview/` —— 宿主侧 Webview 基础设施：`protocol.ts`（双向消息类型，两段共享）、`host.ts`（`createWebviewHost`：CSP、nonce、`localResourceRoots`、资源 URI）、`viewModel.ts`（API 原始数据 → 渲染载荷）。
 - `webview/` —— 独立的前端工程（Preact + TypeScript + UnoCSS），源码在 `webview/src/`，样式配置在 `webview/uno.config.ts`，产物由 `vite.webview.mts` 输出到 `webview-dist/`。
@@ -146,6 +146,7 @@ Vitest 配置了两个 project，互不干扰：
 - 三个页面（索引列表、周番、加载/空态）共用同一套 shortcut：`board`（滚动根）、`surface`（卡片表面）、`chip`（小标签）、`row-link`（整行链接）、`focus-ring`。新增页面优先复用它们，不要另造一套色值。
 - 周番页按来源拆成两个组件，`webview/src/components/` 下的 `WeekBangumiList.tsx` 只做分派：`week/BilibiliWeek.tsx`（按更新时段分组 + 「你在这里」标记）与 `week/BgmTvWeek.tsx`（没有时段，只有星期、首播日期、评分与原名）。新增来源时加一个组件并在分派处加一个分支，不要往现有组件里塞条件。
 - `week/SourceNote.tsx` 是顶部来源提示条的共用实现（`week-source`、`role="note"`），两个来源各自通过 `WeekBoard` 的 `source` 槽传入自己的文案：B 站说明「播出时刻为北京时间」，Bangumi 说明「不含播出时间，因此没有更新提醒」。
+- `bangumiOpen.WeekSource` 的默认值是 `bangumi`（bgm.tv）：收录更全，但没有播出时刻，因此默认状态下没有更新提醒。`createSettings()` 只接受显式写出的 `bilibili`，其余取值（缺省、手写错误、旧版本）一律回退到 `bangumi`；`WeekBangumiList` 与 `WeekDayPayload.source` 的缺省分支同理，不要改回按 B 站处理，否则缺省界面与设置项不一致。提醒相关的测试因此必须显式写 `bangumiOpen.WeekSource = "bilibili"`。
 - 提示条右侧的切换按钮（`SourceSwitch`，`week-source-switch`）只切换当前面板的数据来源：`useWeekBangumiView` 用闭包变量记住它，通过 `weekBangumi:switchSource` 命令按需重拉，**不写回** `bangumiOpen.WeekSource`，因此提醒、状态栏与下次打开的面板仍按设置项走。`openWeekBangumi` 会清掉这个临时选择，`weekBangumi:refresh` 则保留它。两个页面都要把它接到 `SourceNote` 的 `action` 槽；`onSwitchSource` 缺省时不渲染按钮（测试与预览页依赖这一点）。按钮文案用站点名（`bilibili` / `bgm.tv`）而不是设置项的枚举值，与标题里的「Bangumi 每日放送」区分开。
 - `week/marker.ts` 放两个来源共用的纯函数与 hooks（`pubTimeMinute`、`markerIndex`、`nextGapMinutes`、`describeGap`、`describeNow`、`groupByPubTime`、`useNow`）以及标记文案常量；`week/WeekBoard.tsx` 放两页共用的滚动网格（`week-shell` / `week-board`）与「今天」滚动锚点，Bangumi 页通过 `source` prop 传入来源提示条（`week-source`）。
 - Bangumi 页的条目没有播出时刻与延期概念，因此 `SeasonRow` 不渲染 `.time-point`、不画标记、不渲染空的进度行；首播日期占集数的位置，评分单独一枚 `chip`，原名放在 `.season-title` 的悬浮提示里。首播日期必须带「首播」前缀：`air_date` 是整部作品的第一集开播日，不带前缀会被读成本周的更新日期。

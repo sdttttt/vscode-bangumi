@@ -64,9 +64,9 @@ export function createSettingsStub(
             () => true === read("bangumiOpen.DisplayHistory")
         ),
         weekSource: vi.fn(() =>
-            "bangumi" === read("bangumiOpen.WeekSource")
-                ? "bangumi"
-                : "bilibili"
+            "bilibili" === read("bangumiOpen.WeekSource")
+                ? "bilibili"
+                : "bangumi"
         ),
         /*
          * 真实的写入会改动设置本身，因此替身也要照做：否则「不再提醒」之后的

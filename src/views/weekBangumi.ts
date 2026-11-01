@@ -65,11 +65,14 @@ export function useWeekBangumiView(
 
     /**
      * 按来源拉取统一模型。Bangumi 的收录更全，但没有播出时刻，因此不能用于提醒。
+     *
+     * 只把显式的 `bilibili` 交给 B 站实现，其余一律走默认的 Bangumi，与设置项的
+     * 回退规则保持一致。
      */
     const loadSchedule = (): Promise<WeeklySchedule | undefined> =>
-        "bangumi" === sourceOf()
-            ? api.getBgmTvSchedule()
-            : api.getBilibiliSchedule();
+        "bilibili" === sourceOf()
+            ? api.getBilibiliSchedule()
+            : api.getBgmTvSchedule();
 
     const render = (): void => {
         panel.showLoading();

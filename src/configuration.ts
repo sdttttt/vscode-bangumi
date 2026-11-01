@@ -122,11 +122,11 @@ export function createSettings(): Settings {
         weekSource: () => {
             /*
              * 只接受已知的取值：设置项可能被手工写错，也可能来自旧版本，
-             * 这时应当回退到 B 站，而不是让番剧表变成空的。
+             * 这时应当回退到默认的 Bangumi，而不是让番剧表变成空的。
              */
             const source = read(ConfigKey.WeekSource);
 
-            return "bangumi" === source ? "bangumi" : "bilibili";
+            return "bilibili" === source ? "bilibili" : "bangumi";
         },
 
         disableReminder: () => write(ConfigKey.EnableReminder, false),

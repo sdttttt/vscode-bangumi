@@ -128,7 +128,8 @@ describe("App", () => {
 
         fireEvent.click(screen.getByRole("button"));
 
-        expect(onSwitchSource).toHaveBeenCalledWith("bangumi");
+        /* 缺省来源是 Bangumi，因此按钮切到另一边。 */
+        expect(onSwitchSource).toHaveBeenCalledWith("bilibili");
     });
 
     it("renders an empty schedule when no day was sent", () => {
