@@ -82,6 +82,11 @@ jobs:
 
             # A tag run reuses the VSIX built here, so the marketplaces and the
             # GitHub release always ship the artifact the checks ran against.
+            #
+            # `github.ref_name` is not safe as an artifact name: on a pull
+            # request it is `123/merge`, and `upload-artifact` rejects any name
+            # containing `/`. Slashes are folded into dashes; tags such as
+            # `v3.1.1` are unaffected.
             - name: resolve artifact name
               id: name
               run: |
@@ -89,6 +94,7 @@ jobs:
                   name="${{ inputs.artifact }}"
                   if [ -z "$name" ]; then
                       name="vsix-${{ github.ref_name }}"
+                      name="${name//\//-}"
                   fi
                   echo "artifact=$name" >> "$GITHUB_OUTPUT"
 
