@@ -161,8 +161,6 @@ describe("getWeekBangumi", () => {
         });
 
         await expect(api.getWeekBangumi()).resolves.toBeUndefined();
-
-        expect(notifier.info).toHaveBeenCalledWith("咦？没有找到番剧时间表……");
     });
 
     it("does not cache an empty schedule", async () => {
@@ -182,7 +180,6 @@ describe("getWeekBangumi", () => {
         vi.mocked(getJson).mockRejectedValue(new Error("timeout"));
 
         await expect(api.getWeekBangumi()).resolves.toBeUndefined();
-        expect(notifier.info).toHaveBeenCalledWith("咦？没有找到番剧时间表……");
     });
 
     it("returns undefined for an unsuccessful response", async () => {

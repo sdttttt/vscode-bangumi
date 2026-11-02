@@ -8,6 +8,10 @@ import {
 } from "@/request/schedule";
 import { createSettingsStub, type SettingsStub } from "@/test/mocks/settings";
 import {
+    createAvailabilityStub,
+    type AvailabilityStub,
+} from "@/test/mocks/ports";
+import {
     weekBangumi,
     weekBangumiData,
 } from "@/test/mocks/fixtures/weekBangumi";
@@ -25,7 +29,7 @@ import { useWeekBangumiView, type WeekBangumiView } from "@/views/weekBangumi";
 function loadView(
     settings: SettingsStub,
     stub: PanelStub
-): { view: WeekBangumiView; api: BangumiApi } {
+): { view: WeekBangumiView; api: BangumiApi; availability: AvailabilityStub } {
     const api: BangumiApi = {
         getIndexPage: vi.fn(),
         getBilibiliSchedule: vi.fn(),
@@ -38,10 +42,16 @@ function loadView(
         subscriptions: [],
         createPanel: () => stub.panel,
     });
-    const view = useWeekBangumiView({ api, panel, settings });
+    const availability = createAvailabilityStub();
+    const view = useWeekBangumiView({
+        api,
+        panel,
+        settings,
+        availability: availability.availability,
+    });
     panel.onCommand(view.handleCommand);
 
-    return { view, api };
+    return { view, api, availability };
 }
 
 describe("Week bangumi view", () => {
@@ -49,6 +59,7 @@ describe("Week bangumi view", () => {
     let api: BangumiApi;
     let settings: SettingsStub;
     let stub: PanelStub;
+    let availability: AvailabilityStub;
 
     beforeEach(() => {
         settings = createSettingsStub({
@@ -57,7 +68,7 @@ describe("Week bangumi view", () => {
         });
 
         stub = createPanelStub();
-        ({ view, api } = loadView(settings, stub));
+        ({ view, api, availability } = loadView(settings, stub));
     });
 
     it("posts the loading state before the schedule arrives", () => {
@@ -158,6 +169,48 @@ describe("Week bangumi view", () => {
         await Promise.resolve();
 
         expect(stub.posted().at(-1)?.kind).toBe("notFound");
+    });
+
+    it("shows the unavailable state when every source is down", async () => {
+        availability.setDown(true);
+        vi.mocked(api.getBilibiliSchedule).mockResolvedValue(undefined);
+
+        view.openWeekBangumi();
+
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.kind).toBe("unavailable");
+        });
+    });
+
+    it("shows the unavailable state when a failing request leaves every source down", async () => {
+        availability.setDown(true);
+        vi.mocked(api.getBilibiliSchedule).mockRejectedValue(
+            new Error("offline")
+        );
+
+        view.openWeekBangumi();
+
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.kind).toBe("unavailable");
+        });
+    });
+
+    it("redraws the schedule once the sources recover", async () => {
+        availability.setDown(true);
+        vi.mocked(api.getBilibiliSchedule).mockResolvedValue(undefined);
+        view.openWeekBangumi();
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.kind).toBe("unavailable");
+        });
+
+        vi.mocked(api.getBilibiliSchedule).mockResolvedValue(
+            toScheduleFromBilibili(weekBangumi())
+        );
+        availability.setDown(false);
+
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.kind).toBe("weekBangumi");
+        });
     });
 
     it("shows the not found state when the request rejects", async () => {

@@ -44,6 +44,17 @@ describe("App", () => {
         ).toBe(assets.image);
     });
 
+    it("shows the unavailable screen when both sources are down", () => {
+        const { container } = renderApp(viewState({ kind: "unavailable" }));
+
+        expect(
+            screen.getByText("暂时连不上 Bangumi 与 B 站，正在定时重试……")
+        ).toBeTruthy();
+        expect(
+            container.querySelector(".load-image")?.getAttribute("src")
+        ).toBe(assets.image);
+    });
+
     it("omits the image when the host sent no assets", () => {
         const { container } = renderApp(
             viewState({ kind: "loading", assets: undefined })

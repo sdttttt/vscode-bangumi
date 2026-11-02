@@ -88,7 +88,8 @@ describe("activate", () => {
 
         activate(context);
 
-        expect(context.subscriptions).toHaveLength(COMMAND_IDS.length + 1);
+        /* 每个命令一个，另有提醒与可用性探测，二者都持有定时器。 */
+        expect(context.subscriptions).toHaveLength(COMMAND_IDS.length + 2);
         expect(context.subscriptions).toContain(reminder);
     });
 

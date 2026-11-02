@@ -2,8 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as vscode from "vscode";
 import { createSettingsStub, type SettingsStub } from "@/test/mocks/settings";
 import {
+    createAvailabilityStub,
     createCommandsStub,
     createNotifierStub,
+    type AvailabilityStub,
     type CommandsStub,
     type NotifierStub,
 } from "@/test/mocks/ports";
@@ -15,7 +17,9 @@ import {
 } from "@/reminder";
 import { useScheduler } from "@/reminder/scheduler";
 import { useStatusBar } from "@/reminder/statusBar";
+import { toScheduleFromBgmTv } from "@/request/schedule";
 import { weekBangumiData, wBangumi } from "@/test/mocks/fixtures/weekBangumi";
+import { bgmCalendar } from "@/test/mocks/fixtures/bgm";
 import { nextDayStart } from "@/utils/clock";
 
 /**
@@ -91,6 +95,7 @@ interface ReminderHarness {
     readonly notifier: NotifierStub;
     readonly commands: CommandsStub;
     readonly settings: SettingsStub;
+    readonly availability: AvailabilityStub;
 }
 
 function createHarness(
@@ -101,6 +106,7 @@ function createHarness(
     const statusBar = useStatusBar("weekBangumi");
     const notifier = createNotifierStub();
     const commands = createCommandsStub();
+    const availability = createAvailabilityStub();
     const now = (): number => Date.now();
 
     const reminder = useReminder({
@@ -110,6 +116,7 @@ function createHarness(
         settings,
         notifier: notifier.notifier,
         commands: commands.commands,
+        availability: availability.availability,
         onSettingsChanged: listener =>
             vscode.workspace.onDidChangeConfiguration(event =>
                 listener(section => event.affectsConfiguration(section))
@@ -124,7 +131,7 @@ function createHarness(
         now,
     });
 
-    return { reminder, notifier, commands, settings };
+    return { reminder, notifier, commands, settings, availability };
 }
 
 function createReminder(source: WeekSource, settings: SettingsStub): Reminder {
@@ -1154,6 +1161,75 @@ describe("Reminder", () => {
         await Promise.resolve();
 
         expect(source).not.toHaveBeenCalled();
+        reminder.dispose();
+    });
+
+    it("clears the status bar and the timers once every source is down", async () => {
+        settings.values["bangumiOpen.WeekSource"] = "bilibili";
+        const { reminder, availability } = createHarness(
+            () => Promise.resolve(today({})),
+            settings
+        );
+
+        await reminder.start();
+        expect(statusBar.show).toHaveBeenCalled();
+
+        availability.setDown(true);
+
+        expect(statusBar.hide).toHaveBeenCalled();
+        expect(vi.getTimerCount()).toBe(0);
+        reminder.dispose();
+    });
+
+    it("does not keep its own retry timer while suspended", async () => {
+        settings.values["bangumiOpen.WeekSource"] = "bilibili";
+        const source = vi.fn(() => Promise.resolve(undefined));
+        const { reminder, availability } = createHarness(source, settings);
+        await reminder.start();
+
+        availability.setDown(true);
+        await vi.advanceTimersByTimeAsync(10 * 60 * 1000);
+
+        /* 停摆期间的重试由可用性负责，提醒不再叠加自己的定时器。 */
+        expect(source).toHaveBeenCalledTimes(1);
+        reminder.dispose();
+    });
+
+    it("reloads the schedule once the sources recover", async () => {
+        settings.values["bangumiOpen.WeekSource"] = "bilibili";
+        const source = vi.fn(() => Promise.resolve(today({})));
+        const { reminder, availability } = createHarness(source, settings);
+        await reminder.start();
+        availability.setDown(true);
+        source.mockClear();
+
+        availability.setDown(false);
+        await vi.waitFor(() => {
+            expect(source).toHaveBeenCalled();
+        });
+
+        expect(statusBar.text).toContain("今日番剧");
+        reminder.dispose();
+    });
+
+    it("drops the bangumi overview while suspended", async () => {
+        settings.values["bangumiOpen.WeekSource"] = "bangumi";
+        const overview = vi.fn(() =>
+            Promise.resolve(toScheduleFromBgmTv(bgmCalendar(), Date.now()))
+        );
+        const { reminder, availability } = createHarness(
+            () => Promise.resolve(undefined),
+            settings,
+            overview
+        );
+        await reminder.start();
+        await vi.waitFor(() => {
+            expect(statusBar.text).not.toBe("");
+        });
+
+        availability.setDown(true);
+
+        expect(statusBar.hide).toHaveBeenCalled();
         reminder.dispose();
     });
 });

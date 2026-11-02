@@ -3,7 +3,6 @@ import { getJson } from "@/request/http";
 import { createBgmTvApi, type BgmTvApi } from "@/request/bgmtv/api";
 import { BANGUMI_CALENDAR } from "@/request/bgmtv/query";
 import { useCache } from "@/request/cache";
-import { createNotifierStub, type NotifierStub } from "@/test/mocks/ports";
 import { bgmCalendar, bgmCalendarDay } from "@/test/mocks/fixtures/bgm";
 
 vi.mock("@/request/http", () => ({
@@ -12,18 +11,13 @@ vi.mock("@/request/http", () => ({
 
 describe("getCalendar", () => {
     let api: BgmTvApi;
-    let notifier: NotifierStub;
 
     beforeEach(() => {
-        notifier = createNotifierStub();
-        api = createBgmTvApi(
-            {
-                bangumi: useCache(600),
-                week: useCache(60),
-                calendar: useCache(3600),
-            },
-            notifier.notifier
-        );
+        api = createBgmTvApi({
+            bangumi: useCache(600),
+            week: useCache(60),
+            calendar: useCache(3600),
+        });
     });
 
     afterEach(() => {
@@ -54,14 +48,10 @@ describe("getCalendar", () => {
         expect(getJson).toHaveBeenCalledTimes(1);
     });
 
-    it("warns the user and returns undefined for an empty calendar", async () => {
+    it("returns undefined for an empty calendar", async () => {
         vi.mocked(getJson).mockResolvedValue([bgmCalendarDay({ items: [] })]);
 
         await expect(api.getCalendar()).resolves.toBeUndefined();
-
-        expect(notifier.info).toHaveBeenCalledWith(
-            "咦？没有找到 Bangumi 的放送表……"
-        );
     });
 
     it("does not cache an unsuable calendar", async () => {
@@ -77,8 +67,5 @@ describe("getCalendar", () => {
         vi.mocked(getJson).mockRejectedValue(new Error("timeout"));
 
         await expect(api.getCalendar()).resolves.toBeUndefined();
-        expect(notifier.info).toHaveBeenCalledWith(
-            "咦？没有找到 Bangumi 的放送表……"
-        );
     });
 });

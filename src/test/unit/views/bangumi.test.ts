@@ -3,7 +3,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { BangumiApi } from "@/request";
 import { bangumisData } from "@/test/mocks/fixtures/bangumi";
 import { createPanelStub, PanelStub } from "@/test/mocks/panel";
-import { createNotifierStub, type NotifierStub } from "@/test/mocks/ports";
+import {
+    createAvailabilityStub,
+    createNotifierStub,
+    type AvailabilityStub,
+    type NotifierStub,
+} from "@/test/mocks/ports";
 import { useAppState, type AppStore } from "@/state/app";
 import { createWebviewHost } from "@/webview/host";
 import { usePanel } from "@/views/panel";
@@ -19,6 +24,7 @@ function loadView(stubs: ReadonlyArray<PanelStub>): {
     state: AppStore;
     api: BangumiApi;
     notifier: NotifierStub;
+    availability: AvailabilityStub;
     created: ReturnType<typeof vi.fn>;
 } {
     const state = useAppState();
@@ -40,15 +46,17 @@ function loadView(stubs: ReadonlyArray<PanelStub>): {
         },
     });
     const notifier = createNotifierStub();
+    const availability = createAvailabilityStub();
     const view = createBangumiView({
         state,
         api,
         panel,
         notifier: notifier.notifier,
+        availability: availability.availability,
     });
     panel.onCommand(view.handleCommand);
 
-    return { view, state, api, notifier, created };
+    return { view, state, api, notifier, availability, created };
 }
 
 /**
@@ -67,12 +75,16 @@ describe("Bangumi view", () => {
     let state: AppStore;
     let api: BangumiApi;
     let notifier: NotifierStub;
+    let availability: AvailabilityStub;
     let created: ReturnType<typeof vi.fn>;
     let stub: PanelStub;
 
     beforeEach(() => {
         stub = createPanelStub();
-        ({ view, state, api, notifier, created } = loadView([stub, stub]));
+        ({ view, state, api, notifier, availability, created } = loadView([
+            stub,
+            stub,
+        ]));
     });
 
     it("opens a panel that boots the bundled webview", () => {
@@ -142,6 +154,33 @@ describe("Bangumi view", () => {
 
         await vi.waitFor(() => {
             expect(stub.posted().at(-1)?.kind).toBe("notFound");
+        });
+    });
+
+    it("renders the unavailable view when every source is down", async () => {
+        availability.setDown(true);
+        vi.mocked(api.getIndexPage).mockResolvedValue(undefined);
+
+        view.openBangumi();
+
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.kind).toBe("unavailable");
+        });
+    });
+
+    it("reloads the page once the sources recover", async () => {
+        availability.setDown(true);
+        vi.mocked(api.getIndexPage).mockResolvedValue(undefined);
+        view.openBangumi();
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.kind).toBe("unavailable");
+        });
+
+        vi.mocked(api.getIndexPage).mockResolvedValue(bangumisData());
+        availability.setDown(false);
+
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.kind).toBe("bangumi");
         });
     });
 
