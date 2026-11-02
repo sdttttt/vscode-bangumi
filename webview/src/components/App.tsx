@@ -68,6 +68,7 @@ export function App({
                     days={state.days ?? []}
                     assets={state.assets}
                     source={state.source}
+                    fallback={state.fallback}
                     onSwitchSource={onSwitchSource}
                 />
             );

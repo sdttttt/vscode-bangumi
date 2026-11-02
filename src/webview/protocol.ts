@@ -93,6 +93,13 @@ export interface ViewState {
     days?: Array<WeekDayPayload>;
     /** 周番表的数据来源，供 Webview 决定是否显示来源提示。 */
     source?: WeekSourceKind;
+    /**
+     * 当前数据是否由来源回退得来。
+     *
+     * 为 `true` 时说明用户选的是 bgm.tv，但它当时不可用，面板因此借用 B 站的
+     * 数据。界面要据此说明原因，否则读者会以为自己切了来源。
+     */
+    fallback?: boolean;
     /** Webview 无法自行推出的 Uri，由 `asWebviewUri` 解析。 */
     assets?: AssetUris;
 }

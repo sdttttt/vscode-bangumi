@@ -16,6 +16,12 @@ export interface WeekBangumiListProps {
     assets: AssetUris | undefined;
     /** 数据来源，缺省按默认的 Bangumi 处理。 */
     source?: WeekSourceKind;
+    /**
+     * 数据是否由来源回退得来。
+     *
+     * 只在「用户选了 bgm.tv 但它不可用」时为真，用来在提示条上说明原因。
+     */
+    fallback?: boolean;
     /** 覆盖走动的时钟；测试用它把时间固定住。 */
     now?: number;
     /**
@@ -38,6 +44,7 @@ export function WeekBangumiList({
     days,
     assets,
     source,
+    fallback,
     now,
     onSwitchSource,
 }: WeekBangumiListProps) {
@@ -51,6 +58,7 @@ export function WeekBangumiList({
             assets={assets}
             now={now}
             onSwitchSource={onSwitchSource}
+            fallback={fallback}
         />
     ) : (
         <BgmTvWeek

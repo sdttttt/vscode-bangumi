@@ -85,4 +85,29 @@ describe("WeekBangumiList", () => {
         expect(container.querySelector(".time-point")).toBeNull();
         expect(container.querySelector(".now-marker")).toBeNull();
     });
+
+    it("explains why the bilibili schedule is on screen after a fallback", () => {
+        const { container } = render(
+            <WeekBangumiList
+                days={[day()]}
+                assets={assets}
+                source="bilibili"
+                fallback
+            />
+        );
+
+        expect(container.querySelector(".week-source")?.textContent).toContain(
+            "bgm.tv 不可用"
+        );
+    });
+
+    it("shows no fallback reason for a plain bilibili schedule", () => {
+        const { container } = render(
+            <WeekBangumiList days={[day()]} assets={assets} source="bilibili" />
+        );
+
+        expect(
+            container.querySelector(".week-source")?.textContent
+        ).not.toContain("bgm.tv 不可用");
+    });
 });

@@ -57,14 +57,25 @@ export function SourceSwitch({
 export function SourceNote({
     children,
     action,
+    fallback,
 }: {
     children: ComponentChildren;
     /** 右侧的补充操作，通常是来源切换按钮。 */
     action?: ComponentChildren;
+    /**
+     * 这部分数据是否由来源回退得来。
+     *
+     * 为真时额外挂一枚原因徽标：只改正文会让读者以为「本来就是 B 站」，
+     * 而实际上是他选的 bgm.tv 当时不可用。
+     */
+    fallback?: boolean;
 }) {
     return (
         <div class="week-source">
             <p class="week-source-note" role="note">
+                {fallback ? (
+                    <span class="chip chip-warning mr-1.5">bgm.tv 不可用</span>
+                ) : null}
                 {children}
             </p>
             {action}

@@ -177,16 +177,20 @@ export function BilibiliWeek({
     assets,
     now,
     onSwitchSource,
+    fallback,
 }: {
     days: Array<WeekDayPayload>;
     assets: AssetUris | undefined;
     now?: number;
     onSwitchSource?: (source: WeekSourceKind) => void;
+    /** 数据是否由 bgm.tv 回退而来。 */
+    fallback?: boolean;
 }) {
     return (
         <WeekBoard
             source={
                 <SourceNote
+                    fallback={fallback}
                     action={
                         <SourceSwitch
                             current="bilibili"

@@ -318,6 +318,38 @@ describe("Week bangumi view with the Bangumi source", () => {
             expect(stub.posted().at(-1)?.kind).toBe("weekBangumi");
         });
         expect(stub.posted().at(-1)?.source).toBe("bangumi");
+        expect(stub.posted().at(-1)?.fallback).toBe(false);
+    });
+
+    it("marks the schedule as a fallback when the Bangumi source fails", async () => {
+        /* 回退由 `getBgmTvSchedule` 完成，它返回的 `source` 因此是 B 站。 */
+        vi.mocked(api.getBgmTvSchedule).mockResolvedValue(
+            toScheduleFromBilibili(weekBangumi(), now)
+        );
+
+        view.openWeekBangumi();
+
+        await vi.waitFor(() => {
+            const state = stub.posted().at(-1);
+            expect(state?.kind).toBe("weekBangumi");
+            expect(state?.source).toBe("bilibili");
+            expect(state?.fallback).toBe(true);
+        });
+    });
+
+    it("does not mark a bilibili source chosen by the user as a fallback", async () => {
+        settings.values["bangumiOpen.WeekSource"] = "bilibili";
+        vi.mocked(api.getBilibiliSchedule).mockResolvedValue(
+            toScheduleFromBilibili(weekBangumi(), now)
+        );
+
+        view.openWeekBangumi();
+
+        await vi.waitFor(() => {
+            const state = stub.posted().at(-1);
+            expect(state?.source).toBe("bilibili");
+            expect(state?.fallback).toBe(false);
+        });
     });
 
     it("renders seven days even when history is disabled", async () => {

@@ -57,11 +57,16 @@ export function useWeekBangumiView(
 
     /**
      * 渲染统一模型。
+     *
+     * `fallback` 只在「用户要的是 Bangumi，拿回来的却是 B 站」时为真：那就是
+     * 来源回退，界面需要在提示条上说明原因。
      */
     const createWeekBangumiView = (schedule: WeeklySchedule): void => {
         panel.show({
             kind: "weekBangumi",
             source: schedule.source,
+            fallback:
+                "bangumi" === sourceOf() && "bilibili" === schedule.source,
             days: toWeekDayPayloads(schedule, settings.isDisplayHistory()),
         });
     };
