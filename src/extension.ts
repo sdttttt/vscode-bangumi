@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { useAppState } from "./state/app";
 import { createSettings } from "./configuration";
+import { probeOf, useAvailability } from "./availability";
 import { useCache, type RequestCaches } from "./request/cache";
 import { createBangumiApi, type Sources } from "./request";
 import { createBilibiliApi } from "./request/bilibili/api";
@@ -54,9 +55,25 @@ function createSession(
     /* 两个来源由组合根装配：提醒拿 B 站实现，视图拿统一端口。 */
     const sources: Sources = {
         bilibili: createBilibiliApi(caches, notifier),
-        bgmtv: createBgmTvApi(caches, notifier),
+        bgmtv: createBgmTvApi(caches),
     };
-    const api = createBangumiApi(sources);
+
+    /*
+     * 可用性只判定两个周番接口：索引只有 B 站一个来源，失败不会改变
+     * 「周番表能不能看」这件事。
+     *
+     * 恢复后由提醒自己通过 `onDidChange` 重新装载日程，因此这里不再额外挂
+     * 恢复回调——两处都刷新只会让同一份数据被拉取两次。
+     */
+    const availability = useAvailability({
+        probe: probeOf({
+            bangumi: sources.bgmtv.getCalendar,
+            bilibili: sources.bilibili.getWeekBangumi,
+        }),
+    });
+    context.subscriptions.push(availability);
+
+    const api = createBangumiApi(sources, availability);
     const host = createWebviewHost(context.extensionPath);
 
     /**
@@ -96,11 +113,13 @@ function createSession(
         api,
         panel: bangumiPanel,
         notifier,
+        availability,
     });
     const weekBangumi = useWeekBangumiView({
         api,
         panel: weekPanel,
         settings,
+        availability,
     });
     const index = createIndexCommand({ state, menu, notifier });
     const reminder = useReminder({
@@ -112,6 +131,7 @@ function createSession(
         settings,
         notifier,
         commands,
+        availability,
         onSettingsChanged: listener =>
             vscode.workspace.onDidChangeConfiguration(event =>
                 listener(section => event.affectsConfiguration(section))

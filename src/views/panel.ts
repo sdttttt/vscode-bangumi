@@ -37,6 +37,13 @@ export interface Panel {
     showLoading(): void;
     showNotFound(): void;
     /**
+     * 两个数据来源都不可用时的占位界面。
+     *
+     * 与 `showNotFound` 区分开：那里是「这次确实没有数据」，这里是「连不上，
+     * 正在定时重试」，用户能据此决定是换个时间再试还是去查网络。
+     */
+    showUnavailable(): void;
+    /**
      * 注册 Webview 消息转发的命令处理器。
      *
      * 由组合根在视图创建之后注册，面板因此无需知道自己属于哪个视图。
@@ -98,6 +105,7 @@ export function usePanel(config: PanelConfig): Panel {
         show: render,
         showLoading: () => render({ kind: "loading" }),
         showNotFound: () => render({ kind: "notFound" }),
+        showUnavailable: () => render({ kind: "unavailable" }),
         onCommand: handler => {
             commandHandler = handler;
         },

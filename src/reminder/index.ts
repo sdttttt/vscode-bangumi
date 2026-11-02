@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import type { Availability } from "../availability";
 import type { Notifier } from "../notifier";
 import { affectsReminder, type Settings } from "../configuration";
 import type { Commands } from "../commands";
@@ -88,6 +89,13 @@ export interface ReminderOptions {
     readonly notifier: Notifier;
     /** 执行扩展命令。 */
     readonly commands: Commands;
+    /**
+     * 两个来源的可用性。
+     *
+     * 两个来源都连不上时提醒整体停摆：清空日程、停掉定时器、隐藏状态栏，
+     * 只等它探测到恢复后再重新装载。
+     */
+    readonly availability: Availability;
     /** 订阅设置变更，并返回可释放对象。 */
     readonly onSettingsChanged: (
         listener: (affected: (section: string) => boolean) => void
@@ -107,6 +115,7 @@ export interface ReminderOptions {
 export function useReminder(options: ReminderOptions): Reminder {
     const source = options.source;
     const overviewSource = options.overview;
+    const availability = options.availability;
     const now = options.now ?? Date.now;
     const statusBar = options.statusBar;
     const scheduler = options.scheduler;
@@ -119,6 +128,7 @@ export function useReminder(options: ReminderOptions): Reminder {
     /* Bangumi 模式下的当日概览；为 `undefined` 时状态栏走「下一场更新」。 */
     let overview: TodaySummary | undefined;
     let listener: vscode.Disposable | undefined;
+    let availabilityListener: (() => void) | undefined;
     let retryTimer: ReturnType<typeof setTimeout> | undefined;
     /* 每次刷新自增，避免慢响应覆盖更新的结果。 */
     let generation = 0;
@@ -301,7 +311,25 @@ export function useReminder(options: ReminderOptions): Reminder {
             });
     };
 
+    /**
+     * 进入停摆：两个来源都连不上，继续保留日程只会展示过期的内容。
+     */
+    const suspend = (): void => {
+        generation += 1;
+        cancelRetry();
+        scheduler.disarm();
+        events = [];
+        overview = undefined;
+        statusBar.hide();
+    };
+
     const scheduleRetry = (): void => {
+        /* 停摆期间的重试由可用性统一负责，这里不再叠加一层定时器。 */
+        if (availability.isDown()) {
+            suspend();
+            return;
+        }
+
         const delay =
             RETRY_DELAYS_MS[Math.min(retryAttempt, RETRY_DELAYS_MS.length - 1)];
         retryAttempt += 1;
@@ -339,6 +367,8 @@ export function useReminder(options: ReminderOptions): Reminder {
         if (current !== generation || disposed) {
             return;
         }
+
+        availability.report("bilibili", undefined !== days);
 
         if (!days) {
             scheduleRetry();
@@ -458,6 +488,19 @@ export function useReminder(options: ReminderOptions): Reminder {
             });
 
             /*
+             * 停摆结束时重新装载：停摆期间日程已被清空，状态栏也是隐藏的。
+             */
+            availabilityListener?.();
+            availabilityListener = availability.onDidChange(down => {
+                if (down) {
+                    suspend();
+                    return;
+                }
+
+                void apply();
+            });
+
+            /*
              * 忽略列表可能已经攒了很旧的记录，启动时清一次。这不是用户操作，
              * 失败也不必打扰他，提醒照常启动。
              */
@@ -478,6 +521,8 @@ export function useReminder(options: ReminderOptions): Reminder {
             scheduler.disarm();
             listener?.dispose();
             listener = undefined;
+            availabilityListener?.();
+            availabilityListener = undefined;
             statusBar.dispose();
         },
     };

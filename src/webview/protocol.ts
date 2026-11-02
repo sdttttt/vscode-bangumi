@@ -12,7 +12,12 @@
  *
  * @author sdttttt
  */
-export type ViewKind = "loading" | "notFound" | "bangumi" | "weekBangumi";
+export type ViewKind =
+    | "loading"
+    | "notFound"
+    | "unavailable"
+    | "bangumi"
+    | "weekBangumi";
 
 /**
  * 周番数据中的一天，为渲染而展平。

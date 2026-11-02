@@ -23,13 +23,6 @@ const BROKEN_RESPONSE_MESSAGE = `
     `;
 
 /**
- * 无法拉取周番数据时展示的消息。
- *
- * @author sdttttt
- */
-const MISSING_SCHEDULE_MESSAGE = "咦？没有找到番剧时间表……";
-
-/**
  * 一次扩展会话使用的 Bilibili 接口。
  *
  * @author sdttttt
@@ -88,20 +81,14 @@ export function createBilibiliApi(
                 response = await getJson<WeekBangumiResponse>(BANGUMI_WEEK);
             } catch {
                 /*
-                 * 网络失败按空日程上报：视图会回退到「未找到」，
-                 * 提醒则会自行重试。
+                 * 网络失败按空日程上报：视图会回退到另一个来源或展示不可用，
+                 * 提醒则由可用性探测统一重试。这里不弹提示，否则重试期间会
+                 * 反复打扰用户。
                  */
-                notifier.info(MISSING_SCHEDULE_MESSAGE);
                 return;
             }
 
-            if (!isSuccess(response)) {
-                notifier.info(BROKEN_RESPONSE_MESSAGE);
-                return;
-            }
-
-            if (isEmptyArray(response.result)) {
-                notifier.info(MISSING_SCHEDULE_MESSAGE);
+            if (!isSuccess(response) || isEmptyArray(response.result)) {
                 return;
             }
 

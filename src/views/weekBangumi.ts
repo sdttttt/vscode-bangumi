@@ -1,3 +1,4 @@
+import type { Availability } from "../availability";
 import type { BangumiApi } from "../request";
 import type { Settings } from "../configuration";
 import type { WeekSourceKind, WeeklySchedule } from "../request/schedule";
@@ -14,6 +15,8 @@ export interface WeekBangumiViewOptions {
     readonly api: BangumiApi;
     readonly panel: Panel;
     readonly settings: Settings;
+    /** 两个来源的可用性，用于区分「没有数据」与「连不上」。 */
+    readonly availability: Availability;
 }
 
 /**
@@ -36,7 +39,7 @@ export interface WeekBangumiView {
 export function useWeekBangumiView(
     options: WeekBangumiViewOptions
 ): WeekBangumiView {
-    const { api, panel, settings } = options;
+    const { api, panel, settings, availability } = options;
 
     /*
      * 面板自己记住用户从顶部按钮选中的来源。
@@ -48,6 +51,9 @@ export function useWeekBangumiView(
 
     /* 每次渲染自增，用于丢弃后到的旧响应。 */
     let renderToken = 0;
+
+    /* 当前面板是否正停在「暂时不可用」占位页上，用于恢复后自动重绘。 */
+    let showingUnavailable = false;
 
     /**
      * 渲染统一模型。
@@ -93,19 +99,50 @@ export function useWeekBangumiView(
                 }
 
                 if (schedule) {
+                    showingUnavailable = false;
                     createWeekBangumiView(schedule);
                     return;
                 }
 
+                /*
+                 * 两个来源都拉不到时给出「暂时不可用」，而不是「没有找到」：
+                 * 后者会让用户以为今天真的没有番剧，前者才说明问题在网络上。
+                 */
+                if (availability.isDown()) {
+                    showingUnavailable = true;
+                    panel.showUnavailable();
+                    return;
+                }
+
                 /* 没有数据时给出「未找到」，否则面板会一直停在加载态。 */
+                showingUnavailable = false;
                 panel.showNotFound();
             })
             .catch(() => {
-                if (token === renderToken) {
-                    panel.showNotFound();
+                if (token !== renderToken) {
+                    return;
                 }
+
+                if (availability.isDown()) {
+                    showingUnavailable = true;
+                    panel.showUnavailable();
+                    return;
+                }
+
+                showingUnavailable = false;
+                panel.showNotFound();
             });
     };
+
+    /*
+     * 恢复后自动重绘：占位页本身没有重试按钮，用户没有别的办法让面板回来。
+     * 只在这一份占位页正显示时重绘，避免打断用户已经切走的其它内容。
+     */
+    availability.onDidChange(down => {
+        if (!down && showingUnavailable) {
+            render();
+        }
+    });
 
     const view: WeekBangumiView = {
         openWeekBangumi: () => {

@@ -45,6 +45,13 @@ export function App({
                     message="没有找到数据！"
                 />
             );
+        case "unavailable":
+            return (
+                <Placeholder
+                    image={state.assets?.image}
+                    message="暂时连不上 Bangumi 与 B 站，正在定时重试……"
+                />
+            );
         case "bangumi":
             return (
                 <BangumiList

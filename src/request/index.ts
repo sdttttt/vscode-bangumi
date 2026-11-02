@@ -1,3 +1,4 @@
+import type { Availability } from "../availability";
 import type { BilibiliApi } from "./bilibili/api";
 import type { BangumisData } from "./bilibili/schema";
 import type { BgmTvApi } from "./bgmtv/api";
@@ -37,28 +38,62 @@ export interface BangumiApi {
     getIndexPage(url: string): Promise<BangumisData | undefined>;
     /** Bilibili 周番，带播出时刻。 */
     getBilibiliSchedule(): Promise<WeeklySchedule | undefined>;
-    /** Bangumi 每日放送，收录更全但没有播出时刻。 */
+    /**
+     * Bangumi 每日放送，收录更全但没有播出时刻。
+     *
+     * 该来源不可用时会回退到 B 站数据，返回的 `source` 因此可能是 `bilibili`。
+     */
     getBgmTvSchedule(): Promise<WeeklySchedule | undefined>;
 }
 
 /**
  * 创建视图使用的番剧接口。
  *
+ * 默认来源是 Bangumi，因此 {@link BangumiApi.getBgmTvSchedule} 承担回退：
+ * 它不可用时改用 B 站数据，而不是让界面空着。反向不回退——B 站是用户显式
+ * 选中的来源，偷偷换成另一份数据会让「为什么没有播出时刻」变得无从解释。
+ *
+ * 每次请求都会向可用性上报结果，两个来源都失败时由它统一安排恢复探测；
+ * 这里不做任何记忆，来源恢复后下一次请求就会切回去。
+ *
  * @param sources 两个来源的实现
+ * @param availability 两个来源的可用性
  * @author sdttttt
  */
-export function createBangumiApi(sources: Sources): BangumiApi {
+export function createBangumiApi(
+    sources: Sources,
+    availability: Availability
+): BangumiApi {
+    /**
+     * 拉取 B 站周番并上报结果。
+     */
+    const loadBilibili = async (): Promise<WeeklySchedule | undefined> => {
+        const data = await sources.bilibili.getWeekBangumi();
+        availability.report("bilibili", undefined !== data);
+
+        return data ? toScheduleFromBilibili(data) : undefined;
+    };
+
+    /**
+     * 拉取 Bangumi 每日放送并上报结果。
+     */
+    const loadBgmTv = async (): Promise<WeeklySchedule | undefined> => {
+        const days = await sources.bgmtv.getCalendar();
+        availability.report("bangumi", undefined !== days);
+
+        return days ? toScheduleFromBgmTv(days) : undefined;
+    };
+
     return {
         getIndexPage: url => sources.bilibili.getAllBangumi(url),
 
-        getBilibiliSchedule: async () => {
-            const data = await sources.bilibili.getWeekBangumi();
-            return data ? toScheduleFromBilibili(data) : undefined;
-        },
+        getBilibiliSchedule: loadBilibili,
 
         getBgmTvSchedule: async () => {
-            const days = await sources.bgmtv.getCalendar();
-            return days ? toScheduleFromBgmTv(days) : undefined;
+            const schedule = await loadBgmTv();
+
+            /* Bangumi 可用就照常返回；只有它失败时才借用 B 站的数据。 */
+            return schedule ?? (await loadBilibili());
         },
     };
 }

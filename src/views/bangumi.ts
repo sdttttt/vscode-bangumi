@@ -1,3 +1,4 @@
+import type { Availability } from "../availability";
 import type { Notifier } from "../notifier";
 import type { BangumiApi } from "../request";
 import { buildBangumiUrl } from "../request/bilibili/query";
@@ -20,6 +21,8 @@ export interface BangumiViewOptions {
     readonly api: BangumiApi;
     readonly panel: Panel;
     readonly notifier: Notifier;
+    /** 两个来源的可用性，用于区分「没有数据」与「连不上」。 */
+    readonly availability: Availability;
 }
 
 /**
@@ -46,16 +49,28 @@ export interface BangumiView {
  * @author sdttttt
  */
 export function createBangumiView(options: BangumiViewOptions): BangumiView {
-    const { state, api, panel, notifier } = options;
+    const { state, api, panel, notifier, availability } = options;
+
+    /* 当前面板是否正停在「暂时不可用」占位页上，用于恢复后自动重绘。 */
+    let showingUnavailable = false;
 
     /**
      * 渲染一页番剧结果。
      */
     const createBangumiView = (bangumiRes: BangumisData | undefined): void => {
         if (!bangumiRes) {
+            showingUnavailable = availability.isDown();
+
+            if (showingUnavailable) {
+                panel.showUnavailable();
+                return;
+            }
+
             panel.showNotFound();
             return;
         }
+
+        showingUnavailable = false;
 
         panel.show({
             kind: "bangumi",
@@ -78,6 +93,15 @@ export function createBangumiView(options: BangumiViewOptions): BangumiView {
             buildBangumiUrl(state.getQuery(), state.getPage())
         ).then(createBangumiView);
     };
+
+    /*
+     * 恢复后自动重绘：占位页本身没有重试按钮，用户没有别的办法让面板回来。
+     */
+    availability.onDidChange(down => {
+        if (!down && showingUnavailable) {
+            openBangumi();
+        }
+    });
 
     const view: BangumiView = {
         openBangumi,
