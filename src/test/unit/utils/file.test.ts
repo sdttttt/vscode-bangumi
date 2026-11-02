@@ -1,3 +1,4 @@
+import * as path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import type { Webview } from "vscode";
 import { getResourceFile } from "@/utils/file";
@@ -22,7 +23,7 @@ describe("getResourceFile", () => {
         );
 
         expect(String(result)).toBe(
-            "webview:/extension/resources/css/bangumi.css"
+            `webview:${path.join("/extension", "resources", "css", "bangumi.css")}`
         );
     });
 
@@ -59,6 +60,8 @@ describe("getResourceFile", () => {
             "/other"
         );
 
-        expect(String(result)).toBe("webview:/other/resources/loading.gif");
+        expect(String(result)).toBe(
+            `webview:${path.join("/other", "resources", "loading.gif")}`
+        );
     });
 });

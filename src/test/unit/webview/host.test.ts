@@ -1,3 +1,4 @@
+import * as path from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
 import type { Webview } from "vscode";
 import {
@@ -5,6 +6,16 @@ import {
     WEBVIEW_DIST,
     type WebviewHost,
 } from "@/webview/host";
+
+/**
+ * 按当前平台的路径分隔符拼出期望的磁盘路径。
+ *
+ * 生产代码用 `path.join` 组装路径，Windows 上得到的是反斜杠，
+ * 断言不能写死 POSIX 风格。
+ *
+ * @author sdttttt
+ */
+const join = (...segments: string[]): string => path.join(...segments);
 
 /**
  * 构建一个 Webview 替身，其 `asWebviewUri` 返回可读的字符串。
@@ -39,8 +50,8 @@ describe("createWebviewHost", () => {
         );
 
         expect(roots).toEqual([
-            `/extension/${WEBVIEW_DIST}`,
-            "/extension/resources",
+            join("/extension", WEBVIEW_DIST),
+            join("/extension", "resources"),
         ]);
     });
 
@@ -53,7 +64,9 @@ describe("assets", () => {
     it("resolves the illustration through the webview", () => {
         const assets = host.assets(makeWebview());
 
-        expect(assets.image).toBe("webview:/extension/resources/miyagi.jpg");
+        expect(assets.image).toBe(
+            `webview:${join("/extension", "resources", "miyagi.jpg")}`
+        );
     });
 });
 
@@ -62,7 +75,9 @@ describe("withAssets", () => {
         const state = host.withAssets(makeWebview(), { kind: "loading" });
 
         expect(state.kind).toBe("loading");
-        expect(state.assets?.image).toContain("/extension/resources/");
+        expect(state.assets?.image).toContain(
+            join("/extension", "resources") + path.sep
+        );
     });
 
     it("keeps the payload of the state", () => {
@@ -90,8 +105,12 @@ describe("html", () => {
     it("links the bundled script and stylesheet", () => {
         const html = host.html(makeWebview(), "bangumis");
 
-        expect(html).toContain(`webview:/extension/${WEBVIEW_DIST}/main.js`);
-        expect(html).toContain(`webview:/extension/${WEBVIEW_DIST}/main.css`);
+        expect(html).toContain(
+            `webview:${join("/extension", WEBVIEW_DIST, "main.js")}`
+        );
+        expect(html).toContain(
+            `webview:${join("/extension", WEBVIEW_DIST, "main.css")}`
+        );
     });
 
     it("locks the document down with a content security policy", () => {
