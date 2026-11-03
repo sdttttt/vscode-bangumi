@@ -28,4 +28,5 @@ vite.config.mts
 vite.webview.mts
 vitest.config.mts
 pnpm-lock.yaml
+.nvmrc
 webview/**

@@ -41,7 +41,7 @@ body {
     );
     --accent: var(--vscode-textLink-foreground, var(--focus-border));
     --accent-soft: color-mix(in srgb, var(--accent) 12%, transparent);
-    --muted: var(--vscode-descriptionForeground);
+    --muted: var(--vscode-descriptionForeground, var(--vscode-foreground));
     --warning: var(--vscode-editorWarning-foreground, #cca700);
     /* Blended with the foreground so the label stays readable on light themes. */
     --warning-text: color-mix(

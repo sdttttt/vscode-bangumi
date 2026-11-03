@@ -55,8 +55,9 @@ export const DEFAULT_QUERY: BangumiQuery = Object.freeze({
 /**
  * 构建番剧索引某一页的请求地址。
  *
- * 参数直接拼接，而不是交给 `URLSearchParams`，这样已编码的值
- * （例如 `%5B2020%2C2021%29`）能原样到达接口。
+ * 参数直接拼接，而不是交给 `URLSearchParams`，这样已编码的值能原样到达
+ * 接口。注意取值侧用的是 `encodeURI`：它只编码 `[`、` ` 等少数字符，
+ * `,` 与 `)` 原样保留（例如 `%5B2020,2021)`），B 站两种形式都接受。
  *
  * @param query 请求的筛选条件
  * @param page 页码，从 1 开始

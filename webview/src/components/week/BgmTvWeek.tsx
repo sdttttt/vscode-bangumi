@@ -22,10 +22,7 @@ import { SourceNote, SourceSwitch } from "./SourceNote";
  */
 function SeasonRow({ season }: { season: SeasonPayload }) {
     return (
-        <a
-            class="bangumi"
-            href={season.url || undefined}
-            title={season.title}>
+        <a class="bangumi" href={season.url || undefined} title={season.title}>
             <span class="season-poster">
                 {season.cover ? (
                     <img

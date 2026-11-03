@@ -117,9 +117,7 @@ function fromBilibiliSeason(season: WBangumi): ScheduleItem {
         cover: toHttpsUrl(season.square_cover || season.cover),
         url: toHttpsUrl(season.url),
         pubTime: season.pub_time ?? "",
-        progress: delay
-            ? (season.delay_index ?? "")
-            : (season.pub_index ?? ""),
+        progress: delay ? (season.delay_index ?? "") : (season.pub_index ?? ""),
         delay,
         delayReason: season.delay_reason ?? "",
     };

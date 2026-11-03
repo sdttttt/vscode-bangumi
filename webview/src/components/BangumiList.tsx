@@ -37,10 +37,7 @@ function BangumiRow({ bangumi }: { bangumi: BangumiPayload }) {
         );
 
     return (
-        <a
-            class="cover"
-            href={bangumi.link || undefined}
-            title={bangumi.title}>
+        <a class="cover" href={bangumi.link || undefined} title={bangumi.title}>
             <span class="cover-media">
                 {bangumi.cover ? (
                     <img

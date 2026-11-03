@@ -215,10 +215,7 @@ describe("BilibiliWeek", () => {
         try {
             render(
                 <BilibiliWeek
-                    days={[
-                        day({ date: "10-30" }),
-                        day({ isToday: true }),
-                    ]}
+                    days={[day({ date: "10-30" }), day({ isToday: true })]}
                     assets={assets}
                     now={AT_09_30}
                 />
