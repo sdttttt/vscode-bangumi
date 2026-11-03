@@ -154,11 +154,9 @@ export function createSettings(): Settings {
                 : 0;
         },
 
-        isReminderEnabled: () =>
-            readBoolean(ConfigKey.EnableReminder, true),
+        isReminderEnabled: () => readBoolean(ConfigKey.EnableReminder, true),
 
-        isDisplayIndexTags: () =>
-            readBoolean(ConfigKey.DisplayIndexTags, true),
+        isDisplayIndexTags: () => readBoolean(ConfigKey.DisplayIndexTags, true),
 
         isDisplayStatusBar: () => readBoolean(ConfigKey.DisplayStatusBar, true),
 

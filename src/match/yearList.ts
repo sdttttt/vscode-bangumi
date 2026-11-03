@@ -25,11 +25,7 @@ const INDIVIDUAL_MIN_COUNT = 6;
  *
  * @author sdttttt
  */
-const NAMED_TAIL: ReadonlyArray<string> = [
-    "90年代",
-    "80年代",
-    "很久很久以前",
-];
+const NAMED_TAIL: ReadonlyArray<string> = ["90年代", "80年代", "很久很久以前"];
 
 /**
  * 按接口要求编码左闭右开的年份区间。
