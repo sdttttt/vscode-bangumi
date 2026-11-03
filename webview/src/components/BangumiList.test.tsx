@@ -117,6 +117,30 @@ describe("BangumiList", () => {
         expect(screen.getByText("第 1 页")).toBeTruthy();
     });
 
+    it("renders an empty frame instead of a broken image without a cover", () => {
+        /*
+         * 复现（L9，见 TODO.md）：空 cover 的 img 在 CSP 下必然失败，
+         * 只剩破图图标；与 Placeholder 的守卫保持一致。
+         */
+        const { container } = renderList({
+            bangumis: [payload({ cover: "" })],
+        });
+
+        expect(container.querySelector("img.cover-image")).toBeNull();
+        expect(container.querySelector(".cover-media")).toBeTruthy();
+    });
+
+    it("renders a plain card when the link is missing", () => {
+        /*
+         * 复现（L10，见 TODO.md）：空 href 会把 webview 自身的文档地址
+         * 转发出去打开，行为无意义；降级为不可点的卡片。
+         */
+        const { container } = renderList({ bangumis: [payload({ link: "" })] });
+
+        expect(container.querySelector('a[href=""]')).toBeNull();
+        expect(screen.getByText("测试番剧")).toBeTruthy();
+    });
+
     it("links to the bangumi page", () => {
         const { container } = renderList({
             bangumis: [payload({ link: "https://example.test/play/ss9" })],

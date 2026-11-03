@@ -127,4 +127,36 @@ describe("Root", () => {
         expect(screen.getByText("番剧")).toBeTruthy();
         expect(screen.queryByText("星期一")).toBeNull();
     });
+
+    it("ignores messages that are not a view state", () => {
+        /*
+         * 复现（M11，见 TODO.md）：宿主与页面共用 window.message 通道，
+         * 形状不对的杂音此前会照单全收并持久化——文档重建时首渲染即抛错，
+         * ready 永远发不出去，面板从此空白。
+         */
+        render(<Root />);
+
+        act(() => {
+            window.dispatchEvent(
+                new MessageEvent("message", { data: { kind: "bogus" } })
+            );
+        });
+
+        expect(vsCodeApi.setState).not.toHaveBeenCalled();
+    });
+
+    it("recovers from a render error by asking for a replay", () => {
+        /*
+         * 复现（M11，见 TODO.md）：持久化的坏状态让首渲染抛错后，此前
+         * 整棵树卸载、effect 停摆，面板永久空白。错误边界应接住并重发
+         * ready 换取好状态。
+         */
+        vsCodeApi.getState.mockReturnValue({
+            kind: "bogus",
+        } as unknown as ViewState);
+
+        render(<Root />);
+
+        expect(screen.getByText(/渲染失败/)).toBeTruthy();
+    });
 });

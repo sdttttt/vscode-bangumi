@@ -33,20 +33,23 @@ function SeasonRow({ season }: { season: SeasonPayload }) {
     return (
         <a
             class={season.delay ? "bangumi delay" : "bangumi"}
-            href={season.url}
+            /* 空 url 降级为不可点的行：把 webview 自身地址转发出去毫无意义。 */
+            href={season.url || undefined}
             title={season.title}>
             <span class="season-cover">
-                <img
-                    class={
-                        season.delay
-                            ? "season-cover-image season-cover-delay"
-                            : "season-cover-image"
-                    }
-                    alt=""
-                    src={season.cover}
-                    loading="lazy"
-                    decoding="async"
-                />
+                {season.cover ? (
+                    <img
+                        class={
+                            season.delay
+                                ? "season-cover-image season-cover-delay"
+                                : "season-cover-image"
+                        }
+                        alt=""
+                        src={season.cover}
+                        loading="lazy"
+                        decoding="async"
+                    />
+                ) : null}
             </span>
             <span class="season-info">
                 <span
@@ -155,7 +158,10 @@ function Day({
                         <div class="time-group">
                             <div class="time-point">{group.pubTime}</div>
                             {group.seasons.map(season => (
-                                <SeasonRow key={season.url} season={season} />
+                                <SeasonRow
+                                    key={season.url || season.title}
+                                    season={season}
+                                />
                             ))}
                         </div>
                     </Fragment>

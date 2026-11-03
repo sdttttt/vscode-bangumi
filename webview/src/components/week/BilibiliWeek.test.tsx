@@ -53,6 +53,39 @@ describe("BilibiliWeek", () => {
         expect(container.querySelector(".today-badge")).toBeNull();
     });
 
+    it("renders an empty frame instead of a broken image without a cover", () => {
+        /*
+         * 复现（L9，见 TODO.md）：宿主给不出封面时 cover 是空串，空 src
+         * 在 CSP 下必然失败，画框里只剩破图图标。Placeholder 已有守卫，
+         * 这里补齐同样的处理。
+         */
+        const { container } = render(
+            <BilibiliWeek
+                days={[day({ seasons: [season({ cover: "" })] })]}
+                assets={assets}
+            />
+        );
+
+        expect(container.querySelector("img.season-cover-image")).toBeNull();
+        expect(container.querySelector(".season-cover")).toBeTruthy();
+    });
+
+    it("renders a plain row when the url is missing", () => {
+        /*
+         * 复现（L10，见 TODO.md）：空 href 会把 webview 自身的文档地址
+         * 转发出去打开，行为无意义；降级为不可点的行。
+         */
+        const { container } = render(
+            <BilibiliWeek
+                days={[day({ seasons: [season({ url: "" })] })]}
+                assets={assets}
+            />
+        );
+
+        expect(container.querySelector('a[href=""]')).toBeNull();
+        expect(container.querySelector(".bangumi")).toBeTruthy();
+    });
+
     it("renders one time point per publication slot", () => {
         const { container } = render(
             <BilibiliWeek
