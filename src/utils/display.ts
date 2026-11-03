@@ -44,6 +44,24 @@ export function updatedMessage(titles: RemindTitles): string {
 }
 
 /**
+ * 把剩余分钟数换算成提醒文案里的时长。
+ *
+ * 提前量上限是一天，长于 60 分钟时继续用「N万分钟」不可读，换算成小时。
+ *
+ * @author sdttttt
+ */
+function describeRemaining(minuteTime: string | number): string {
+    if ("string" === typeof minuteTime || 60 > minuteTime) {
+        return `${minuteTime}分钟`;
+    }
+
+    const hours = Math.floor(minuteTime / 60);
+    const minutes = minuteTime % 60;
+
+    return 0 === minutes ? `${hours}小时` : `${hours}小时${minutes}分钟`;
+}
+
+/**
  * 剧集即将更新的提醒文案。
  *
  * @author sdttttt
@@ -52,5 +70,5 @@ export function upcomingMessage(
     titles: RemindTitles,
     minuteTime: string | number
 ): string {
-    return `${formatTitles(titles)} 还有${minuteTime}分钟就更新啦！`;
+    return `${formatTitles(titles)} 还有${describeRemaining(minuteTime)}就更新啦！`;
 }

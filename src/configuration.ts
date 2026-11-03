@@ -86,6 +86,17 @@ export function affectsReminder(
 }
 
 /**
+ * 提前量的合理上限，单位为秒。
+ *
+ * 提前量按秒配置：按毫秒习惯填入的大数（600000 本意是 10 分钟，实际约 7 天）
+ * 会把地平线内全部事件钳到当下，启动瞬间通知轰炸。收敛到一天——更长的提前
+ * 没有现实意义。
+ *
+ * @author sdttttt
+ */
+const MAX_REMINDER_AHEAD_SECONDS = 24 * 60 * 60;
+
+/**
  * 创建一次扩展会话的设置读取器。
  *
  * 每次读取都会查询 workspace，因此扩展运行期间修改的设置无需重建会话即可生效。
@@ -116,21 +127,42 @@ export function createSettings(): Settings {
         return run;
     };
 
+    /*
+     * 布尔配置只认真正的布尔：VS Code 的 get() 不按 schema 纠偏，手工写坏
+     * 的类型（如 "false" 字符串）会原样返回，按真值处理会让「已关闭」的
+     * 设置照常生效。未配置时回退 schema 默认，其余一律按关闭处理——
+     * 宁可少展示，也不违背用户的关闭意图。
+     */
+    const readBoolean = (key: ConfigKey, fallback: boolean): boolean => {
+        const value = read(key);
+
+        return undefined === value ? fallback : true === value;
+    };
+
     return {
         reminderAheadTime: () => {
-            const aheadTime = read(ConfigKey.ReminderAheadTime);
-            const result = aheadTime as number;
+            const result = read(ConfigKey.ReminderAheadTime);
 
-            return isNaN(result) || 0 > result ? 0 : result;
+            /*
+             * 只接受有限的正数：手写坏类型的值（字符串、布尔、Infinity）
+             * 一律回退 0，而不是靠下游的隐式转型侥幸正确。
+             */
+            return "number" === typeof result &&
+                Number.isFinite(result) &&
+                0 < result
+                ? Math.min(result, MAX_REMINDER_AHEAD_SECONDS)
+                : 0;
         },
 
-        isReminderEnabled: () => false !== read(ConfigKey.EnableReminder),
+        isReminderEnabled: () =>
+            readBoolean(ConfigKey.EnableReminder, true),
 
-        isDisplayIndexTags: () => read(ConfigKey.DisplayIndexTags) as boolean,
+        isDisplayIndexTags: () =>
+            readBoolean(ConfigKey.DisplayIndexTags, true),
 
-        isDisplayStatusBar: () => read(ConfigKey.DisplayStatusBar) as boolean,
+        isDisplayStatusBar: () => readBoolean(ConfigKey.DisplayStatusBar, true),
 
-        isDisplayHistory: () => read(ConfigKey.DisplayHistory) as boolean,
+        isDisplayHistory: () => readBoolean(ConfigKey.DisplayHistory, false),
 
         weekSource: () => {
             /*
