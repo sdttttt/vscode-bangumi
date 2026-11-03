@@ -523,4 +523,51 @@ describe("Week bangumi view source switch", () => {
         });
         expect(another.api.getBilibiliSchedule).not.toHaveBeenCalled();
     });
+
+    it("does not resurrect a closed panel when a late schedule arrives", async () => {
+        /*
+         * 复现（M6，见 TODO.md）：日程在途时用户关闭面板，迟到的响应
+         * 不应把面板重新拉起来。
+         */
+        const created = vi.fn();
+        const late = createPanelStub();
+        const panel = usePanel({
+            viewType: "bangumiOpen.week",
+            title: "周番表",
+            host: createWebviewHost("/extension"),
+            subscriptions: [],
+            createPanel: () => {
+                created();
+                return late.panel;
+            },
+        });
+        const localApi: BangumiApi = {
+            getIndexPage: vi.fn(),
+            getBilibiliSchedule: vi.fn(),
+            getBgmTvSchedule: vi.fn(),
+        };
+        let resolveLate:
+            | ((value: ReturnType<typeof toScheduleFromBilibili>) => void)
+            | undefined;
+        vi.mocked(localApi.getBilibiliSchedule).mockReturnValueOnce(
+            new Promise(resolve => {
+                resolveLate = resolve;
+            })
+        );
+        const localView = useWeekBangumiView({
+            api: localApi,
+            panel,
+            settings,
+            availability: createAvailabilityStub().availability,
+        });
+
+        localView.openWeekBangumi();
+        expect(created).toHaveBeenCalledTimes(1);
+
+        late.dispose();
+        resolveLate?.(toScheduleFromBilibili(weekBangumi(), now));
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(created).toHaveBeenCalledTimes(1);
+    });
 });

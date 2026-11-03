@@ -49,6 +49,13 @@ export interface Panel {
      * 由组合根在视图创建之后注册，面板因此无需知道自己属于哪个视图。
      */
     onCommand(handler: (command: WebviewCommand) => void): void;
+    /**
+     * 注册面板被用户关闭时的监听。
+     *
+     * 视图用它作废在途的异步响应：面板已随用户的意图消失，迟到的数据
+     * 不应该把面板重新拉起来。
+     */
+    onDidClose(listener: () => void): void;
 }
 
 /**
@@ -63,6 +70,7 @@ export function usePanel(config: PanelConfig): Panel {
     let panel: vscode.WebviewPanel | undefined;
     let lastState: ViewState = { kind: "loading" };
     let commandHandler: (command: WebviewCommand) => void = () => undefined;
+    const closeListeners: Array<() => void> = [];
 
     const render = (state: ViewState): void => {
         lastState = state;
@@ -89,6 +97,9 @@ export function usePanel(config: PanelConfig): Panel {
             panel.onDidDispose(
                 () => {
                     panel = undefined;
+                    for (const listener of closeListeners) {
+                        listener();
+                    }
                 },
                 null,
                 config.subscriptions
@@ -108,6 +119,9 @@ export function usePanel(config: PanelConfig): Panel {
         showUnavailable: () => render({ kind: "unavailable" }),
         onCommand: handler => {
             commandHandler = handler;
+        },
+        onDidClose: listener => {
+            closeListeners.push(listener);
         },
     };
 }

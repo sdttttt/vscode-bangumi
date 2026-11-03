@@ -52,6 +52,14 @@ export function useWeekBangumiView(
     /* 每次渲染自增，用于丢弃后到的旧响应。 */
     let renderToken = 0;
 
+    /*
+     * 面板被用户关闭后在途的响应全部作废：迟到的数据不该把面板重新拉起来。
+     * 用户再次执行命令时 render() 会先自增，新请求照常渲染。
+     */
+    panel.onDidClose(() => {
+        renderToken += 1;
+    });
+
     /* 当前面板是否正停在「暂时不可用」占位页上，用于恢复后自动重绘。 */
     let showingUnavailable = false;
 
