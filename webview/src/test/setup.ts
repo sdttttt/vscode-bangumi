@@ -1,5 +1,6 @@
 import { afterEach, vi } from "vitest";
 import { cleanup } from "@testing-library/preact";
+import type { ViewState, WebviewCommand } from "@shared/webview/protocol";
 
 /**
  * VS Code 注入 Webview 的 API 的替身。
@@ -7,9 +8,9 @@ import { cleanup } from "@testing-library/preact";
  * @author sdttttt
  */
 export const vsCodeApi = {
-    getState: vi.fn(() => undefined),
-    setState: vi.fn(),
-    postMessage: vi.fn(),
+    getState: vi.fn<() => ViewState | undefined>(() => undefined),
+    setState: vi.fn<(state: ViewState) => void>(),
+    postMessage: vi.fn<(command: WebviewCommand) => void>(),
 };
 
 /*
