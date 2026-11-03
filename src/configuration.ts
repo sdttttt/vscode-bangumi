@@ -103,6 +103,19 @@ export function createSettings(): Settings {
                 .update(key, value, vscode.ConfigurationTarget.Global)
         );
 
+    /*
+     * 忽略列表的读-改-写必须串行：两条通知接连弹出的场景下，用户可能先后
+     * 快速点掉两个「不再提醒」。并发时后到者会读到尚未落盘的旧列表，用自己
+     * 的合并结果覆盖先到者刚写入的记录，丢一次忽略。所有对忽略列表的写入
+     * 排在同一条 promise 链上，每个操作都基于前一个操作的最终结果。
+     */
+    let ignoredWrites: Promise<unknown> = Promise.resolve();
+    const queueIgnoredWrite = (task: () => Promise<void>): Promise<void> => {
+        const run = ignoredWrites.then(task, task);
+        ignoredWrites = run.catch(() => undefined);
+        return run;
+    };
+
     return {
         reminderAheadTime: () => {
             const aheadTime = read(ConfigKey.ReminderAheadTime);
@@ -139,24 +152,27 @@ export function createSettings(): Settings {
          * 用会话开始时捕获的副本合并会把那些改动覆盖掉。
          */
         ignoreReminders: titles =>
-            write(
-                ConfigKey.IgnoredReminders,
-                addIgnored(
-                    normalizeIgnored(read(ConfigKey.IgnoredReminders)),
-                    titles,
-                    Date.now()
+            queueIgnoredWrite(() =>
+                write(
+                    ConfigKey.IgnoredReminders,
+                    addIgnored(
+                        normalizeIgnored(read(ConfigKey.IgnoredReminders)),
+                        titles,
+                        Date.now()
+                    )
                 )
             ),
 
-        pruneIgnoredReminders: () => {
-            const { kept, changed } = pruneIgnored(
-                read(ConfigKey.IgnoredReminders),
-                Date.now()
-            );
+        pruneIgnoredReminders: () =>
+            queueIgnoredWrite(() => {
+                const { kept, changed } = pruneIgnored(
+                    read(ConfigKey.IgnoredReminders),
+                    Date.now()
+                );
 
-            return changed
-                ? write(ConfigKey.IgnoredReminders, kept)
-                : Promise.resolve();
-        },
+                return changed
+                    ? write(ConfigKey.IgnoredReminders, kept)
+                    : Promise.resolve();
+            }),
     };
 }
