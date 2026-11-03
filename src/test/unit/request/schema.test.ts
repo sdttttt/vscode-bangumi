@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { isSuccess, isValidBangumisRequest } from "@/request/bilibili/schema";
+import {
+    BangumisResponse,
+    BiliResponse,
+    isSuccess,
+    isValidBangumisRequest,
+} from "@/request/bilibili/schema";
 import { isValidCalendar } from "@/request/bgmtv/schema";
 import { bgmCalendar, bgmCalendarDay } from "@/test/mocks/fixtures/bgm";
 import { bangumisData } from "@/test/mocks/fixtures/bangumi";
@@ -15,6 +20,10 @@ describe("isSuccess", () => {
         [1, "success"],
     ])("rejects code %i with message %j", (code, message) => {
         expect(isSuccess({ code, message })).toBe(false);
+    });
+
+    it.each([[null], [undefined]])("rejects %j without throwing", res => {
+        expect(isSuccess(res as unknown as BiliResponse)).toBe(false);
     });
 });
 
@@ -46,6 +55,31 @@ describe("isValidBangumisRequest", () => {
                 message: "success",
                 data: bangumisData({ list: [] }),
             })
+        ).toBe(false);
+    });
+
+    it("rejects a successful response without a data field", () => {
+        expect(
+            isValidBangumisRequest({
+                code: 0,
+                message: "success",
+            } as BangumisResponse)
+        ).toBe(false);
+    });
+
+    it("rejects a response whose data is null without throwing", () => {
+        expect(
+            isValidBangumisRequest({
+                code: 0,
+                message: "success",
+                data: null,
+            } as unknown as BangumisResponse)
+        ).toBe(false);
+    });
+
+    it("rejects a null response without throwing", () => {
+        expect(
+            isValidBangumisRequest(null as unknown as BangumisResponse)
         ).toBe(false);
     });
 });

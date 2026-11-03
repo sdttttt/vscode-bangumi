@@ -99,12 +99,43 @@ describe("getAllBangumi", () => {
         expect(getJson).toHaveBeenCalledTimes(2);
     });
 
-    it("propagates a network failure", async () => {
+    it("returns undefined and reports when the request fails", async () => {
         vi.mocked(getJson).mockRejectedValue(new Error("timeout"));
 
         await expect(
             api.getAllBangumi(buildBangumiUrl(DEFAULT_QUERY, 1))
-        ).rejects.toThrow("timeout");
+        ).resolves.toBeUndefined();
+
+        expect(notifier.info).toHaveBeenCalledOnce();
+
+        /*
+         * 失败的响应不该被缓存：把网络恢复后的正常响应喂回去，
+         * 下一次调用应当重新走网络。
+         */
+        vi.mocked(getJson).mockResolvedValue({
+            code: 0,
+            message: "success",
+            data: bangumisData(),
+        });
+
+        await expect(
+            api.getAllBangumi(buildBangumiUrl(DEFAULT_QUERY, 1))
+        ).resolves.toEqual(bangumisData());
+        expect(getJson).toHaveBeenCalledTimes(2);
+    });
+
+    it("returns undefined without reporting when the data field is missing", async () => {
+        vi.mocked(getJson).mockResolvedValue({ code: 0, message: "success" });
+
+        await expect(
+            api.getAllBangumi(buildBangumiUrl(DEFAULT_QUERY, 1))
+        ).resolves.toBeUndefined();
+
+        /*
+         * 成功码但缺 data 是服务端的形态异常：响应按不可用处理，
+         * 但不打「B 站服务异常」的文案（那只留给非成功码）。
+         */
+        expect(notifier.info).not.toHaveBeenCalled();
     });
 });
 

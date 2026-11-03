@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { BangumiApi } from "@/request";
-import { bangumisData } from "@/test/mocks/fixtures/bangumi";
+import type { BangumisData } from "@/request/bilibili/schema";
+import { bangumi, bangumisData } from "@/test/mocks/fixtures/bangumi";
 import { createPanelStub, PanelStub } from "@/test/mocks/panel";
 import {
     createAvailabilityStub,
@@ -157,6 +158,20 @@ describe("Bangumi view", () => {
         });
     });
 
+    it("falls back to the not found view when the request rejects", async () => {
+        vi.mocked(api.getIndexPage).mockRejectedValue(new Error("timeout"));
+
+        view.openBangumi();
+
+        /*
+         * rejection 必须被视图接住：面板不能停在加载态，
+         * 也不能把 rejection 泄漏成 unhandled rejection。
+         */
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.kind).toBe("notFound");
+        });
+    });
+
     it("renders the unavailable view when every source is down", async () => {
         availability.setDown(true);
         vi.mocked(api.getIndexPage).mockResolvedValue(undefined);
@@ -255,6 +270,36 @@ describe("Bangumi view", () => {
         expect(state.getPage()).toBe(1);
     });
 
+    it.each(["-3", "2.5", "Infinity"])(
+        "rejects the non positive integer page %j and keeps the current one",
+        async input => {
+            /*
+             * 复现（M7，见 TODO.md）：校验只有 `0 === number`，负数、小数与
+             * Infinity 全部穿过并写入 state。修复后页码应保持不变。
+             */
+            vi.mocked(api.getIndexPage).mockReturnValue(new Promise(() => {}));
+            notifier.ask.mockResolvedValue(input);
+
+            await view.jumpPage();
+
+            expect(state.getPage()).toBe(1);
+        }
+    );
+
+    it("stays silent when the user dismisses the input box", async () => {
+        /*
+         * 复现（M7，见 TODO.md）：Esc 取消输入（undefined → 0）会误弹
+         * 「页码必须是大于 0 的数字」。取消即静默，不应有任何提示。
+         */
+        vi.mocked(api.getIndexPage).mockReturnValue(new Promise(() => {}));
+        notifier.ask.mockResolvedValue(undefined);
+
+        await view.jumpPage();
+
+        expect(notifier.info).not.toHaveBeenCalled();
+        expect(state.getPage()).toBe(1);
+    });
+
     it("reuses the open panel instead of creating a second one", () => {
         vi.mocked(api.getIndexPage).mockReturnValue(new Promise(() => {}));
 
@@ -272,6 +317,62 @@ describe("Bangumi view", () => {
         view.openBangumi();
 
         expect(created).toHaveBeenCalledTimes(2);
+    });
+
+    it("drops a stale response that arrives after a newer request", async () => {
+        /*
+         * 复现（M5，见 TODO.md）：page=2 的请求 A 在途时又发了 page=3 的
+         * 请求 B；B 先返回渲染第 3 页，A 后返回会把第 2 页的内容渲染出来，
+         * 页码标签却写着 3。修复后旧响应必须被丢弃。
+         */
+        let resolveStale: (value: BangumisData) => void = () => undefined;
+        vi.mocked(api.getIndexPage)
+            .mockReturnValueOnce(
+                new Promise<BangumisData>(resolve => {
+                    resolveStale = resolve;
+                })
+            )
+            .mockResolvedValueOnce(
+                bangumisData({ list: [bangumi({ title: "第三页番剧" })] })
+            );
+
+        view.nextPage();
+        view.nextPage();
+
+        await vi.waitFor(() => {
+            expect(stub.posted().at(-1)?.bangumis?.[0]?.title).toBe(
+                "第三页番剧"
+            );
+            expect(stub.posted().at(-1)?.page).toBe(3);
+        });
+
+        resolveStale(bangumisData({ list: [bangumi({ title: "旧页番剧" })] }));
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(stub.posted().at(-1)?.bangumis?.[0]?.title).toBe("第三页番剧");
+        expect(stub.posted().at(-1)?.page).toBe(3);
+    });
+
+    it("does not resurrect a closed panel when a late response arrives", async () => {
+        /*
+         * 复现（M6，见 TODO.md）：请求在途时用户关闭面板，响应迟到后
+         * 面板不应被重新拉起来。
+         */
+        let resolveLate: (value: BangumisData) => void = () => undefined;
+        vi.mocked(api.getIndexPage).mockReturnValueOnce(
+            new Promise<BangumisData>(resolve => {
+                resolveLate = resolve;
+            })
+        );
+
+        view.openBangumi();
+        expect(created).toHaveBeenCalledTimes(1);
+
+        stub.dispose();
+        resolveLate(bangumisData());
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(created).toHaveBeenCalledTimes(1);
     });
 
     it("routes the pager commands sent by the webview", () => {
