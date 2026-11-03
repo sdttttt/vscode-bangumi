@@ -109,7 +109,15 @@ export function useScheduler(
             }
             consumed += 1;
             if (GRACE_MS >= at - event.at) {
-                hooks.onEvent(event);
+                /*
+                 * 回调的异常不能中断消费循环：此刻定时器已置空，剩下的
+                 * 到期事件与后续装弹都会被一并带走，调度器从此静默停摆。
+                 */
+                try {
+                    hooks.onEvent(event);
+                } catch {
+                    /* 通知失败只损失这一条，日程本身照常推进。 */
+                }
             }
         }
 

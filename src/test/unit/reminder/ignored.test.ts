@@ -120,6 +120,24 @@ describe("addIgnored", () => {
 
         expect(after.map(item => item.title)).toEqual(["甲", "乙", "丙"]);
     });
+
+    it("trims titles and skips blank ones", () => {
+        /*
+         * 复现（L2，见 TODO.md）：写入空白标题后，下次读取会被
+         * normalizeIgnored 丢弃并触发 prune 重写设置文件——写入侧应当与
+         * 读取侧用同一套合法性判定。
+         */
+        const result = addIgnored([], ["  ", " 甲 ", ""], NOW);
+
+        expect(result.map(item => item.title)).toEqual(["甲"]);
+    });
+
+    it("matches a known entry after trimming the incoming title", () => {
+        const before = [entry(1, "甲")];
+        const after = addIgnored(before, ["甲 "], NOW);
+
+        expect(after).toEqual([entry(0, "甲")]);
+    });
 });
 
 describe("pruneIgnored", () => {
