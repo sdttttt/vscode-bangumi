@@ -22,14 +22,17 @@ export const season = (
 /**
  * 一份日程渲染载荷。
  *
+ * 默认日期与 `AT_*` 时刻常量同属 UTC+8 的 2026-10-31：标记与「今天」徽标
+ * 现在要跟实时时钟核对日期，钉住的用例因此需要日期与时刻一致。
+ *
  * @author sdttttt
  */
 export const day = (
     overrides: Partial<WeekDayPayload> = {}
 ): WeekDayPayload => ({
-    date: "1-1",
-    dayOfWeek: 1,
-    label: "星期一",
+    date: "10-31",
+    dayOfWeek: 6,
+    label: "星期六",
     isToday: false,
     seasons: [season()],
     ...overrides,

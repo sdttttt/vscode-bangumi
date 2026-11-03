@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
-import type { SeasonPayload } from "@shared/webview/protocol";
+import { dayKey, sameDayKey } from "@shared/utils/clock";
+import type { SeasonPayload, WeekDayPayload } from "@shared/webview/protocol";
 
 /**
  * 一天中的一个更新时段。
@@ -187,18 +188,43 @@ export function useNow(pinned: number | undefined, active: boolean): number {
 }
 
 /**
- * 按更新时间把一天的番剧分组，并保持原有顺序。
+ * 这一天是否仍是实时时钟上的今天。
  *
- * 接口已经按 `pub_time` 排好序，因此一趟遍历即可，相邻的分组也会保持相邻。
+ * `isToday` 是宿主推送的静态载荷：面板跨过 UTC+8 午夜后它就过期了，而宿主
+ * 不会主动重推。把 `date` 与实时时钟比对，过期的「今天」不再画标记与徽标
+ * ——指向昨天时刻表的倒计时只会误导。
+ *
+ * @author sdttttt
+ */
+export function isLiveToday(
+    day: Pick<WeekDayPayload, "date" | "isToday">,
+    now: number
+): boolean {
+    return day.isToday && sameDayKey(day.date, dayKey(now));
+}
+
+/**
+ * 按更新时间把一天的番剧分组，时间顺序与接口原序一致。
+ *
+ * 「接口已按 `pub_time` 升序」是适配器没有强制的假设：延期条目被插到异常
+ * 位置之类的乱序数据会让倒计时指向列表顺序上的下一场，而不是时间上最近的。
+ * 这里先做一次稳定排序（无法解析的时段排到末尾），再按相邻归组——不相邻的
+ * 重复时刻也随之合并，渲染键不会重复。
  *
  * @author sdttttt
  */
 export function groupByPubTime(
     seasons: Array<SeasonPayload>
 ): Array<SeasonGroup> {
+    const ordered = [...seasons].sort((left, right) => {
+        const at = (season: SeasonPayload): number =>
+            pubTimeMinute(season.pubTime) ?? Number.MAX_SAFE_INTEGER;
+        return at(left) - at(right);
+    });
+
     const groups: Array<SeasonGroup> = [];
 
-    for (const season of seasons) {
+    for (const season of ordered) {
         const last = groups.at(-1);
         if (last && last.pubTime === season.pubTime) {
             last.seasons.push(season);

@@ -94,11 +94,11 @@ export function yearOf(epochMs: number): number {
  * 比较两个 `月-日` 键是否为同一天，按数值归一。
  *
  * 接口的 `date` 不保证零填充（`3-5` 与 `03-05` 都可能出现），字符串直比会
- * 在回退路径上失配。
+ * 在回退路径上失配。Webview 侧判断「今天」是否过期也用它，因此导出共享。
  *
  * @author sdttttt
  */
-function sameDayKey(left: string, right: string): boolean {
+export function sameDayKey(left: string, right: string): boolean {
     const [leftMonth, leftDate] = left.split("-").map(Number);
     const [rightMonth, rightDate] = right.split("-").map(Number);
 

@@ -4,6 +4,7 @@ import type {
     WeekDayPayload,
     WeekSourceKind,
 } from "@shared/webview/protocol";
+import { isLiveToday, useNow } from "./marker";
 import { WeekBoard } from "./WeekBoard";
 import { SourceNote, SourceSwitch } from "./SourceNote";
 
@@ -52,26 +53,32 @@ function SeasonRow({ season }: { season: SeasonPayload }) {
  * 渲染一天。
  *
  * 没有更新时段，因此渲染的是普通列表而不是时间表：既不画 `.time-point`，
- * 也不画「你在这里」标记与倒计时。
+ * 也不画「你在这里」标记与倒计时。「今天」徽标要跟着实时时钟走——跨过
+ * 午夜后过期的 isToday 不再画徽标，因此这里同样订阅时钟。
  *
  * @author sdttttt
  */
 function Day({
     day,
     assets,
+    now: pinned,
 }: {
     day: WeekDayPayload;
     assets: AssetUris | undefined;
+    now: number | undefined;
 }) {
+    const now = useNow(pinned, day.isToday);
+    const liveToday = isLiveToday(day, now);
+
     return (
-        <section class={day.isToday ? "item today" : "item"}>
-            <header class={day.isToday ? "day day-today" : "day"}>
+        <section class={liveToday ? "item today" : "item"}>
+            <header class={liveToday ? "day day-today" : "day"}>
                 <h2
                     class={
-                        day.isToday ? "day-title day-title-today" : "day-title"
+                        liveToday ? "day-title day-title-today" : "day-title"
                     }>
                     <span>{day.label}</span>
-                    {day.isToday && assets ? (
+                    {liveToday && assets ? (
                         <span class="today-badge">
                             <img
                                 class="today-badge-image"
@@ -103,10 +110,13 @@ function Day({
 export function BgmTvWeek({
     days,
     assets,
+    now,
     onSwitchSource,
 }: {
     days: Array<WeekDayPayload>;
     assets: AssetUris | undefined;
+    /** 冻结「今天」判断所用时刻，测试用；缺省跟随实时时钟。 */
+    now?: number;
     onSwitchSource?: (source: WeekSourceKind) => void;
 }) {
     return (
@@ -123,7 +133,7 @@ export function BgmTvWeek({
                 </SourceNote>
             }>
             {days.map(day => (
-                <Day key={day.date} day={day} assets={assets} />
+                <Day key={day.date} day={day} assets={assets} now={now} />
             ))}
         </WeekBoard>
     );

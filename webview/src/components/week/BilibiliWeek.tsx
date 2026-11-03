@@ -9,6 +9,7 @@ import { formatMinuteOfDay, minuteOfDay } from "@shared/utils/clock";
 import {
     describeNow,
     groupByPubTime,
+    isLiveToday,
     markerIndex,
     NOW_LABEL,
     useNow,
@@ -120,18 +121,20 @@ function Day({
     const groups = groupByPubTime(day.seasons);
     const now = useNow(pinned, day.isToday);
     const nowMinute = minuteOfDay(now);
-    const marker = day.isToday ? markerIndex(groups, nowMinute) : -1;
+    /* 跨过 UTC+8 午夜后 isToday 就过期了：日期与实时时钟对不上不再画标记。 */
+    const liveToday = isLiveToday(day, now);
+    const marker = liveToday ? markerIndex(groups, nowMinute) : -1;
     const countdown = describeNow(groups, nowMinute);
 
     return (
-        <section class={day.isToday ? "item today" : "item"}>
-            <header class={day.isToday ? "day day-today" : "day"}>
+        <section class={liveToday ? "item today" : "item"}>
+            <header class={liveToday ? "day day-today" : "day"}>
                 <h2
                     class={
-                        day.isToday ? "day-title day-title-today" : "day-title"
+                        liveToday ? "day-title day-title-today" : "day-title"
                     }>
                     <span>{day.label}</span>
-                    {day.isToday && assets ? (
+                    {liveToday && assets ? (
                         <span class="today-badge">
                             <img
                                 class="today-badge-image"
