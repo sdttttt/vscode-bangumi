@@ -144,6 +144,15 @@ export function useReminder(options: ReminderOptions): Reminder {
     let muted = false;
     /* 上一次读到的提醒开关，用于识别「用户重新开启」这一转变。 */
     let lastEnabled = settings.isReminderEnabled();
+    /*
+     * 本次会话已经播报过的事件（按播出时刻识别）。
+     *
+     * 调度器的防重发只对单份日程有效：日程重建（跨日滚动或设置变更）会让
+     * 「已触发但还没开播」的提前量事件重新回到队列，`at` 被钳到当下立刻重发。
+     * 这里补上跨重建的记忆，且只记真正弹出过通知的事件——被忽略的组与提醒
+     * 关闭期间的静默消费不算，用户重新开启提醒后仍应收到那条尚未播出的通知。
+     */
+    const firedPubTs = new Set<number>();
 
     const cancelRetry = (): void => {
         if (undefined !== retryTimer) {
@@ -290,6 +299,9 @@ export function useReminder(options: ReminderOptions): Reminder {
             return;
         }
 
+        /* 从这里起通知确定要弹出，记下它，日程重建时不再重发。 */
+        firedPubTs.add(event.pubTs);
+
         const notice = describeNotice(event, now());
 
         const message =
@@ -394,8 +406,15 @@ export function useReminder(options: ReminderOptions): Reminder {
             at,
             settings.reminderAheadTime()
         );
-        events = schedule.events;
-        scheduler.arm(schedule);
+        /*
+         * 已经播报过的事件不再重新装载：否则提前量窗口横跨重建点的事件
+         * 会在每次重建后立刻再响一次。
+         */
+        const remaining = schedule.events.filter(
+            event => !firedPubTs.has(event.pubTs)
+        );
+        events = remaining;
+        scheduler.arm({ ...schedule, events: remaining });
         renderStatusBar(at);
     };
 

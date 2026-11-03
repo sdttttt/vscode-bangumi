@@ -16,6 +16,7 @@ import {
     type WeekSource,
 } from "@/reminder";
 import { useScheduler } from "@/reminder/scheduler";
+import { ROLLOVER_DELAY_MS } from "@/reminder/schedule";
 import { useStatusBar } from "@/reminder/statusBar";
 import { toScheduleFromBgmTv } from "@/request/schedule";
 import { weekBangumiData, wBangumi } from "@/test/mocks/fixtures/weekBangumi";
@@ -533,6 +534,86 @@ describe("Reminder", () => {
             "《今日番剧》 还有10分钟就更新啦！",
             ["打开周番表", "不再提醒"]
         );
+        reminder.dispose();
+    });
+
+    it("announces the lead-time update once even when a settings change rebuilds the schedule", async () => {
+        settings.values["bangumiOpen.ReminderAheadTime"] = 600;
+
+        /*
+         * 数据只在闭包外构造一次：重建后的日程必须还是同一部 13:00 播出的
+         * 番剧。`today()` 夹具会在每次 source 调用时重算 pub_ts，用在这里
+         * 会掩盖重建重发的问题。
+         */
+        const data = [
+            weekBangumiData({
+                date: "10-31",
+                is_today: 1,
+                seasons: [
+                    wBangumi({
+                        title: "晚间番剧",
+                        pub_time: "13:00",
+                        pub_ts: Math.floor(Date.now() / 1000) + 3_600,
+                    }),
+                ],
+            }),
+        ];
+        const { reminder, notifier } = createHarness(
+            () => Promise.resolve(data),
+            settings
+        );
+
+        await reminder.start();
+        vi.advanceTimersByTime(3_000_000);
+        expect(notifier.actions).toHaveBeenCalledTimes(1);
+
+        const listener = vi.mocked(vscode.workspace.onDidChangeConfiguration)
+            .mock.calls[0][0];
+        listener({ affectsConfiguration: () => true } as never);
+        await vi.advanceTimersByTimeAsync(1_000);
+
+        /* 已播报且尚未开播的事件不能因日程重建而重发。 */
+        expect(notifier.actions).toHaveBeenCalledTimes(1);
+        reminder.dispose();
+    });
+
+    it("announces the lead-time update once across the day rollover", async () => {
+        settings.values["bangumiOpen.ReminderAheadTime"] = 600;
+
+        /*
+         * 番剧在 rollover 之后 5 分钟播出，提前量窗口（10 分钟）恰好横跨
+         * rollover：「先触发、再重建」的顺序每天必然发生一次。
+         * rollover 时刻按 nextDayStart 动态计算，与时区无关。
+         */
+        const nowMs = Date.now();
+        const rolloverMs = nextDayStart(nowMs) + ROLLOVER_DELAY_MS;
+        const data = [
+            weekBangumiData({
+                date: "10-31",
+                is_today: 1,
+                seasons: [
+                    wBangumi({
+                        title: "深夜番剧",
+                        pub_time: "00:10",
+                        pub_ts: Math.floor((rolloverMs + 5 * 60 * 1000) / 1000),
+                    }),
+                ],
+            }),
+        ];
+        const source = vi.fn(() => Promise.resolve(data));
+        const { reminder, notifier } = createHarness(source, settings);
+
+        await reminder.start();
+
+        await vi.advanceTimersByTimeAsync(rolloverMs - 5 * 60 * 1000 - nowMs);
+        expect(notifier.actions).toHaveBeenCalledTimes(1);
+
+        await vi.advanceTimersByTimeAsync(ROLLOVER_DELAY_MS + 1);
+        await vi.advanceTimersByTimeAsync(0);
+
+        /* rollover 确实重建了日程，但播报过的提前量事件不再重发。 */
+        expect(source).toHaveBeenCalledTimes(2);
+        expect(notifier.actions).toHaveBeenCalledTimes(1);
         reminder.dispose();
     });
 
