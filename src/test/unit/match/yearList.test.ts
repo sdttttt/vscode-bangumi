@@ -174,7 +174,9 @@ describe("year filter", () => {
 
         await pick(h, choice);
 
-        expect(h.state.getQuery().year).toBe(encodeURI(`[${year},${year + 1})`));
+        expect(h.state.getQuery().year).toBe(
+            encodeURI(`[${year},${year + 1})`)
+        );
     });
 
     it("keeps the other filters untouched", async () => {
