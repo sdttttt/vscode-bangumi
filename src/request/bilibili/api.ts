@@ -50,57 +50,99 @@ export function createBilibiliApi(
     caches: RequestCaches,
     notifier: Notifier
 ): BilibiliApi {
+    /*
+     * 正在进行的请求按地址去重：午夜 rollover 的提醒刷新与用户此刻打开
+     * 周番面板并发时，同一地址只发一次请求、写一次缓存。
+     */
+    const pendingBangumi = new Map<string, Promise<BangumisData | undefined>>();
+    let pendingWeek: Promise<Array<WeekBangumiData> | undefined> | undefined;
+
     return {
-        getAllBangumi: async url => {
+        getAllBangumi: url => {
             const cached = caches.bangumi.get(url);
             if (cached) {
-                return cached;
+                return Promise.resolve(cached);
             }
 
-            let response: BangumisResponse;
-            try {
-                response = await getJson<BangumisResponse>(url);
-            } catch {
-                /* 网络失败与周番路径保持同一形态：上报后返回空数据。 */
-                notifier.info(BROKEN_RESPONSE_MESSAGE);
-                return;
+            const inFlight = pendingBangumi.get(url);
+            if (inFlight) {
+                return inFlight;
             }
 
-            if (!isValidBangumisRequest(response)) {
-                if (!isSuccess(response)) {
-                    notifier.info(BROKEN_RESPONSE_MESSAGE);
+            const request = (async () => {
+                try {
+                    let response: BangumisResponse;
+                    try {
+                        response = await getJson<BangumisResponse>(url);
+                    } catch {
+                        /* 网络失败与周番路径保持同一形态：上报后返回空数据。 */
+                        notifier.info(BROKEN_RESPONSE_MESSAGE);
+                        return;
+                    }
+
+                    if (!isValidBangumisRequest(response)) {
+                        if (!isSuccess(response)) {
+                            notifier.info(BROKEN_RESPONSE_MESSAGE);
+                        }
+                        return;
+                    }
+
+                    caches.bangumi.set(url, response.data);
+                    return response.data;
+                } finally {
+                    /*
+                     * 在请求结算的同时清槽：清理若排在结算之后的微任务里，
+                     * 紧随其后的顺序调用会误复用已完成的 promise。
+                     */
+                    pendingBangumi.delete(url);
                 }
-                return;
-            }
-
-            caches.bangumi.set(url, response.data);
-            return response.data;
+            })();
+            pendingBangumi.set(url, request);
+            return request;
         },
 
-        getWeekBangumi: async () => {
+        /*
+         * 周番路径保持静默：它同时被后台的提醒重试与用户打开的视图消费，
+         * 在数据层弹窗会让离线重试的每一轮都打扰一次。何时提示由调用方
+         * 决定——视图有「未找到」页面兜底，提醒按失败序列只报一次。
+         */
+        getWeekBangumi: () => {
             const cached = caches.week.get(BANGUMI_WEEK);
             if (cached) {
-                return cached;
+                return Promise.resolve(cached);
             }
 
-            let response: WeekBangumiResponse;
-            try {
-                response = await getJson<WeekBangumiResponse>(BANGUMI_WEEK);
-            } catch {
-                /*
-                 * 网络失败按空日程上报：视图会回退到另一个来源或展示不可用，
-                 * 提醒则由可用性探测统一重试。这里不弹提示，否则重试期间会
-                 * 反复打扰用户。
-                 */
-                return;
+            if (pendingWeek) {
+                return pendingWeek;
             }
 
-            if (!isSuccess(response) || isEmptyArray(response.result)) {
-                return;
-            }
+            const request = (async () => {
+                try {
+                    let response: WeekBangumiResponse;
+                    try {
+                        response =
+                            await getJson<WeekBangumiResponse>(BANGUMI_WEEK);
+                    } catch {
+                        return;
+                    }
 
-            caches.week.set(BANGUMI_WEEK, response.result);
-            return response.result;
+                    if (!isSuccess(response)) {
+                        return;
+                    }
+
+                    if (isEmptyArray(response.result)) {
+                        return;
+                    }
+
+                    caches.week.set(BANGUMI_WEEK, response.result);
+                    return response.result;
+                } finally {
+                    /* 同 getAllBangumi：在结算的同时清槽，顺序调用不被误复用。 */
+                    pendingWeek = undefined;
+                }
+            })();
+            pendingWeek = request;
+            return request;
         },
     };
 }

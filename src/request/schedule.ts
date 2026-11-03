@@ -225,6 +225,13 @@ export function toScheduleFromBgmTv(
             const items = days
                 .filter(day => day.weekday.id === dayOfWeek)
                 .flatMap(day => day.items)
+                /* 缺 air_date 的条目会让排序比较器抛错，宁缺毋滥。 */
+                .filter(
+                    subject =>
+                        null !== subject &&
+                        undefined !== subject &&
+                        "string" === typeof subject.air_date
+                )
                 .slice()
                 .sort(compareSubjects);
 

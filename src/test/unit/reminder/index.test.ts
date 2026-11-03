@@ -494,7 +494,9 @@ describe("Reminder", () => {
          * 矛盾——用户只想藏状态栏，结果再也收不到提醒。
          */
         settings.values["bangumiOpen.DisplayStatusBar"] = false;
-        const source = vi.fn(() => Promise.resolve(today({ offsetSeconds: 60 })));
+        const source = vi.fn(() =>
+            Promise.resolve(today({ offsetSeconds: 60 }))
+        );
         const { reminder, notifier } = createHarness(source, settings);
 
         await reminder.start();
@@ -1232,6 +1234,106 @@ describe("Reminder", () => {
 
         expect(source).toHaveBeenCalledTimes(2);
         expect(statusBar.text).toContain("今日番剧");
+        reminder.dispose();
+    });
+
+    it("reports a broken schedule once across retries", async () => {
+        /*
+         * 复现（M10，见 TODO.md）：离线期间重试每十分钟一轮，逐次弹窗是
+         * 轰炸——同一段失败序列只允许提示一次。
+         */
+        const source = vi.fn().mockRejectedValue(new Error("offline"));
+        const { reminder, notifier } = createHarness(source, settings);
+
+        await reminder.start();
+        await vi.advanceTimersByTimeAsync(30_000);
+        await vi.advanceTimersByTimeAsync(120_000);
+        await vi.advanceTimersByTimeAsync(600_000);
+
+        expect(notifier.info).toHaveBeenCalledTimes(1);
+        reminder.dispose();
+    });
+
+    it("reports again after the connection recovers and breaks once more", async () => {
+        const source = vi
+            .fn()
+            .mockRejectedValueOnce(new Error("offline"))
+            .mockResolvedValueOnce(today({}) as never)
+            .mockRejectedValue(new Error("offline"));
+        const { reminder, notifier } = createHarness(source, settings);
+
+        await reminder.start();
+        await vi.advanceTimersByTimeAsync(30_000);
+        expect(notifier.info).toHaveBeenCalledTimes(1);
+
+        /* 恢复会重置提示标记：下一段失败序列允许再提示一次。 */
+        await vi.advanceTimersByTimeAsync(
+            nextDayStart(Date.now()) - Date.now() + 5 * 60 * 1000
+        );
+
+        expect(notifier.info).toHaveBeenCalledTimes(2);
+        reminder.dispose();
+    });
+
+    it("clears the stale next update when a refresh fails", async () => {
+        /*
+         * 复现（L4，见 TODO.md）：时钟跳过事件时刻（休眠恢复）后事件被
+         * 宽限机制静默消费，状态栏来不及重绘；此时跨日刷新又失败——
+         * 状态栏不能继续显示早已过去的「下一场更新」。
+         */
+        const source = vi
+            .fn()
+            .mockResolvedValueOnce(today({ offsetSeconds: 60 }))
+            .mockResolvedValue(undefined);
+        const reminder = createReminder(source, settings);
+
+        await reminder.start();
+        expect(statusBar.text).toContain("今日番剧");
+
+        vi.setSystemTime(Date.now() + 2 * 60 * 60 * 1000);
+        await vi.advanceTimersByTimeAsync(60_000);
+        await vi.advanceTimersByTimeAsync(
+            nextDayStart(Date.now()) - Date.now() + 5 * 60 * 1000
+        );
+
+        /*
+         * 事件被宽限机制静默消费时没有走 fire()，状态栏来不及重绘；
+         * 刷新失败路径必须补一次重绘，把过期条目隐藏掉。
+         */
+        expect(statusBar.hide).toHaveBeenCalled();
+        reminder.dispose();
+    });
+
+    it("clears the stale overview when a summary refresh fails", async () => {
+        /*
+         * 复现（L4，见 TODO.md）：概览刷新失败时残留昨日的概览文本，
+         * 宁可让条目消失也不显示过期内容。
+         */
+        settings.values["bangumiOpen.WeekSource"] = "bangumi";
+        const schedule = vi
+            .fn()
+            .mockResolvedValueOnce({
+                source: "bangumi" as const,
+                hasSlots: false,
+                days: [
+                    { dayOfWeek: 6, date: "10-31", isToday: true, items: [] },
+                ],
+            })
+            .mockResolvedValue(undefined);
+        const { reminder } = createHarness(
+            () => Promise.resolve(today({})),
+            settings,
+            schedule
+        );
+
+        await reminder.start();
+        expect(statusBar.text).toContain("今日");
+
+        await vi.advanceTimersByTimeAsync(
+            nextDayStart(Date.now()) - Date.now() + 5 * 60 * 1000
+        );
+
+        expect(statusBar.hide).toHaveBeenCalled();
         reminder.dispose();
     });
 

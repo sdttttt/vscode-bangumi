@@ -37,6 +37,24 @@ import { summarizeToday, type TodaySummary } from "./summary";
 const RETRY_DELAYS_MS: ReadonlyArray<number> = [30_000, 120_000, 600_000];
 
 /**
+ * B 站周番拉取失败时的一次性提示。
+ *
+ * 提示只在失败序列的第一轮给出：重试每十分钟一轮，逐次弹窗是骚扰。
+ *
+ * @author sdttttt
+ */
+const MISSING_SCHEDULE_MESSAGE = "咦？没有找到番剧时间表……";
+
+/**
+ * Bangumi 放送表拉取失败时的一次性提示。
+ *
+ * 单独一条，不复用 B 站故障的文案：出问题的并不是同一个服务。
+ *
+ * @author sdttttt
+ */
+const MISSING_CALENDAR_MESSAGE = "咦？没有找到 Bangumi 的放送表……";
+
+/**
  * 拉取周番数据。可注入，测试因此不会触碰网络，会话也可以传入自己的 `BangumiApi`。
  *
  * @author sdttttt
@@ -134,6 +152,8 @@ export function useReminder(options: ReminderOptions): Reminder {
     let generation = 0;
     let retryAttempt = 0;
     let warnedMissingToday = false;
+    /* 当前这段失败序列是否已经提示过：恢复成功后重置。 */
+    let warnedOffline = false;
     let disposed = false;
     /*
      * 用户在提醒上按下「不再提醒」后的本地静音标记。
@@ -159,6 +179,21 @@ export function useReminder(options: ReminderOptions): Reminder {
             clearTimeout(retryTimer);
             retryTimer = undefined;
         }
+    };
+
+    /**
+     * 一段失败序列只提示一次。
+     *
+     * 数据层保持静默（它同时被后台重试与视图消费），面向用户的提示由这里
+     * 统一给出；恢复成功后标记重置，下一段失败序列允许再提示。
+     */
+    const reportOffline = (message: string): void => {
+        if (warnedOffline || disposed) {
+            return;
+        }
+
+        warnedOffline = true;
+        notifier.info(message);
     };
 
     /**
@@ -383,10 +418,18 @@ export function useReminder(options: ReminderOptions): Reminder {
         availability.report("bilibili", undefined !== days);
 
         if (!days) {
+            reportOffline(MISSING_SCHEDULE_MESSAGE);
+
+            /*
+             * 状态栏里「下一场更新」的时刻可能已经过去（比如休眠恢复后事件
+             * 被宽限机制静默消费）：重绘一次，宁可让条目消失也不显示过期时刻。
+             */
+            renderStatusBar(now());
             scheduleRetry();
             return;
         }
 
+        warnedOffline = false;
         retryAttempt = 0;
         const at = now();
 
@@ -444,10 +487,16 @@ export function useReminder(options: ReminderOptions): Reminder {
         }
 
         if (!schedule) {
+            reportOffline(MISSING_CALENDAR_MESSAGE);
+
+            /* 概览跟着「今天」走：取不到新数据时残留昨日的列表只会误导。 */
+            overview = undefined;
+            renderStatusBar(now());
             scheduleRetry();
             return;
         }
 
+        warnedOffline = false;
         retryAttempt = 0;
         events = [];
         overview = summarizeToday(schedule);
