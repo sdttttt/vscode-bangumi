@@ -401,11 +401,18 @@ export function useReminder(options: ReminderOptions): Reminder {
             }
         }
 
-        const schedule: Schedule = buildSchedule(
-            days,
-            at,
-            settings.reminderAheadTime()
-        );
+        let schedule: Schedule;
+        try {
+            schedule = buildSchedule(days, at, settings.reminderAheadTime());
+        } catch {
+            /*
+             * 结构残缺的日程无法排程：按一次失败重试，而不是让 rejection
+             * 逃出去、提醒在本会话余下的时间里静默停摆。
+             */
+            scheduleRetry();
+            return;
+        }
+
         /*
          * 已经播报过的事件不再重新装载：否则提前量窗口横跨重建点的事件
          * 会在每次重建后立刻再响一次。
@@ -481,10 +488,11 @@ export function useReminder(options: ReminderOptions): Reminder {
         }
 
         /*
-         * 提醒关掉时状态栏条目仍然要显示「下一场更新」：静音只针对弹窗。
-         * 因此这里照常装载日程，`fire()` 会在真正到期时跳过通知。
+         * 两个开关都关才整体停摆。提醒与状态栏是各自独立的出口：
+         * 只关状态栏时照常装载日程，弹窗由 `fire()` 与 `canNotify()` 决定；
+         * 只关提醒时照常装载日程，状态栏仍显示「下一场更新」。
          */
-        if (!settings.isDisplayStatusBar()) {
+        if (!settings.isDisplayStatusBar() && !settings.isReminderEnabled()) {
             generation += 1;
             cancelRetry();
             scheduler.disarm();
