@@ -108,13 +108,20 @@ function fromBilibiliSeason(season: WBangumi): ScheduleItem {
     const delay = 1 === season.delay;
 
     return {
-        title: season.title,
+        /*
+         * 实测接口在 delay=0 时整体省略 delay 字段；pub_time 一旦缺失，
+         * Webview 的 pubTimeMinute 会在渲染期对 undefined.trim() 抛错。
+         * 字符串字段统一归一成空串，别让 undefined 流进 typed 模型。
+         */
+        title: season.title ?? "",
         cover: toHttpsUrl(season.square_cover || season.cover),
         url: toHttpsUrl(season.url),
-        pubTime: season.pub_time,
-        progress: delay ? season.delay_index : season.pub_index,
+        pubTime: season.pub_time ?? "",
+        progress: delay
+            ? (season.delay_index ?? "")
+            : (season.pub_index ?? ""),
         delay,
-        delayReason: season.delay_reason,
+        delayReason: season.delay_reason ?? "",
     };
 }
 

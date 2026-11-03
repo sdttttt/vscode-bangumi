@@ -82,13 +82,27 @@ export function toWeekDayPayloads(
 export function toBangumiPayloads(
     bangumis: Array<Bangumi>
 ): Array<BangumiPayload> {
-    return bangumis.map(bangumi => ({
-        badge: bangumi.badge,
-        cover: bangumi.cover,
-        finish: 1 === bangumi.is_finish,
-        indexShow: bangumi.index_show,
-        link: bangumi.link,
-        order: bangumi.order,
-        title: bangumi.title,
-    }));
+    /*
+     * 接口异常时可能混进 null 或缺字段的条目：undefined 直达 Webview 会在
+     * `bangumi.title.length` 之类的地方抛错，Preact 渲染树整体失败、面板
+     * 白屏。没有名字的条目没有展示价值，直接滤掉；其余缺省字段补成空串，
+     * 坏一行不能坏一页。
+     */
+    return bangumis
+        .filter(
+            (bangumi): bangumi is Bangumi =>
+                null !== bangumi &&
+                undefined !== bangumi &&
+                "object" === typeof bangumi &&
+                "string" === typeof bangumi.title
+        )
+        .map(bangumi => ({
+            badge: bangumi.badge ?? "",
+            cover: bangumi.cover ?? "",
+            finish: 1 === bangumi.is_finish,
+            indexShow: bangumi.index_show ?? "",
+            link: bangumi.link ?? "",
+            order: bangumi.order ?? "",
+            title: bangumi.title,
+        }));
 }
