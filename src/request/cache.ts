@@ -24,18 +24,30 @@ export interface Cache<T> {
  */
 export function useCache<T>(timeoutSeconds: number): Cache<T> {
     const timeout = timeoutSeconds * 1000;
-    const values = new Map<string, T>();
+    const values = new Map<string, { value: T; expiresAt: number }>();
     const timers = new Map<string, ReturnType<typeof setTimeout>>();
 
     return {
-        get: key => values.get(key),
+        /*
+         * 定时器不是精确的过期保证：宿主挂起恢复或事件循环阻塞的窗口内，
+         * 时钟可能已越过 TTL 而定时器还没触发。读取时再核对一次到期时刻，
+         * 宁可少服务一次，也不把过期条目当新鲜货。
+         */
+        get: key => {
+            const entry = values.get(key);
+            if (!entry) {
+                return undefined;
+            }
+
+            return Date.now() < entry.expiresAt ? entry.value : undefined;
+        },
         set: (key, value) => {
             const previous = timers.get(key);
             if (previous) {
                 clearTimeout(previous);
             }
 
-            values.set(key, value);
+            values.set(key, { value, expiresAt: Date.now() + timeout });
             timers.set(
                 key,
                 setTimeout(() => {

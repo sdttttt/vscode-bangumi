@@ -42,6 +42,8 @@ export function createFilterMenu(options: FilterMenuOptions): FilterMenu {
 
     /**
      * 展示目前已选标签的文案。
+     *
+     * 只在选择之后调用，而选择必然已记录标签，因此没有「无标签」的分支。
      */
     const showTags = (): void => {
         if (!settings.isDisplayIndexTags()) {
@@ -49,11 +51,6 @@ export function createFilterMenu(options: FilterMenuOptions): FilterMenu {
         }
 
         const tags = state.getTags();
-        if (0 === tags.size) {
-            notifier.error("标签：默认");
-            return;
-        }
-
         notifier.info(`已选标签：${[...tags.values()].join("、")}`);
     };
 
