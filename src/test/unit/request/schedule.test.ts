@@ -61,6 +61,34 @@ describe("toScheduleFromBilibili", () => {
         expect(schedule.days[0].items[0].progress).toBe("第3话");
     });
 
+    it("normalises missing string fields to empty strings", () => {
+        /*
+         * 复现（L8，见 TODO.md）：实测接口在 delay=0 时整体省略 delay 字段，
+         * pub_time 一旦缺失，Webview 的 pubTimeMinute 会在渲染期对
+         * undefined.trim() 抛错崩掉整个周番表。
+         */
+        const schedule = toScheduleFromBilibili([
+            weekBangumiData({
+                seasons: [
+                    wBangumi({
+                        title: undefined as unknown as string,
+                        pub_time: undefined as unknown as string,
+                        pub_index: undefined as unknown as string,
+                        delay_index: undefined as unknown as string,
+                        delay_reason: undefined as unknown as string,
+                    }),
+                ],
+            }),
+        ]);
+
+        const item = schedule.days[0].items[0];
+
+        expect(item.title).toBe("");
+        expect(item.pubTime).toBe("");
+        expect(item.progress).toBe("");
+        expect(item.delayReason).toBe("");
+    });
+
     it("uses the delay progress when the season was postponed", () => {
         const schedule = toScheduleFromBilibili([
             weekBangumiData({

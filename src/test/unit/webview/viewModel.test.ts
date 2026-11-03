@@ -272,4 +272,20 @@ describe("toBangumiPayloads", () => {
     it("returns nothing for an empty list", () => {
         expect(toBangumiPayloads([])).toHaveLength(0);
     });
+
+    it("drops entries the api mangled instead of crashing the webview", () => {
+        /*
+         * 复现（L11，见 TODO.md）：list 里混进 null 或缺 title 的条目时，
+         * undefined 直达 Webview 的 `bangumi.title.length` 抛 TypeError，
+         * Preact 渲染树整体失败、面板白屏。
+         */
+        const payloads = toBangumiPayloads([
+            null as never,
+            bangumi({ title: undefined as unknown as string }),
+            bangumi(),
+        ]);
+
+        expect(payloads).toHaveLength(1);
+        expect(payloads[0].title).toBe("测试番剧");
+    });
 });

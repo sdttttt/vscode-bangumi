@@ -151,6 +151,8 @@ export interface WBangumi {
     url: string;
 
     delay: number;
-    delay_index: string;
-    delay_reason: string;
+    /** 延期到的集数说明；接口在 delay=0 时整体省略该字段。 */
+    delay_index?: string;
+    /** 延期原因，同样可能整体缺失。 */
+    delay_reason?: string;
 }
