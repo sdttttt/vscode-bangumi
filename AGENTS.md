@@ -33,7 +33,7 @@
 - 依赖安装统一走 `.github/actions/setup` 复合 action，`pnpm` 版本取自 `package.json#packageManager`，Node 版本取自 `.nvmrc`。
 - 版本以 `package.json` 为准：标签去掉 `v` 后必须等于版本号、或以其为前缀（`v2.2.8` 与 `v2.2.8.patch3` 都算 `2.2.8`），否则发布 job 直接失败。
 - 只有 `x.y.z` 形式的版本视为正式版，`v2.3.0.beta.1` 这类会带上 `--pre-release`。
-- 令牌通过环境变量传入（`VSCE_PAT`、`OVSX_PAT`），不要写成命令行参数，否则会出现在进程列表里。
+- 发布不需要任何 PAT secret：`vsce` / `ovsx` 均以 `--oidc` 走 OpenID Connect 可信发布（工作流持有 `id-token: write`），全程没有令牌，也不要按旧文档往仓库里补 `VSCE_PAT` / `OVSX_PAT`。
 - `vsce` / `ovsx` 已装为 devDependency（`pnpm package` / `pnpm publish:vsce` / `pnpm publish:ovsx`），不要再在 CI 里 `dlx`，这样可以锁版本。
 
 ## 目录结构与职责

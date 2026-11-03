@@ -13,7 +13,6 @@
         "skipLibCheck": true,
         "experimentalDecorators": true,
         "paths": {
-            "~/*": ["./*"],
             "@/*": ["./src/*"]
         }
     },

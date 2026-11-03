@@ -9,3 +9,4 @@ resources/mincss/**
 coverage
 webview-dist
 TODO.md
+.DS_Store

@@ -5,6 +5,12 @@ on:
     push:
         tags: ["v*"]
 
+# Two tags pushed in quick succession would otherwise publish concurrently;
+# a release runs to completion before the next one starts.
+concurrency:
+    group: release
+    cancel-in-progress: false
+
 # `contents: write` is for the GitHub release, `actions: read` for downloading
 # the VSIX that `build.yml` produced in this same run, and `id-token: write`
 # for the OpenID Connect token `vsce` exchanges for a Marketplace credential.
