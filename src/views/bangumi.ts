@@ -141,8 +141,14 @@ export function createBangumiView(options: BangumiViewOptions): BangumiView {
             };
 
             const text = await notifier.ask(inputOptions);
+
+            /* 用户按 Esc 取消输入：取消即静默，不该弹输入错误的提示。 */
+            if (undefined === text) {
+                return;
+            }
+
             const number = toNumber(text);
-            if (0 === number) {
+            if (!Number.isInteger(number) || 1 > number) {
                 notifier.info("页码必须是大于 0 的数字，大小不做限制。");
                 return;
             }
