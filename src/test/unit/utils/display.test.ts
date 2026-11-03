@@ -29,4 +29,16 @@ describe("upcomingMessage", () => {
             "《甲》、《乙》 还有10分钟就更新啦！"
         );
     });
+
+    it("switches to hours once the remainder reaches an hour", () => {
+        expect(upcomingMessage("咒术回战", 90)).toBe(
+            "《咒术回战》 还有1小时30分钟就更新啦！"
+        );
+    });
+
+    it("drops the trailing minutes on a whole hour", () => {
+        expect(upcomingMessage("咒术回战", 1440)).toBe(
+            "《咒术回战》 还有24小时就更新啦！"
+        );
+    });
 });

@@ -44,6 +44,32 @@ describe("createSettings", () => {
         expect(settings.reminderAheadTime()).toBe(0);
     });
 
+    it("falls back to zero for a non numeric lead time", () => {
+        /*
+         * 复现（M9，见 TODO.md）：isNaN 对字符串先隐式转型，"30" 原样
+         * 透传成字符串，接口声明 number 全靠下游隐式转型侥幸成立。
+         */
+        stubConfig({ [ConfigKey.ReminderAheadTime]: "30" });
+
+        expect(settings.reminderAheadTime()).toBe(0);
+    });
+
+    it("falls back to zero for an infinite lead time", () => {
+        stubConfig({ [ConfigKey.ReminderAheadTime]: Number.POSITIVE_INFINITY });
+
+        expect(settings.reminderAheadTime()).toBe(0);
+    });
+
+    it("caps the lead time at one day", () => {
+        /*
+         * 复现（M9，见 TODO.md）：按毫秒习惯填 600000（本意 10 分钟）会把
+         * 地平线内全部事件钳到当下，启动瞬间通知轰炸。
+         */
+        stubConfig({ [ConfigKey.ReminderAheadTime]: 600_000 });
+
+        expect(settings.reminderAheadTime()).toBe(86_400);
+    });
+
     it("treats the reminder as enabled unless explicitly disabled", () => {
         stubConfig({});
 
@@ -54,6 +80,22 @@ describe("createSettings", () => {
         stubConfig({ [ConfigKey.EnableReminder]: false });
 
         expect(settings.isReminderEnabled()).toBe(false);
+    });
+
+    it("treats a hand broken boolean as off", () => {
+        /*
+         * 复现（L1，见 TODO.md）：手写 "false"（字符串）是非空字符串、
+         * 真值，按「开」处理——设置界面显示已关，提醒却照弹。
+         */
+        stubConfig({
+            [ConfigKey.EnableReminder]: "false",
+            [ConfigKey.DisplayHistory]: "false",
+            [ConfigKey.DisplayStatusBar]: "false",
+        });
+
+        expect(settings.isReminderEnabled()).toBe(false);
+        expect(settings.isDisplayHistory()).toBe(false);
+        expect(settings.isDisplayStatusBar()).toBe(false);
     });
 
     it("reads the display index tags flag", () => {
