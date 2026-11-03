@@ -76,6 +76,39 @@ describe("useScheduler", () => {
         expect(fired).toEqual(["甲", "乙", "丙"]);
     });
 
+    it("keeps consuming when an event callback throws", () => {
+        /*
+         * 复现（L5，见 TODO.md）：tick 的事件回调无异常隔离，同步抛出会
+         * 中断 while 循环——此刻定时器已置空，剩余到期事件不再消费，
+         * 调度器静默停摆到下次设置变更。
+         */
+        const fired: Array<string> = [];
+        const scheduler = useScheduler(
+            {
+                onEvent: incoming => {
+                    if ("甲" === incoming.titles[0]) {
+                        throw new Error("boom");
+                    }
+                    fired.push(incoming.titles[0]);
+                },
+                onRollover: vi.fn(),
+            },
+            Date.now
+        );
+        const now = Date.now();
+
+        scheduler.arm(
+            schedule([
+                event(now + 1_000, "甲"),
+                event(now + 1_000, "乙"),
+                event(now + 2_000, "丙"),
+            ])
+        );
+
+        expect(() => vi.advanceTimersByTime(2_000)).not.toThrow();
+        expect(fired).toEqual(["乙", "丙"]);
+    });
+
     it("skips an event missed beyond the grace window", () => {
         const onEvent = vi.fn();
         const scheduler = useScheduler(

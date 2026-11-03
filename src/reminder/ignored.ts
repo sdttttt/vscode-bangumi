@@ -119,7 +119,17 @@ export function addIgnored(
     const ignoredAt = stampOf(now);
     const result = [...entries];
 
-    for (const title of titles) {
+    for (const raw of titles) {
+        const title = raw.trim();
+
+        /*
+         * 与 normalizeIgnored 的合法性判定保持一致：空白标题写进去也会在
+         * 下次读取时被丢弃，再触发一次 prune 重写设置文件，不如不写。
+         */
+        if ("" === title) {
+            continue;
+        }
+
         const index = result.findIndex(entry => entry.title === title);
         if (0 > index) {
             result.push({ title, ignoredAt });

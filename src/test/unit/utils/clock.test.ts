@@ -99,6 +99,24 @@ describe("isCurrentDay", () => {
             isCurrentDay({ date: "4-1", date_ts: 0, is_today: 0 }, now)
         ).toBe(false);
     });
+
+    it("matches zero padded date strings", () => {
+        /*
+         * 复现（L7，见 TODO.md）：dayKey 产出无填充的 `3-5`，接口若返回
+         * `03-05`，字符串回退比较会失配。按数值归一后两种写法都成立。
+         */
+        const now = atUtc8(2026, 3, 5, 12);
+
+        expect(
+            isCurrentDay({ date: "03-05", date_ts: 0, is_today: 0 }, now)
+        ).toBe(true);
+        expect(
+            isCurrentDay({ date: "3-5", date_ts: 0, is_today: 0 }, now)
+        ).toBe(true);
+        expect(
+            isCurrentDay({ date: "03-06", date_ts: 0, is_today: 0 }, now)
+        ).toBe(false);
+    });
 });
 
 describe("dayDistance", () => {

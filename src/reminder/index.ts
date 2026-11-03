@@ -355,6 +355,9 @@ export function useReminder(options: ReminderOptions): Reminder {
                 if (chosen) {
                     commands.execute("weekBangumi");
                 }
+            })
+            .catch(() => {
+                /* 通知交互失败不能变成 unhandled rejection：日程照常推进。 */
             });
     };
 

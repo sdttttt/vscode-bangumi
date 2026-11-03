@@ -91,6 +91,21 @@ export function yearOf(epochMs: number): number {
 }
 
 /**
+ * 比较两个 `月-日` 键是否为同一天，按数值归一。
+ *
+ * 接口的 `date` 不保证零填充（`3-5` 与 `03-05` 都可能出现），字符串直比会
+ * 在回退路径上失配。
+ *
+ * @author sdttttt
+ */
+function sameDayKey(left: string, right: string): boolean {
+    const [leftMonth, leftDate] = left.split("-").map(Number);
+    const [rightMonth, rightDate] = right.split("-").map(Number);
+
+    return leftMonth === rightMonth && leftDate === rightDate;
+}
+
+/**
  * 给定时刻之后最近的 UTC+8 午夜的毫秒时间戳。
  *
  * @author sdttttt
@@ -115,7 +130,7 @@ export function isCurrentDay(day: DayStamp, now: number): boolean {
     if (0 < day.date_ts) {
         return dayKey(day.date_ts * 1000) === dayKey(now);
     }
-    return day.date === dayKey(now);
+    return sameDayKey(day.date, dayKey(now));
 }
 
 /**
