@@ -63,9 +63,25 @@ describe("getCalendar", () => {
         expect(getJson).toHaveBeenCalledTimes(2);
     });
 
-    it("reports a network failure instead of rejecting", async () => {
+    it("returns undefined without reporting on a network failure", async () => {
         vi.mocked(getJson).mockRejectedValue(new Error("timeout"));
 
         await expect(api.getCalendar()).resolves.toBeUndefined();
+    });
+
+    it("filters unusable days before caching", async () => {
+        /*
+         * 复现（M4，见 TODO.md）：校验只要求「至少一天可用」，坏天会随
+         * 整包进缓存并在适配器里炸掉整页——哪怕其余六天完好。
+         */
+        vi.mocked(getJson).mockResolvedValue([
+            bgmCalendarDay(),
+            null,
+            bgmCalendarDay({ items: [] }),
+        ]);
+
+        const days = await api.getCalendar();
+
+        expect(days).toHaveLength(1);
     });
 });

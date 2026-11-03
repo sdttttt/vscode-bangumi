@@ -100,6 +100,22 @@ describe("toScheduleFromBilibili", () => {
 });
 
 describe("toScheduleFromBgmTv", () => {
+    it("drops items without an air date instead of crashing", () => {
+        /*
+         * 复现（M4，见 TODO.md）：items 里混进 null 或缺 air_date 的条目
+         * 时，排序比较器直接读不到字段抛 TypeError，整页渲染失败。
+         */
+        const days = [bgmCalendarDay({ items: [bgmSubject(), null as never] })];
+
+        const schedule = toScheduleFromBgmTv(days, SATURDAY_NOON);
+
+        const total = schedule.days.reduce(
+            (count, day) => count + day.items.length,
+            0
+        );
+        expect(total).toBe(1);
+    });
+
     it("marks the source as slot-less", () => {
         const schedule = toScheduleFromBgmTv(bgmCalendar(), SATURDAY_NOON);
 

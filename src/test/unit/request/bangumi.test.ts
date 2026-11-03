@@ -137,6 +137,28 @@ describe("getAllBangumi", () => {
          */
         expect(notifier.info).not.toHaveBeenCalled();
     });
+
+    it("shares one request between concurrent calls for the same url", async () => {
+        /*
+         * 复现（L13，见 TODO.md）：午夜 rollover 的提醒刷新与用户打开面板
+         * 并发时，同一地址此前会发两次请求、写两次缓存。
+         */
+        let resolveJson: (value: unknown) => void = () => undefined;
+        vi.mocked(getJson).mockReturnValue(
+            new Promise(resolve => {
+                resolveJson = resolve;
+            })
+        );
+        const url = buildBangumiUrl(DEFAULT_QUERY, 1);
+
+        const first = api.getAllBangumi(url);
+        const second = api.getAllBangumi(url);
+
+        resolveJson({ code: 0, message: "success", data: bangumisData() });
+        await Promise.all([first, second]);
+
+        expect(getJson).toHaveBeenCalledTimes(1);
+    });
 });
 
 describe("getWeekBangumi", () => {
@@ -184,7 +206,7 @@ describe("getWeekBangumi", () => {
         expect(getJson).toHaveBeenCalledTimes(1);
     });
 
-    it("warns the user and returns undefined for an empty schedule", async () => {
+    it("returns undefined without reporting for an empty schedule", async () => {
         vi.mocked(getJson).mockResolvedValue({
             code: 0,
             message: "success",
@@ -192,6 +214,13 @@ describe("getWeekBangumi", () => {
         });
 
         await expect(api.getWeekBangumi()).resolves.toBeUndefined();
+
+        /*
+         * 数据层保持静默（M10，见 TODO.md）：这条提示原本会在离线重试的
+         * 每一轮都弹一次。何时提示由调用方决定——提醒按失败序列只报一次，
+         * 视图有「未找到」页面兜底。
+         */
+        expect(notifier.info).not.toHaveBeenCalled();
     });
 
     it("does not cache an empty schedule", async () => {
@@ -207,10 +236,11 @@ describe("getWeekBangumi", () => {
         expect(getJson).toHaveBeenCalledTimes(2);
     });
 
-    it("reports a network failure instead of rejecting", async () => {
+    it("returns undefined without reporting on a network failure", async () => {
         vi.mocked(getJson).mockRejectedValue(new Error("timeout"));
 
         await expect(api.getWeekBangumi()).resolves.toBeUndefined();
+        expect(notifier.info).not.toHaveBeenCalled();
     });
 
     it("returns undefined for an unsuccessful response", async () => {

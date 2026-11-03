@@ -91,6 +91,30 @@ export interface BgmImages {
 }
 
 /**
+ * 单天每日放送是否为可用数据。
+ *
+ * 星期是分组依据：适配器无条件读 `weekday.id`，缺了它会让归一过程抛错；
+ * 条目数组是遍历对象，缺失同样如此。
+ *
+ * @param day 每日放送的某一天
+ * @returns 这一天可参与归一时返回 true
+ * @author sdttttt
+ */
+export function isUsableCalendarDay(day: unknown): day is BgmCalendarDay {
+    if (undefined === day || null === day) {
+        return false;
+    }
+
+    const entry = day as BgmCalendarDay;
+
+    return (
+        Array.isArray(entry.items) &&
+        0 < entry.items.length &&
+        "number" === typeof entry.weekday?.id
+    );
+}
+
+/**
  * 每日放送是否为可用数据。
  *
  * 接口没有响应包装，因此只检查是否至少有一天带条目。
@@ -100,25 +124,5 @@ export interface BgmImages {
  * @author sdttttt
  */
 export function isValidCalendar(days: unknown): days is Array<BgmCalendarDay> {
-    if (!Array.isArray(days)) {
-        return false;
-    }
-
-    return days.some(day => {
-        if (undefined === day || null === day) {
-            return false;
-        }
-
-        const entry = day as BgmCalendarDay;
-
-        /*
-         * 星期是分组依据：适配器无条件读 `weekday.id`，缺了它会让归一过程抛错，
-         * 而那时响应已经写进缓存，面板会一直停在「加载中」。
-         */
-        return (
-            Array.isArray(entry.items) &&
-            0 < entry.items.length &&
-            "number" === typeof entry.weekday?.id
-        );
-    });
+    return Array.isArray(days) && days.some(isUsableCalendarDay);
 }
