@@ -1,8 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/preact";
+import { act, fireEvent, render, screen } from "@testing-library/preact";
 import { BgmTvWeek } from "@webview/components/week/BgmTvWeek";
+import { NOW_TICK_MS } from "@webview/components/week/marker";
 import { assets } from "@webview/test/fixtures";
-import { bgmDay, season } from "@webview/test/week";
+import { AT_09_30, bgmDay, season } from "@webview/test/week";
 
 describe("BgmTvWeek", () => {
     it("renders no time point without a publication slot", () => {
@@ -156,7 +157,11 @@ describe("BgmTvWeek", () => {
     });
     it("marks the current day with the today badge", () => {
         const { container } = render(
-            <BgmTvWeek days={[bgmDay({ isToday: true })]} assets={assets} />
+            <BgmTvWeek
+                days={[bgmDay({ isToday: true })]}
+                assets={assets}
+                now={AT_09_30}
+            />
         );
 
         expect(container.querySelector(".item.today")).toBeTruthy();
@@ -167,7 +172,11 @@ describe("BgmTvWeek", () => {
 
     it("hides the today badge when no assets were sent", () => {
         const { container } = render(
-            <BgmTvWeek days={[bgmDay({ isToday: true })]} assets={undefined} />
+            <BgmTvWeek
+                days={[bgmDay({ isToday: true })]}
+                assets={undefined}
+                now={AT_09_30}
+            />
         );
 
         expect(container.querySelector(".today-badge")).toBeNull();
@@ -176,12 +185,42 @@ describe("BgmTvWeek", () => {
     it("styles the current day header differently", () => {
         const { container } = render(
             <BgmTvWeek
-                days={[bgmDay({ isToday: true }), bgmDay({ date: "1-2" })]}
+                days={[bgmDay({ isToday: true }), bgmDay({ date: "10-30" })]}
                 assets={assets}
+                now={AT_09_30}
             />
         );
 
         expect(container.querySelectorAll(".day-title-today")).toHaveLength(1);
+    });
+
+    it("stops marking the day once the clock crosses midnight", () => {
+        /*
+         * 复现（H4，见 TODO.md）：isToday 是宿主推送的静态载荷，面板跨过
+         * UTC+8 午夜后它就过期了——「今天」徽标与样式不能一直挂在昨天的列上。
+         */
+        vi.useFakeTimers();
+        /* 2026-10-31 23:59 UTC+8。 */
+        vi.setSystemTime(Date.UTC(2026, 9, 31, 15, 59));
+
+        try {
+            const { container } = render(
+                <BgmTvWeek days={[bgmDay({ isToday: true })]} assets={assets} />
+            );
+
+            expect(container.querySelector(".item.today")).toBeTruthy();
+
+            /* 2026-11-01 00:01 UTC+8；让时钟订阅走一拍才会重渲染。 */
+            vi.setSystemTime(Date.UTC(2026, 9, 31, 16, 1));
+            act(() => {
+                vi.advanceTimersByTime(NOW_TICK_MS);
+            });
+
+            expect(container.querySelector(".item.today")).toBeNull();
+            expect(container.querySelector(".today-badge")).toBeNull();
+        } finally {
+            vi.useRealTimers();
+        }
     });
 
     it("links every subject to its page", () => {

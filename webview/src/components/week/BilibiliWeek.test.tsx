@@ -28,7 +28,11 @@ describe("BilibiliWeek", () => {
 
     it("marks the current day and shows its badge", () => {
         const { container } = render(
-            <BilibiliWeek days={[day({ isToday: true })]} assets={assets} />
+            <BilibiliWeek
+                days={[day({ isToday: true })]}
+                assets={assets}
+                now={AT_09_30}
+            />
         );
 
         expect(container.querySelector(".item.today")).toBeTruthy();
@@ -39,7 +43,11 @@ describe("BilibiliWeek", () => {
 
     it("hides the badge when no assets were sent", () => {
         const { container } = render(
-            <BilibiliWeek days={[day({ isToday: true })]} assets={undefined} />
+            <BilibiliWeek
+                days={[day({ isToday: true })]}
+                assets={undefined}
+                now={AT_09_30}
+            />
         );
 
         expect(container.querySelector(".today-badge")).toBeNull();
@@ -175,10 +183,11 @@ describe("BilibiliWeek", () => {
             render(
                 <BilibiliWeek
                     days={[
-                        day({ date: "1-1" }),
-                        day({ date: "1-2", isToday: true }),
+                        day({ date: "10-30" }),
+                        day({ isToday: true }),
                     ]}
                     assets={assets}
+                    now={AT_09_30}
                 />
             );
 
@@ -212,8 +221,8 @@ describe("now marker", () => {
         const { container } = render(
             <BilibiliWeek
                 days={[
-                    day({ date: "1-1", isToday: false }),
-                    day({ date: "1-2", isToday: true }),
+                    day({ date: "10-30", isToday: false }),
+                    day({ isToday: true }),
                 ]}
                 assets={assets}
                 now={AT_09_30}
@@ -415,6 +424,47 @@ describe("now marker", () => {
         );
 
         expect(container.querySelector(".now-marker")).toBeNull();
+    });
+
+    it("stops marking and counting down once the clock crosses midnight", () => {
+        /*
+         * 复现（H4，见 TODO.md）：isToday 是宿主推送的静态载荷，面板跨过
+         * UTC+8 午夜后它就过期了——标记若继续按新一天的分钟数在昨天的
+         * 时刻表上倒计时，只会指向早已播完的时段。
+         */
+        vi.useFakeTimers();
+        /* 2026-10-31 23:59 UTC+8：当天已播完。 */
+        vi.setSystemTime(Date.UTC(2026, 9, 31, 15, 59));
+
+        try {
+            const { container } = render(
+                <BilibiliWeek
+                    days={[
+                        day({
+                            isToday: true,
+                            seasons: [season({ pubTime: "20:00" })],
+                        }),
+                    ]}
+                    assets={assets}
+                />
+            );
+
+            expect(
+                container.querySelector(".now-marker")?.textContent
+            ).toContain(NOW_DONE_LABEL);
+
+            /* 2026-11-01 00:01 UTC+8；让时钟订阅走一拍才会重渲染。 */
+            vi.setSystemTime(Date.UTC(2026, 9, 31, 16, 1));
+            act(() => {
+                vi.advanceTimersByTime(NOW_TICK_MS);
+            });
+
+            expect(container.querySelector(".item.today")).toBeNull();
+            expect(container.querySelector(".now-marker")).toBeNull();
+            expect(container.querySelector(".today-badge")).toBeNull();
+        } finally {
+            vi.useRealTimers();
+        }
     });
 });
 

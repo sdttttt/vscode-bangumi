@@ -25,6 +25,40 @@ describe("groupByPubTime", () => {
         expect(groups[1].pubTime).toBe("21:00");
     });
 
+    it("orders the groups by time even when the api returns them out of order", () => {
+        /*
+         * 复现（M12，见 TODO.md）：适配器保持接口原序，「已按 pub_time 升序」
+         * 只是未强制的假设——乱序时倒计时会指向列表顺序上的下一场，而不是
+         * 时间上最近的一场。
+         */
+        const groups = groupByPubTime([
+            season({ pubTime: "23:00", url: "a" }),
+            season({ pubTime: "20:00", url: "b" }),
+        ]);
+
+        expect(groups.map(group => group.pubTime)).toEqual(["20:00", "23:00"]);
+    });
+
+    it("merges repeated times that are not adjacent", () => {
+        const groups = groupByPubTime([
+            season({ pubTime: "20:00", url: "a" }),
+            season({ pubTime: "21:00", url: "b" }),
+            season({ pubTime: "20:00", url: "c" }),
+        ]);
+
+        expect(groups.map(group => group.pubTime)).toEqual(["20:00", "21:00"]);
+        expect(groups[0].seasons).toHaveLength(2);
+    });
+
+    it("keeps unparseable times at the end without breaking the scan", () => {
+        const groups = groupByPubTime([
+            season({ pubTime: "拖更了", url: "a" }),
+            season({ pubTime: "20:00", url: "b" }),
+        ]);
+
+        expect(groups.map(group => group.pubTime)).toEqual(["20:00", "拖更了"]);
+    });
+
     it("returns no group for an empty list", () => {
         expect(groupByPubTime([])).toHaveLength(0);
     });
