@@ -487,6 +487,127 @@ describe("Reminder", () => {
         reminder.dispose();
     });
 
+    it("keeps the reminder alive when only the status bar is off", async () => {
+        /*
+         * 复现（M1，见 TODO.md）：原实现里 DisplayStatusBar=false 会整体
+         * 杀死调度，与「EnableReminder 只控制弹窗，状态栏单独控制」的约定
+         * 矛盾——用户只想藏状态栏，结果再也收不到提醒。
+         */
+        settings.values["bangumiOpen.DisplayStatusBar"] = false;
+        const source = vi.fn(() => Promise.resolve(today({ offsetSeconds: 60 })));
+        const { reminder, notifier } = createHarness(source, settings);
+
+        await reminder.start();
+
+        /* 日程照常装载，到期照常弹窗。 */
+        expect(source).toHaveBeenCalled();
+        vi.advanceTimersByTime(60_000);
+        expect(notifier.actions).toHaveBeenCalled();
+
+        /* 状态栏本身仍然不显示。 */
+        expect(statusBar.show).not.toHaveBeenCalled();
+        reminder.dispose();
+    });
+
+    it("stays schedulable when a season has no usable pub_ts", async () => {
+        /*
+         * 复现（M2，见 TODO.md）：缺失/非数值的 pub_ts 穿过守卫生成 at=NaN
+         * 的事件，armNext 里 Math.min(NaN, …) 非有限直接 return——调度器
+         * 不装任何定时器，rollover 也从此停摆。
+         */
+        const { reminder } = createHarness(
+            () =>
+                Promise.resolve([
+                    weekBangumiData({
+                        date: "10-31",
+                        is_today: 1,
+                        seasons: [
+                            wBangumi({
+                                title: "坏数据番剧",
+                                pub_time: "20:00",
+                                pub_ts: undefined as unknown as number,
+                            }),
+                        ],
+                    }),
+                ]),
+            settings
+        );
+
+        await reminder.start();
+
+        /* NaN 事件被过滤后，日程里至少还有 rollover 定时器。 */
+        expect(vi.getTimerCount()).toBe(1);
+        reminder.dispose();
+    });
+
+    it("keeps the rollover alive when a broken season sits next to a valid one", async () => {
+        /*
+         * 复现（M2，见 TODO.md）：NaN 事件无论排在有效事件前后，消费完
+         * 之后 armNext 都会被 NaN 卡死，跨日滚动不再发生。
+         */
+        const source = vi.fn(() =>
+            Promise.resolve([
+                weekBangumiData({
+                    date: "10-31",
+                    is_today: 1,
+                    seasons: [
+                        wBangumi({
+                            title: "坏数据番剧",
+                            pub_time: "20:00",
+                            pub_ts: undefined as unknown as number,
+                        }),
+                        wBangumi({
+                            title: "正常番剧",
+                            pub_time: "12:01",
+                            pub_ts: Math.floor(Date.now() / 1000) + 60,
+                        }),
+                    ],
+                }),
+            ])
+        );
+        const { reminder, notifier } = createHarness(source, settings);
+
+        await reminder.start();
+        vi.advanceTimersByTime(60_000);
+        expect(notifier.actions).toHaveBeenCalled();
+
+        /* 跨日滚动必须照常拉取新日程。 */
+        await vi.advanceTimersByTimeAsync(
+            nextDayStart(Date.now()) - Date.now() + 5 * 60 * 1000
+        );
+        expect(source.mock.calls.length).toBeGreaterThan(1);
+        reminder.dispose();
+    });
+
+    it("retries when the schedule data cannot be built", async () => {
+        /*
+         * 复现（M3，见 TODO.md）：buildSchedule 原先在 try 之外，结构残缺
+         * 的响应让 refresh 直接 reject，scheduleRetry 永远不会执行——提醒
+         * 静默死亡直到下次设置变更。
+         */
+        const source = vi.fn(() =>
+            Promise.resolve([
+                weekBangumiData({
+                    date: "10-31",
+                    is_today: 1,
+                    seasons: undefined as unknown as ReturnType<
+                        typeof wBangumi
+                    >[],
+                }),
+            ])
+        );
+        const reminder = createReminder(source, settings);
+
+        await reminder.start();
+
+        /* 构建失败按一次失败处理：安排重试而不是整体崩掉。 */
+        expect(vi.getTimerCount()).toBe(1);
+
+        await vi.advanceTimersByTimeAsync(30_000);
+        expect(source).toHaveBeenCalledTimes(2);
+        reminder.dispose();
+    });
+
     it("warns once when the schedule has no entry for today", async () => {
         const { reminder, notifier } = createHarness(
             () =>

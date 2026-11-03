@@ -73,7 +73,15 @@ export function buildEvents(
 
     for (const day of days) {
         for (const season of day.seasons) {
-            if (isDelayed(season) || 0 >= season.pub_ts) {
+            /*
+             * 缺失或非数值的 pub_ts 必须在这里拦下：NaN 能穿过 `0 >=` 与
+             * 后面的比较，最终生成 at=NaN 的事件把调度器的装弹卡死。
+             */
+            if (
+                isDelayed(season) ||
+                !Number.isFinite(season.pub_ts) ||
+                0 >= season.pub_ts
+            ) {
                 continue;
             }
             const group = groups.get(season.pub_ts);
