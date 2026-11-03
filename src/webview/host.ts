@@ -75,6 +75,19 @@ export function createWebviewHost(extensionPath: string): WebviewHost {
      */
     const nonce = (): string => randomBytes(16).toString("hex");
 
+    /**
+     * 转义文本中的 HTML 特殊字符。
+     *
+     * title 目前只来自静态常量，但 html() 是公开接口：转义让任何动态标题
+     * 都无法把标记注入文档头部。
+     */
+    const escapeHtml = (text: string): string =>
+        text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+
     return {
         options: () => ({
             enableScripts: true,
@@ -110,7 +123,7 @@ export function createWebviewHost(extensionPath: string): WebviewHost {
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="${csp}">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${title}</title>
+<title>${escapeHtml(title)}</title>
 <link rel="stylesheet" href="${style}">
 </head>
 <body>

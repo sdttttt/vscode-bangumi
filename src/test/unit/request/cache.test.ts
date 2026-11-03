@@ -34,6 +34,20 @@ describe("useCache", () => {
         expect(cache.get("key")).toBeUndefined();
     });
 
+    it("does not serve an entry whose ttl passed while the timers were idle", () => {
+        /*
+         * 复现（L14，见 TODO.md）：过期只由定时器驱动——宿主挂起恢复或
+         * 事件循环阻塞的窗口内，时钟已越过 TTL 但定时器还没触发，get
+         * 不该把过期条目当新鲜货端出来。
+         */
+        const cache = useCache<number>(1);
+        cache.set("key", 1);
+
+        vi.setSystemTime(Date.now() + 5_000);
+
+        expect(cache.get("key")).toBeUndefined();
+    });
+
     it("keeps the newest value when the same key is written twice", () => {
         const cache = useCache<number>(10);
         cache.set("key", 1);

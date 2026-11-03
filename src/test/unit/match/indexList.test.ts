@@ -247,6 +247,23 @@ describe("createFilterMenu", () => {
         expect(h.notifier.error).not.toHaveBeenCalled();
     });
 
+    it("never uses the error channel for tag announcements", async () => {
+        /*
+         * L21（见 TODO.md）：「标签：默认」分支不可达——showTags 只在
+         * 选择之后调用，而选择必然已记录标签。这里固定错误通道零参与，
+         * 防止它被重新引入。
+         */
+        await pickFrom(h, SeasonVersionList, "电影");
+        h.notifier.error.mockClear();
+
+        h.menu.open(StyleList);
+        await vi.waitFor(() => {
+            expect(h.notifier.pick).toHaveBeenCalled();
+        });
+
+        expect(h.notifier.error).not.toHaveBeenCalled();
+    });
+
     it("does nothing when the list is dismissed", async () => {
         h.notifier.pick.mockResolvedValue(undefined);
 

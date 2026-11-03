@@ -146,4 +146,19 @@ describe("html", () => {
 
         expect(html).not.toContain("<script>");
     });
+
+    it("escapes html special characters in the title", () => {
+        /*
+         * 复现（L3，见 TODO.md）：title 目前只来自静态常量，但 html() 是
+         * 公开接口——动态标题里的标记不应被原样注入文档头部。
+         */
+        const html = host.html(
+            makeWebview(),
+            "</title><script>alert(1)</script>"
+        );
+
+        expect(html).toContain(
+            "<title>&lt;/title&gt;&lt;script&gt;alert(1)&lt;/script&gt;</title>"
+        );
+    });
 });
