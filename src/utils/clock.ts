@@ -80,6 +80,17 @@ export function weekDayOf(epochMs: number): number {
 }
 
 /**
+ * 给定时刻所在的 UTC+8 年份。
+ *
+ * 年份筛选的菜单按它生成「今年」，与 B 站的日界保持同一套时钟。
+ *
+ * @author sdttttt
+ */
+export function yearOf(epochMs: number): number {
+    return new Date(toBilibiliTime(epochMs)).getUTCFullYear();
+}
+
+/**
  * 给定时刻之后最近的 UTC+8 午夜的毫秒时间戳。
  *
  * @author sdttttt

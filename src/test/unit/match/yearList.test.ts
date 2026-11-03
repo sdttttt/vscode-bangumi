@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { decodeYear } from "@/match/yearList";
+import { decodeYear, buildYearChoices } from "@/match/yearList";
 import YearList from "@/match/yearList";
 import { createFilterMenu } from "@/match/indexList";
 import { useAppState, type AppStore } from "@/state/app";
@@ -70,6 +70,84 @@ describe("decodeYear", () => {
     });
 });
 
+describe("year choices", () => {
+    it("offers the current UTC+8 year as a choice", () => {
+        const currentYear = new Date(Date.now() + 8 * 60 * 60 * 1000)
+            .getUTCFullYear()
+            .toString();
+
+        expect(YearList.choices).toContain(currentYear);
+    });
+
+    it.each([
+        [
+            /* 2026-11-03 12:00 UTC+8：个体年份向下对齐到区间档网格。 */
+            Date.UTC(2026, 10, 3, 4, 0),
+            [
+                "2026",
+                "2025",
+                "2024",
+                "2023",
+                "2022",
+                "2021",
+                "2020",
+                "2015-2019",
+                "2010-2014",
+                "2005-2009",
+                "2000-2004",
+                "90年代",
+                "80年代",
+                "很久很久以前",
+            ],
+        ],
+        [
+            /* 2030-06-01 08:00 UTC+8：恰好 6 个个体，多出一档 2020-2024。 */
+            Date.UTC(2030, 5, 1, 0, 0),
+            [
+                "2030",
+                "2029",
+                "2028",
+                "2027",
+                "2026",
+                "2025",
+                "2020-2024",
+                "2015-2019",
+                "2010-2014",
+                "2005-2009",
+                "2000-2004",
+                "90年代",
+                "80年代",
+                "很久很久以前",
+            ],
+        ],
+        [
+            /* 2029-06-01 08:00 UTC+8：个体延伸到 2020 补上与区间档之间的缝。 */
+            Date.UTC(2029, 5, 1, 0, 0),
+            [
+                "2029",
+                "2028",
+                "2027",
+                "2026",
+                "2025",
+                "2024",
+                "2023",
+                "2022",
+                "2021",
+                "2020",
+                "2015-2019",
+                "2010-2014",
+                "2005-2009",
+                "2000-2004",
+                "90年代",
+                "80年代",
+                "很久很久以前",
+            ],
+        ],
+    ])("builds the menu for the given moment", (epochMs, expected) => {
+        expect(buildYearChoices(epochMs)).toEqual(expected);
+    });
+});
+
 describe("year filter", () => {
     let h: Harness;
 
@@ -78,7 +156,6 @@ describe("year filter", () => {
     });
 
     it.each([
-        ["2020", "[2020,2021)"],
         ["90年代", "[1990,2000)"],
         ["80年代", "[1980,1990)"],
         ["很久很久以前", "[,1980)"],
@@ -90,16 +167,26 @@ describe("year filter", () => {
         expect(h.state.getQuery().year).toBe(encodeURI(expected));
     });
 
+    it("writes the current year into the year parameter", async () => {
+        /* 菜单首项按构造就是今年，用它驱动避免用例随年份腐坏。 */
+        const choice = YearList.choices[0];
+        const year = Number(choice);
+
+        await pick(h, choice);
+
+        expect(h.state.getQuery().year).toBe(encodeURI(`[${year},${year + 1})`));
+    });
+
     it("keeps the other filters untouched", async () => {
         h.state.setQuery({ area: "2" });
 
-        await pick(h, "2020");
+        await pick(h, YearList.choices[0]);
 
         expect(h.state.getQuery().area).toBe("2");
     });
 
     it("opens the bangumi view after a choice is made", async () => {
-        await pick(h, "2020");
+        await pick(h, YearList.choices[0]);
 
         expect(h.commands.execute).toHaveBeenCalledWith("openBangumi");
     });
