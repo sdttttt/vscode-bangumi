@@ -37,15 +37,20 @@ function BangumiRow({ bangumi }: { bangumi: BangumiPayload }) {
         );
 
     return (
-        <a class="cover" href={bangumi.link} title={bangumi.title}>
+        <a
+            class="cover"
+            href={bangumi.link || undefined}
+            title={bangumi.title}>
             <span class="cover-media">
-                <img
-                    class="cover-image"
-                    src={bangumi.cover}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                />
+                {bangumi.cover ? (
+                    <img
+                        class="cover-image"
+                        src={bangumi.cover}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                    />
+                ) : null}
             </span>
             <div class="cover-body">
                 <div class="cover-head">
@@ -98,7 +103,10 @@ export function BangumiList({
             <div class="board">
                 <div class="bangumi-grid">
                     {bangumis.map(bangumi => (
-                        <BangumiRow key={bangumi.link} bangumi={bangumi} />
+                        <BangumiRow
+                            key={bangumi.link || bangumi.title}
+                            bangumi={bangumi}
+                        />
                     ))}
                 </div>
             </div>

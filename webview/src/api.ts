@@ -1,6 +1,37 @@
 import type { ViewState, WebviewCommand } from "@shared/webview/protocol";
 
 /**
+ * 状态推送里合法的视图种类。
+ *
+ * @author sdttttt
+ */
+const KNOWN_KINDS: ReadonlySet<string> = new Set([
+    "loading",
+    "notFound",
+    "bangumi",
+    "weekBangumi",
+]);
+
+/**
+ * 判断一份来路不明的数据是否为宿主推送的状态。
+ *
+ * 宿主与页面共用同一个 `window.message` 通道：形状不对的杂音不能进状态机，
+ * 更不能被持久化——否则文档重建时首渲染即抛错，`ready` 永远发不出去，
+ * 面板从此空白。
+ *
+ * @author sdttttt
+ */
+function isViewState(value: unknown): value is ViewState {
+    if ("object" !== typeof value || null === value) {
+        return false;
+    }
+
+    const kind = (value as { kind?: unknown }).kind;
+
+    return "string" === typeof kind && KNOWN_KINDS.has(kind);
+}
+
+/**
  * VS Code 注入到每个 Webview 的 API 的类型化封装。
  *
  * 每个文档只允许调用一次 `acquireVsCodeApi`，因此各模块统一走这个单例，
@@ -56,7 +87,11 @@ export function send(command: WebviewCommand): void {
 export function onHostMessage(
     listener: (state: ViewState) => void
 ): () => void {
-    const handler = (event: MessageEvent<ViewState>): void => {
+    const handler = (event: MessageEvent): void => {
+        if (!isViewState(event.data)) {
+            return;
+        }
+
         listener(event.data);
     };
     window.addEventListener("message", handler);

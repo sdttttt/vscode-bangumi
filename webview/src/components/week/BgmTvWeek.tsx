@@ -22,15 +22,20 @@ import { SourceNote, SourceSwitch } from "./SourceNote";
  */
 function SeasonRow({ season }: { season: SeasonPayload }) {
     return (
-        <a class="bangumi" href={season.url} title={season.title}>
+        <a
+            class="bangumi"
+            href={season.url || undefined}
+            title={season.title}>
             <span class="season-poster">
-                <img
-                    class="season-poster-image"
-                    alt=""
-                    src={season.cover}
-                    loading="lazy"
-                    decoding="async"
-                />
+                {season.cover ? (
+                    <img
+                        class="season-poster-image"
+                        alt=""
+                        src={season.cover}
+                        loading="lazy"
+                        decoding="async"
+                    />
+                ) : null}
             </span>
             <span class="season-info">
                 <span class="season-title" title={season.originalTitle}>
@@ -92,7 +97,10 @@ function Day({
             </header>
             <div class="timeline">
                 {day.seasons.map(season => (
-                    <SeasonRow key={season.url} season={season} />
+                    <SeasonRow
+                        key={season.url || season.title}
+                        season={season}
+                    />
                 ))}
             </div>
         </section>
