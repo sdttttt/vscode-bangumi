@@ -32,7 +32,7 @@ export interface BangumiViewOptions {
  */
 export interface BangumiView {
     /** 在当前页打开番剧列表。 */
-    openBangumi(): Promise<void>;
+    openBangumi(): void;
     /** 展示下一页。 */
     nextPage(): void;
     /** 展示上一页；已经是第一页时给出提示。 */
@@ -54,10 +54,22 @@ export function createBangumiView(options: BangumiViewOptions): BangumiView {
     /* 当前面板是否正停在「暂时不可用」占位页上，用于恢复后自动重绘。 */
     let showingUnavailable = false;
 
-    /**
-     * 渲染一页番剧结果。
+    /*
+     * 每次请求自增；面板被用户关闭时同样自增，在途响应因此全部作废——
+     * 旧响应既不能覆盖新内容，也不能把已关闭的面板重新拉起来。
      */
-    const createBangumiView = (bangumiRes: BangumisData | undefined): void => {
+    let generation = 0;
+    panel.onDidClose(() => {
+        generation += 1;
+    });
+
+    /**
+     * 渲染一页番剧结果。页码取自发起请求时捕获的值，与数据同源。
+     */
+    const render = (
+        page: number,
+        bangumiRes: BangumisData | undefined
+    ): void => {
         if (!bangumiRes) {
             showingUnavailable = availability.isDown();
 
@@ -74,7 +86,7 @@ export function createBangumiView(options: BangumiViewOptions): BangumiView {
 
         panel.show({
             kind: "bangumi",
-            page: state.getPage(),
+            page,
             bangumis: toBangumiPayloads(bangumiRes.list),
         });
     };
@@ -86,21 +98,32 @@ export function createBangumiView(options: BangumiViewOptions): BangumiView {
         notifier.info(`第${state.getPage()}页`);
     };
 
-    const openBangumi = async (): Promise<void> => {
+    const load = async (page: number): Promise<void> => {
+        const current = ++generation;
         panel.showLoading();
 
         try {
             const bangumiRes = await api.getIndexPage(
-                buildBangumiUrl(state.getQuery(), state.getPage())
+                buildBangumiUrl(state.getQuery(), page)
             );
-            createBangumiView(bangumiRes);
+
+            /* 更新的请求或面板关闭会让本次响应作废。 */
+            if (current === generation) {
+                render(page, bangumiRes);
+            }
         } catch {
-            /*
-             * 请求层通常已经上报过失败，这里只兜底把面板落到「未找到」，
-             * 不让 rejection 逃出去把面板留在加载态。
-             */
-            panel.showNotFound();
+            if (current === generation) {
+                /*
+                 * 请求层通常已经上报过失败，这里只兜底把面板落到「未找到」，
+                 * 不让 rejection 逃出去把面板留在加载态。
+                 */
+                panel.showNotFound();
+            }
         }
+    };
+
+    const openBangumi = (): void => {
+        void load(state.getPage());
     };
 
     /*
@@ -118,20 +141,20 @@ export function createBangumiView(options: BangumiViewOptions): BangumiView {
         nextPage: () => {
             state.setPage(state.getPage() + 1);
             showPageNumber();
-            void openBangumi();
+            openBangumi();
         },
 
         backPage: () => {
             if (1 < state.getPage()) {
                 state.setPage(state.getPage() - 1);
                 showPageNumber();
-                void openBangumi();
+                openBangumi();
                 return;
             }
 
             state.setPage(1);
             notifier.info("真的一滴都没有了！");
-            void openBangumi();
+            openBangumi();
         },
 
         jumpPage: async () => {
