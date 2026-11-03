@@ -165,6 +165,48 @@ describe("createSettings", () => {
         expect(written.map(item => item.title)).toEqual(["乙", "甲"]);
     });
 
+    it("serializes overlapping ignore writes so neither is lost", async () => {
+        /*
+         * 复现（M8，见 TODO.md）：两次「不再提醒」并发时，第二次的读取
+         * 发生在第一次写落盘之前——它基于旧列表合并，最终覆盖掉先写入
+         * 的记录，丢一次忽略。
+         */
+        let stored: Array<{ title: string }> = [];
+        let releaseFirstWrite: () => void = () => undefined;
+        const update = vi.fn((_key: string, value: unknown) => {
+            if (1 === update.mock.calls.length) {
+                return new Promise<void>(resolve => {
+                    releaseFirstWrite = () => {
+                        stored = value as Array<{ title: string }>;
+                        resolve();
+                    };
+                });
+            }
+
+            stored = value as Array<{ title: string }>;
+            return Promise.resolve();
+        });
+        vi.mocked(vscode.workspace.getConfiguration).mockReturnValue({
+            get: vi.fn(() => stored),
+            update,
+        } as unknown as ReturnType<typeof vscode.workspace.getConfiguration>);
+
+        const first = settings.ignoreReminders(["甲"]);
+        const second = settings.ignoreReminders(["乙"]);
+
+        /* 队列让写入变成微任务：先让第一个写开始并阻塞在 update 上。 */
+        await vi.waitFor(() => {
+            expect(update).toHaveBeenCalledTimes(1);
+        });
+
+        releaseFirstWrite();
+        await Promise.all([first, second]);
+
+        const titles = stored.map(item => item.title);
+        expect(titles).toContain("甲");
+        expect(titles).toContain("乙");
+    });
+
     it("drops expired ignored records on prune", async () => {
         const stale = {
             title: "甲",
