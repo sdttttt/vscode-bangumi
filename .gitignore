@@ -8,3 +8,4 @@ dist/
 resources/mincss/**
 coverage
 webview-dist
+TODO.md
