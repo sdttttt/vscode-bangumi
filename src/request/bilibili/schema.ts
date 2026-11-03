@@ -17,6 +17,10 @@ import { isEmptyArray, isEmptyObject } from "../../utils/type";
  * @author sdttttt
  */
 export function isSuccess(res: BiliResponse): boolean {
+    if (null === res || undefined === res) {
+        return false;
+    }
+
     return 0 === res.code && "success" === res.message;
 }
 

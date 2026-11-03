@@ -37,11 +37,18 @@ export function isEmptyArray(array: Array<unknown>): boolean {
 /**
  * 判断对象是否为空。
  *
+ * `null` 与 `undefined` 视为空：JSON.stringify 对它们不产生 `{}`，
+ * 若不提前拦截，守卫链会在「字段缺失」这种最需要防御的响应上失效。
+ *
  * @param obj 待判断的对象
- * @returns 空对象时返回 true
+ * @returns 空对象、未定义或 null 时返回 true
  *
  * @author sdttttt
  */
 export function isEmptyObject(obj: unknown): boolean {
+    if (null === obj || undefined === obj) {
+        return true;
+    }
+
     return "{}" === JSON.stringify(obj);
 }

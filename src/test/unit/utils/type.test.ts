@@ -52,4 +52,12 @@ describe("isEmptyObject", () => {
         /* JSON.stringify 会丢弃 undefined 值，因此这里等价于空对象 */
         expect(isEmptyObject({ a: undefined })).toBe(true);
     });
+
+    it("reports undefined as empty", () => {
+        expect(isEmptyObject(undefined)).toBe(true);
+    });
+
+    it("reports null as empty", () => {
+        expect(isEmptyObject(null)).toBe(true);
+    });
 });

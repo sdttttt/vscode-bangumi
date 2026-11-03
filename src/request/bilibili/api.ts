@@ -57,7 +57,14 @@ export function createBilibiliApi(
                 return cached;
             }
 
-            const response = await getJson<BangumisResponse>(url);
+            let response: BangumisResponse;
+            try {
+                response = await getJson<BangumisResponse>(url);
+            } catch {
+                /* 网络失败与周番路径保持同一形态：上报后返回空数据。 */
+                notifier.info(BROKEN_RESPONSE_MESSAGE);
+                return;
+            }
 
             if (!isValidBangumisRequest(response)) {
                 if (!isSuccess(response)) {

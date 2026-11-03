@@ -32,7 +32,7 @@ export interface BangumiViewOptions {
  */
 export interface BangumiView {
     /** 在当前页打开番剧列表。 */
-    openBangumi(): void;
+    openBangumi(): Promise<void>;
     /** 展示下一页。 */
     nextPage(): void;
     /** 展示上一页；已经是第一页时给出提示。 */
@@ -86,12 +86,21 @@ export function createBangumiView(options: BangumiViewOptions): BangumiView {
         notifier.info(`第${state.getPage()}页`);
     };
 
-    const openBangumi = (): void => {
+    const openBangumi = async (): Promise<void> => {
         panel.showLoading();
 
-        api.getIndexPage(
-            buildBangumiUrl(state.getQuery(), state.getPage())
-        ).then(createBangumiView);
+        try {
+            const bangumiRes = await api.getIndexPage(
+                buildBangumiUrl(state.getQuery(), state.getPage())
+            );
+            createBangumiView(bangumiRes);
+        } catch {
+            /*
+             * 请求层通常已经上报过失败，这里只兜底把面板落到「未找到」，
+             * 不让 rejection 逃出去把面板留在加载态。
+             */
+            panel.showNotFound();
+        }
     };
 
     /*
@@ -109,20 +118,20 @@ export function createBangumiView(options: BangumiViewOptions): BangumiView {
         nextPage: () => {
             state.setPage(state.getPage() + 1);
             showPageNumber();
-            openBangumi();
+            void openBangumi();
         },
 
         backPage: () => {
             if (1 < state.getPage()) {
                 state.setPage(state.getPage() - 1);
                 showPageNumber();
-                openBangumi();
+                void openBangumi();
                 return;
             }
 
             state.setPage(1);
             notifier.info("真的一滴都没有了！");
-            openBangumi();
+            void openBangumi();
         },
 
         jumpPage: async () => {
