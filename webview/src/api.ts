@@ -1,16 +1,25 @@
-import type { ViewState, WebviewCommand } from "@shared/webview/protocol";
+import type {
+    ViewState,
+    ViewKind,
+    WebviewCommand,
+} from "@shared/webview/protocol";
 
 /**
  * 状态推送里合法的视图种类。
  *
+ * 以 `Record<ViewKind, true>` 而不是裸字符串集合书写：漏掉一个种类是
+ * 编译错误，而不是运行期把宿主的推送悄悄丢弃——`unavailable` 曾被这样
+ * 丢过，双源停摆的占位页因此永远显示不出来。
+ *
  * @author sdttttt
  */
-const KNOWN_KINDS: ReadonlySet<string> = new Set([
-    "loading",
-    "notFound",
-    "bangumi",
-    "weekBangumi",
-]);
+const KNOWN_KINDS: Readonly<Record<ViewKind, true>> = {
+    loading: true,
+    notFound: true,
+    unavailable: true,
+    bangumi: true,
+    weekBangumi: true,
+};
 
 /**
  * 判断一份来路不明的数据是否为宿主推送的状态。
@@ -28,7 +37,7 @@ function isViewState(value: unknown): value is ViewState {
 
     const kind = (value as { kind?: unknown }).kind;
 
-    return "string" === typeof kind && KNOWN_KINDS.has(kind);
+    return "string" === typeof kind && Boolean(KNOWN_KINDS[kind as ViewKind]);
 }
 
 /**
