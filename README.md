@@ -67,6 +67,6 @@
 
 代码以 **Zero-Clause BSD (0BSD)** 发布，见 [LICENSE](LICENSE)。第三方声明见 [THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt)。
 
-图标与界面插图为《日常》的同人素材，版权归原作者所有，不在本项目授权范围内（`Icon.png`、`resources/` 下的图片、`resources/b2.png`）。
+图标界面插图为第三方素材，版权归原作者所有，不在本项目授权范围内（`Icon.png`、`resources/` 下的图片）。
 
 数据来自 B 站与 [Bangumi](https://bgm.tv) 的公开接口，本项目与两者均无隶属关系。
