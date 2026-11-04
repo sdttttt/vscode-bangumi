@@ -145,6 +145,31 @@ describe("Root", () => {
         expect(vsCodeApi.setState).not.toHaveBeenCalled();
     });
 
+    it("accepts every kind the host can push", () => {
+        /*
+         * 回归：入站守卫的种类表曾漏掉 unavailable——双源停摆时宿主推送的
+         * 占位页被静默丢弃，面板停在旧内容上。逐个种类走消息通道推送，
+         * 守卫今后漏掉 ViewKind 的任何成员都会在这里先红；此前的 App 用例
+         * 直接渲染状态、绕过了通道，因此测不到守卫漏项。
+         */
+        const states: Array<ViewState> = [
+            { kind: "loading" },
+            { kind: "notFound" },
+            list(),
+            schedule(),
+        ];
+
+        render(<Root />);
+
+        for (const state of states) {
+            push(state);
+            expect(vsCodeApi.setState).toHaveBeenCalledWith(state);
+        }
+
+        push(viewState({ kind: "unavailable" }));
+        expect(screen.getByText(/暂时连不上/)).toBeTruthy();
+    });
+
     it("recovers from a render error by asking for a replay", () => {
         /*
          * 复现（M11，见 TODO.md）：持久化的坏状态让首渲染抛错后，此前
