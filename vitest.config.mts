@@ -53,7 +53,9 @@ export default defineConfig({
         ],
         exclude: ["node_modules", "dist", "out", "webview-dist"],
         coverage: {
-            provider: "v8",
+            // bun 运行时是 JavaScriptCore，不支持 V8 覆盖率，因此用 istanbul
+            // 在转换期插桩，与运行时无关。
+            provider: "istanbul",
             reporter: ["text", "lcov"],
             include: ["src/**/*.ts", "webview/src/**/*.{ts,tsx}"],
             exclude: [

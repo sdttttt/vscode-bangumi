@@ -19,7 +19,7 @@
         "coverage/",
         "webview-dist/",
         "public/",
-        "pnpm-lock.yaml",
+        "bun.lock",
         "resources/"
     ]
 }

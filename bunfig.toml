@@ -1,0 +1,4 @@
+# 依赖下载与锁文件地址固定为官方 registry，保证本地、CI 与 bun.lock
+# 三者一致；这一优先级高于用户级 `~/.npmrc` 的 `registry=` 配置。
+[install]
+registry = "https://registry.npmjs.org/"

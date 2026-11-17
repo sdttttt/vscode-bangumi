@@ -58,7 +58,7 @@ jobs:
               id: version
               run: |
                   set -eu
-                  version="$(node -p "require('./package.json').version")"
+                  version="$(jq -r '.version' package.json)"
                   tag="${GITHUB_REF_NAME#v}"
                   case "$tag" in
                       "$version" | "$version".* ) ;;
@@ -93,7 +93,7 @@ jobs:
                   if [ "${{ steps.version.outputs.prerelease }}" = "true" ]; then
                       args="$args --pre-release"
                   fi
-                  pnpm publish:vsce $args
+                  bun run publish:vsce $args
 
             # `ovsx` enables trusted publishing on its own once a CI system
             # hands it an OIDC token and no access token is present. A
@@ -109,7 +109,7 @@ jobs:
                   if [ "${{ steps.version.outputs.prerelease }}" = "true" ]; then
                       args="$args --pre-release"
                   fi
-                  pnpm publish:ovsx $args
+                  bun run publish:ovsx $args
 
             # `action-gh-release` only writes a body when one is given, so the
             # release notes are taken from `CHANGELOG.md`: the section whose

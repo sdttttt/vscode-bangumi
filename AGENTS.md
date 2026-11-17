@@ -4,37 +4,36 @@
 
 ## 构建与测试
 
-包管理器固定为 pnpm 10（见 `package.json` 的 `packageManager` 字段），**不要**使用 npm 或 yarn。Node.js 需要 22 及以上（Vite 8、Vitest 5 与 oxlint 的要求）。
+包管理器固定为 Bun（版本见 `package.json` 的 `packageManager` 字段），**不要**使用 npm、yarn 或 pnpm。vite、vitest、tsc 与 vsce 全部经 `bun run --bun` 跑在 Bun 运行时上，工具链不依赖 Node.js。
 
-| 用途      | 命令                                                             |
-| --------- | ---------------------------------------------------------------- |
-| 构建      | `pnpm build`（先扩展、后 Webview，两条独立流水线）               |
-| 监听构建  | `pnpm watch`（并行跑 `watch:extension` 与 `watch:webview`）      |
-| 类型检查  | `pnpm typecheck`（`tsc -p ./` + `tsc -p webview`，strict，TS 7） |
-| 单元测试  | `pnpm test`（Vitest 双 project，监听模式用 `pnpm test:watch`）   |
-| 覆盖率    | `pnpm test:coverage`（v8，阈值 90% 行/函数、85% 分支）           |
-| 代码检查  | `pnpm lint`（oxlint），自动修复用 `pnpm lint:fix`                |
-| 格式化    | `pnpm format`（oxfmt 原地写入），只检查用 `pnpm format:check`    |
-| 生产打包  | `pnpm vscode:prepublish`（等价 `pnpm build`）                    |
-| 生成 VSIX | `pnpm package`（本地 `vsce`，附加参数写在 `--` 之后）            |
+| 用途      | 命令                                                                        |
+| --------- | --------------------------------------------------------------------------- |
+| 构建      | `bun run build`（先扩展、后 Webview，两条独立流水线）                       |
+| 监听构建  | `bun run watch`（concurrently 并行跑 `watch:extension` 与 `watch:webview`） |
+| 类型检查  | `bun run typecheck`（`tsc -p ./` + `tsc -p webview`，strict，TS 7）         |
+| 单元测试  | `bun run test`（Vitest 双 project，监听模式用 `bun run test:watch`）        |
+| 覆盖率    | `bun run test:coverage`（istanbul，阈值 90% 行/函数、85% 分支）             |
+| 代码检查  | `bun run lint`（oxlint），自动修复用 `bun run lint:fix`                     |
+| 格式化    | `bun run format`（oxfmt 原地写入），只检查用 `bun run format:check`         |
+| 生成 VSIX | `bun run package`（本地 `vsce`，附加参数写在 `--` 之后）                    |
 
-提交改动前至少跑通 `pnpm typecheck`、`pnpm lint`、`pnpm format:check`、`pnpm test`。
+提交改动前至少跑通 `bun run typecheck`、`bun run lint`、`bun run format:check`、`bun run test`。
 
 ## GitHub Actions
 
 `.github/workflows/build.yml` 是唯一的校验入口，`push`、`pull_request` 与 `workflow_call` 三种触发方式共用同一份定义：
 
 - `quality` —— `format:check`、`lint`、`typecheck` 三个独立步骤，失败时能一眼看出问题类别。
-- `test` —— 只跑 `pnpm test:coverage`。覆盖率命令本身就会执行全部用例，再跑一次 `pnpm test` 纯属浪费。
+- `test` —— 只跑 `bun run test:coverage`。覆盖率命令本身就会执行全部用例，再跑一次 `bun run test` 纯属浪费。
 - `package` —— 依赖前两个 job，构建并上传 `bangumiopen.vsix`。
 
 发布由 `.github/workflows/release.yml` 在推送 `v*` 标签时触发：先以 `workflow_call` 复用 `build.yml`（完整校验 + 产出 VSIX），再下载**同一份**产物推送到 VS Code Marketplace、Open VSX 与 GitHub Release。三处发布共用一份 VSIX，产物不会互相漂移。
 
-- 依赖安装统一走 `.github/actions/setup` 复合 action，`pnpm` 版本取自 `package.json#packageManager`，Node 版本取自 `.nvmrc`。
+- 依赖安装统一走 `.github/actions/setup` 复合 action：Bun 版本取自 `package.json#packageManager`（`oven-sh/setup-bun` 默认就读这个字段），依赖下载缓存走 `actions/cache`（键在 `bun.lock` 上）。CI 不安装 Node.js。
 - 版本以 `package.json` 为准：标签去掉 `v` 后必须等于版本号、或以其为前缀（`v2.2.8` 与 `v2.2.8.patch3` 都算 `2.2.8`），否则发布 job 直接失败。
 - 只有 `x.y.z` 形式的版本视为正式版，`v2.3.0.beta.1` 这类会带上 `--pre-release`。
 - 发布不需要任何 PAT secret：`vsce` / `ovsx` 均以 `--oidc` 走 OpenID Connect 可信发布（工作流持有 `id-token: write`），全程没有令牌，也不要按旧文档往仓库里补 `VSCE_PAT` / `OVSX_PAT`。
-- `vsce` / `ovsx` 已装为 devDependency（`pnpm package` / `pnpm publish:vsce` / `pnpm publish:ovsx`），不要再在 CI 里 `dlx`，这样可以锁版本。
+- `vsce` / `ovsx` 已装为 devDependency（`bun run package` / `bun run publish:vsce` / `bun run publish:ovsx`），不要再在 CI 里 `dlx`，这样可以锁版本。
 
 ## 目录结构与职责
 
@@ -57,7 +56,7 @@
 
 ## 打包约束
 
-扩展与 Webview 各有一个 Vite 配置，**依次**执行（`pnpm build` 已封装）：
+扩展与 Webview 各有一个 Vite 配置，**依次**执行（`bun run build` 已封装）：
 
 - [vite.config.mts](vite.config.mts) → `dist/extension.js`（ES module，Node.js 20）
 - [vite.webview.mts](vite.webview.mts) → `webview-dist/main.js` + `webview-dist/main.css`（ES module，Chromium 132）
@@ -76,6 +75,7 @@
 - `@types/vscode` 的 major.minor **不能高于** `engines.vscode`，这是 `vsce package` 的强制校验（`validateVSCodeTypesCompatibility`），不满足会直接打包失败。两者必须同步升级。
 - `@types/vscode` 只用于类型检查，扩展运行时不受它影响；但不要依赖比 `engines.vscode` 更新的 API，否则老版本 VS Code 上会调用不存在的接口。
 - `engines.vscode` 取 **最低可用版本**而非最新版，这是市场惯例（cpptools `^1.77`、python `^1.95`、eslint `^1.90`、gitlens `^1.101`）。VS Code 约每两周一版，锁死最新版会让老用户直接装不上。
+- manifest **不声明 `vscode:prepublish`**：vsce 会用硬编码的 `npm run` 启动这个生命周期脚本，bun-only 工具链不依赖它。两个构建因此显式写在 `package` 与 `publish:vsce` 脚本的开头，不要把 `vscode:prepublish` 加回 manifest。
 
 ## Webview 架构
 
@@ -96,27 +96,27 @@ Webview 不再是字符串拼接出来的静态 HTML，而是一个独立构建�
 - oxlint **不实现**格式化类规则（`indent`、`quotes`、`semi`、`brace-style`、`key-spacing` 等），这些全部由 oxfmt 负责，不要在 oxlint 配置里写。
 - oxfmt **只支持 K&R 花括号风格**，没有 `braceStyle` 选项。因此本项目统一使用 `if (cond) {` 同行写法，不要手动改成左花括号独占一行。
 - oxfmt 会重排 import（`import { A, B } from "x";` 合并为一行）并把对象属性的对齐冒号还原成单个空格，这是预期行为。
-- `pnpm format` 会原地改写文件；提交前用 `pnpm format:check` 确认无差异。
+- `bun run format` 会原地改写文件；提交前用 `bun run format:check` 确认无差异。
 
 ## TypeScript 版本约定
 
 项目直接使用 TypeScript 7（`typescript@^7.0.2`）。它是 Go 原生实现，**不提供 JS 编译器 API**：
 
-- `npx tsc` / `pnpm typecheck` 正常工作
+- `bun run typecheck` 正常工作（脚本里的 `--bun` 让 tsc 跑在 Bun 运行时上）
 - 任何依赖 TypeScript 旧版 API 的工具（如 typescript-eslint）都无法使用，因此本项目不再引入这类工具
 
 如果将来需要 oxlint 的类型感知规则（`--type-aware`），要额外安装 `oxlint-tsgolint` 包。
 
 ## 测试约定
 
-全部用例都是可在纯 Node.js 里运行的单元测试，不启动 VS Code，也不打真实网络。
+全部用例都是纯单元测试，跑在 Bun 运行时上（`bun run --bun vitest`），不启动 VS Code，也不打真实网络。
 
 Vitest 配置了两个 project，互不干扰：
 
 - `extension`（`node` 环境）—— `src/test/unit/**/*.test.ts`
 - `webview`（`happy-dom` 环境）—— `webview/src/**/*.test.tsx`
 
-`pnpm test` 会跑两者；只跑一侧用 `vitest run --project webview`。
+`bun run test` 会跑两者；只跑一侧用 `bun run --bun vitest run --project webview`。
 
 - `src/test/unit/` —— 宿主侧用例，按被测目录镜像分层（`utils/`、`request/`、`state/`、`match/`、`views/`、`webview/`、`reminder/`）。
 - `webview/src/**/*.test.tsx` —— 组件用例，与被测组件同目录。渲染用 `@testing-library/preact` 的 `render`/`screen`，查询用语义选择器（`getByText`），不要断言完整 HTML 字符串。

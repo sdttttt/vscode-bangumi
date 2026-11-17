@@ -39,13 +39,13 @@ jobs:
             - uses: ./.github/actions/setup
 
             - name: format check
-              run: pnpm format:check
+              run: bun run format:check
 
             - name: lint
-              run: pnpm lint
+              run: bun run lint
 
             - name: typecheck
-              run: pnpm typecheck
+              run: bun run typecheck
 
     test:
         name: Test and coverage
@@ -55,10 +55,10 @@ jobs:
             - uses: actions/checkout@v7
             - uses: ./.github/actions/setup
 
-            # `pnpm test:coverage` runs the whole suite, so a separate
-            # `pnpm test` would only repeat the same work.
+            # `bun run test:coverage` runs the whole suite, so a separate
+            # `bun run test` would only repeat the same work.
             - name: test
-              run: pnpm test:coverage
+              run: bun run test:coverage
 
             - name: upload coverage report
               if: always()
@@ -98,10 +98,11 @@ jobs:
                   fi
                   echo "artifact=$name" >> "$GITHUB_OUTPUT"
 
-            # `vsce` runs the `vscode:prepublish` script (which is `pnpm build`)
-            # itself, so there is no separate build step here.
+            # The `package` script builds both bundles explicitly: vsce would
+            # run the prepublish script through `npm`, which a bun-only
+            # toolchain deliberately does not depend on.
             - name: package
-              run: pnpm package --out bangumiopen.vsix
+              run: bun run package --out bangumiopen.vsix
 
             - name: upload VSIX
               uses: actions/upload-artifact@v7

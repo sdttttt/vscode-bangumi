@@ -8,7 +8,7 @@ import type { AssetUris, ViewState } from "./protocol";
 /**
  * 构建后的 Webview 产物目录，相对于扩展根目录。
  *
- * 它特意放在 `dist/` 之外，这样扩展的重新构建（`pnpm watch`）可以不断清空
+ * 它特意放在 `dist/` 之外，这样扩展的重新构建（`bun run watch`）可以不断清空
  * `dist/`，而不会把 Webview 产物一并删掉。
  *
  * @author sdttttt

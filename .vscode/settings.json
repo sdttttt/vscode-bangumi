@@ -12,7 +12,7 @@
         "coverage": true,
         "webview-dist": true
     },
-    // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
+    // Turn off tsc task auto detection since we have the necessary tasks as bun scripts
     "typescript.tsc.autoDetect": "off",
     "editor.insertSpaces": true,
     "bangumiOpen.EnableReminder": true,
@@ -21,7 +21,7 @@
     "editor.formatOnSave": true,
     "editor.formatOnSaveMode": "file",
     "files.autoSave": "onFocusChange",
-    "vitest.commandLine": "pnpm test --",
+    "vitest.commandLine": "bun run test --",
     "files.eol": "\n",
     "[typescript]": {
         "editor.defaultFormatter": "oxc.oxfmt-vscode"

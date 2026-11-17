@@ -133,35 +133,34 @@
         }
     },
     "private": true,
-    "packageManager": "pnpm@10.34.9",
+    "packageManager": "bun@1.4.4",
     "scripts": {
-        "build": "pnpm build:extension && pnpm build:webview",
-        "vscode:prepublish": "pnpm build",
-        "watch": "pnpm --parallel --stream run \"/^watch:/\"",
-        "typecheck": "tsc -p ./ --noEmit && tsc -p webview --noEmit",
-        "test": "vitest run",
-        "test:watch": "vitest",
-        "test:coverage": "vitest run --coverage",
-        "pretest": "pnpm typecheck",
+        "build": "bun run build:extension && bun run build:webview",
+        "watch": "concurrently --names extension,webview --kill-others \"bun run watch:extension\" \"bun run watch:webview\"",
+        "typecheck": "bun run --bun tsc -p ./ --noEmit && bun run --bun tsc -p webview --noEmit",
+        "test": "bun run typecheck && bun run --bun vitest run",
+        "test:watch": "bun run --bun vitest",
+        "test:coverage": "bun run --bun vitest run --coverage",
         "lint": "oxlint",
         "lint:fix": "oxlint --fix",
         "format": "oxfmt",
         "format:check": "oxfmt --check",
-        "build:extension": "vite build",
-        "build:webview": "vite build --config vite.webview.mts",
-        "watch:extension": "vite build --sourcemap inline --watch",
-        "watch:webview": "vite build --config vite.webview.mts --sourcemap inline --watch",
-        "package": "vsce package --no-dependencies",
-        "publish:vsce": "vsce publish --no-dependencies",
-        "publish:ovsx": "ovsx publish"
+        "build:extension": "bun run --bun vite build",
+        "build:webview": "bun run --bun vite build --config vite.webview.mts",
+        "watch:extension": "bun run --bun vite build --sourcemap inline --watch",
+        "watch:webview": "bun run --bun vite build --config vite.webview.mts --sourcemap inline --watch",
+        "package": "bun run build && bun run --bun vsce package --no-dependencies",
+        "publish:vsce": "bun run build && bun run --bun vsce publish --no-dependencies",
+        "publish:ovsx": "bun run --bun ovsx publish"
     },
     "devDependencies": {
         "@testing-library/preact": "3.2.6",
         "@types/node": "^22.0.0",
         "@types/vscode": "~1.100.0",
         "@types/vscode-webview": "1.57.5",
-        "@vitest/coverage-v8": "5.1.0",
+        "@vitest/coverage-istanbul": "5.1.0",
         "@vscode/vsce": "4.1.0",
+        "concurrently": "10.0.7",
         "happy-dom": "21.0.4",
         "ovsx": "1.3.0",
         "oxfmt": "0.76.0",
@@ -172,9 +171,7 @@
         "vite": "^8.3.5",
         "vitest": "^5.1.0"
     },
-    "pnpm": {
-        "onlyBuiltDependencies": [
-            "@vscode/vsce-sign"
-        ]
-    }
+    "trustedDependencies": [
+        "@vscode/vsce-sign"
+    ]
 }

@@ -4,12 +4,13 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "type": "npm",
-            "script": "watch",
-            "label": "npm: watch",
-            // `pnpm watch` 并行跑扩展与 Webview 两条监听构建，二者的输出都带
-            // `built in`，因此「任一条首次完成」就会判定任务就绪。扩展构建只有
-            // 几十毫秒、几乎总在前面，抢跑窗口可以忽略。
+            "type": "shell",
+            "command": "bun run watch",
+            "label": "bun: watch",
+            // `bun run watch` 用 concurrently 并行跑扩展与 Webview 两条监听构建，
+            // 输出带 `[extension]` / `[webview]` 前缀且都含 `built in`，因此
+            // 「任一条首次完成」就会判定任务就绪。扩展构建只有几十毫秒、几乎总在
+            // 前面，抢跑窗口可以忽略。
             "problemMatcher": {
                 "owner": "vite",
                 "pattern": [],
@@ -30,16 +31,16 @@
             }
         },
         {
-            "type": "npm",
-            "script": "test",
-            "label": "npm: test",
+            "type": "shell",
+            "command": "bun run test",
+            "label": "bun: test",
             "problemMatcher": [],
             "group": "test"
         },
         {
-            "type": "npm",
-            "script": "test:coverage",
-            "label": "npm: test:coverage",
+            "type": "shell",
+            "command": "bun run test:coverage",
+            "label": "bun: test:coverage",
             "problemMatcher": [],
             "group": "test"
         }
